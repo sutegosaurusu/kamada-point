@@ -3,79 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>鎌田ポイント管理</title>
+<title>ログイン判定</title>
 </head>
 
 <body>
 
-<h1>鎌田ポイント管理</h1>
-
-<div id="list">読み込み中...</div>
-
-<hr>
-
-<div id="adminPanel" style="display:none">
-  👑 管理者
-  <button id="logButton">履歴</button>
-  <button id="banButton">BAN</button>
-  <button id="unbanButton">BAN解除</button>
-</div>
-
-<div id="userPanel" style="display:none">
-  👤 ユーザー
-  <button id="rankButton">ランキング</button>
-</div>
-
-<hr>
-
-<h2>会員登録</h2>
-<input id="name" placeholder="名前"><br><br>
-<input id="email" placeholder="メール"><br><br>
-<input id="password" type="password" placeholder="パスワード"><br><br>
-<button id="registerButton">登録</button>
-
-<hr>
-
-<h2>ポイント操作</h2>
-
-<select id="userSelect"></select><br><br>
-
-<input id="addPoint" type="number" placeholder="＋">
-<button id="addButton">＋</button>
-
-<input id="minusPoint" type="number" placeholder="－">
-<button id="minusButton">－</button>
-
-<hr>
-
-<h2>履歴</h2>
-<div id="logList"></div>
-
-<hr>
-
-<h2>ランキング</h2>
-<div id="rankList"></div>
+<h1>ログイン中...</h1>
+<div id="status">確認しています</div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  getDatabase,
-  ref,
-  onValue,
-  get,
-  update,
-  set,
-  push
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
@@ -88,242 +28,45 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 const auth = getAuth(app);
+const db = getDatabase(app);
 
-let currentUser = null;
-let isAdmin = false;
+onAuthStateChanged(auth, async (user) => {
 
-let logUnsub = null;
-let rankUnsub = null;
-let authReady = false;
-
-/* ---------------- 会員一覧 ---------------- */
-onValue(ref(db,"members"), snap => {
-
-  const data = snap.val() || {};
-  const list = document.getElementById("list");
-  const select = document.getElementById("userSelect");
-
-  list.innerHTML = "";
-  select.innerHTML = "";
-
-  for (const uid in data) {
-    const u = data[uid];
-
-    const p = document.createElement("p");
-    p.textContent = `${u.name} : ${u.point || 0}pt ${u.banned ? "🚫BAN" : ""}`;
-    list.appendChild(p);
-
-    const opt = document.createElement("option");
-    opt.value = uid;
-    opt.textContent = u.name;
-    select.appendChild(opt);
-  }
-});
-
-/* ---------------- ログイン ---------------- */
-onAuthStateChanged(auth, async user => {
-
-  authReady = true;
+  const status = document.getElementById("status");
 
   if (!user) {
-    currentUser = null;
-    isAdmin = false;
-    document.getElementById("adminPanel").style.display = "none";
-    document.getElementById("userPanel").style.display = "none";
+    status.textContent = "未ログインです";
+    location.href = "login.html";
     return;
   }
 
-  currentUser = user;
+  status.textContent = "権限確認中...";
 
-  const snap = await get(ref(db,"members/"+user.uid));
+  const snap = await get(ref(db, "members/" + user.uid));
 
   if (!snap.exists()) {
-    await signOut(auth);
+    status.textContent = "ユーザーデータなし";
     return;
   }
 
   const data = snap.val();
 
-  /* BANチェック */
+  // BANチェック
   if (data.banned === true) {
-    alert("BANされています");
-    await signOut(auth);
-    currentUser = null;
-    isAdmin = false;
+    status.textContent = "BANされています";
     return;
   }
 
-  isAdmin = data.admin === true;
-
-  document.getElementById("adminPanel").style.display = isAdmin ? "block" : "none";
-  document.getElementById("userPanel").style.display = isAdmin ? "none" : "block";
+  // 管理者判定
+  if (data.admin === true) {
+    status.textContent = "管理者ページへ移動";
+    location.href = "admin.html";
+  } else {
+    status.textContent = "ユーザーページへ移動";
+    location.href = "user.html";
+  }
 });
-
-/* ---------------- 管理者チェック ---------------- */
-function adminOnly() {
-  if (!isAdmin || !currentUser) return false;
-  return true;
-}
-
-/* ---------------- ＋ポイント ---------------- */
-document.getElementById("addButton").onclick = async () => {
-
-  if (!adminOnly()) return;
-
-  const uid = document.getElementById("userSelect").value;
-  const val = Number(document.getElementById("addPoint").value);
-
-  if (!uid || !val || val <= 0) return;
-
-  const r = ref(db,"members/"+uid);
-  const s = await get(r);
-
-  const current = Number(s.val()?.point || 0);
-
-  await update(r,{
-    point: current + val
-  });
-
-  push(ref(db,"logs/"+uid),{
-    action: "+"+val,
-    by: currentUser.uid,
-    time: Date.now()
-  });
-};
-
-/* ---------------- －ポイント ---------------- */
-document.getElementById("minusButton").onclick = async () => {
-
-  if (!adminOnly()) return;
-
-  const uid = document.getElementById("userSelect").value;
-  const val = Number(document.getElementById("minusPoint").value);
-
-  if (!uid || !val || val <= 0) return;
-
-  const r = ref(db,"members/"+uid);
-  const s = await get(r);
-
-  const current = Number(s.val()?.point || 0);
-
-  await update(r,{
-    point: current - val
-  });
-
-  push(ref(db,"logs/"+uid),{
-    action: "-"+val,
-    by: currentUser.uid,
-    time: Date.now()
-  });
-};
-
-/* ---------------- BAN ---------------- */
-document.getElementById("banButton").onclick = async () => {
-
-  if (!adminOnly()) return;
-
-  const uid = document.getElementById("userSelect").value;
-  if (!uid) return;
-
-  await update(ref(db,"members/"+uid),{
-    banned: true
-  });
-
-  alert("BAN完了");
-};
-
-/* ---------------- BAN解除 ---------------- */
-document.getElementById("unbanButton").onclick = async () => {
-
-  if (!adminOnly()) return;
-
-  const uid = document.getElementById("userSelect").value;
-  if (!uid) return;
-
-  await update(ref(db,"members/"+uid),{
-    banned: false
-  });
-
-  alert("BAN解除完了");
-};
-
-/* ---------------- 履歴 ---------------- */
-document.getElementById("logButton").onclick = () => {
-
-  const uid = document.getElementById("userSelect").value;
-  const box = document.getElementById("logList");
-
-  if (!uid) return;
-
-  if (logUnsub) logUnsub();
-
-  logUnsub = onValue(ref(db,"logs/"+uid), snap => {
-
-    const data = snap.val() || {};
-    box.innerHTML = "";
-
-    if (!Object.keys(data).length) {
-      box.textContent = "履歴なし";
-      return;
-    }
-
-    Object.values(data).forEach(l => {
-      const div = document.createElement("div");
-      div.textContent = `${l.action} / ${new Date(l.time).toLocaleString()}`;
-      box.appendChild(div);
-    });
-  });
-};
-
-/* ---------------- ランキング ---------------- */
-document.getElementById("rankButton").onclick = () => {
-
-  const box = document.getElementById("rankList");
-
-  if (rankUnsub) rankUnsub();
-
-  rankUnsub = onValue(ref(db,"members"), snap => {
-
-    const data = snap.val() || {};
-    box.innerHTML = "";
-
-    const arr = Object.values(data)
-      .filter(u => u.banned !== true)
-      .map(u => ({
-        name: u.name,
-        point: Number(u.point || 0)
-      }))
-      .sort((a,b)=>b.point-a.point);
-
-    arr.forEach((u,i)=>{
-      const div = document.createElement("div");
-      div.textContent = `${i+1}位 ${u.name} : ${u.point}`;
-      box.appendChild(div);
-    });
-  });
-};
-
-/* ---------------- 登録 ---------------- */
-document.getElementById("registerButton").onclick = async () => {
-
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const pass = document.getElementById("password").value;
-
-  if (!name || !email || !pass) return;
-
-  const user = await createUserWithEmailAndPassword(auth,email,pass);
-
-  await set(ref(db,"members/"+user.user.uid),{
-    name,
-    email,
-    point: 0,
-    admin: false,
-    banned: false
-  });
-};
 
 </script>
 
