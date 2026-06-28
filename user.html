@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ユーザーページ</title>
+</head>
+
+<body>
+
+<h1>ユーザーページ</h1>
+
+<h2>自分のポイント</h2>
+<div id="myPoint">読み込み中...</div>
+
+<hr>
+
+<h2>ランキング</h2>
+<button id="rankButton">表示</button>
+<div id="rankList"></div>
+
+<hr>
+
+<h2>履歴</h2>
+<button id="logButton">表示</button>
+<div id="logList"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+  authDomain: "kamadapoint.firebaseapp.com",
+  databaseURL: "https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kamadapoint",
+  storageBucket: "kamadapoint.firebasestorage.app",
+  messagingSenderId: "601769416524",
+  appId: "1:601769416524:web:0be49ce5a0baf87f75e1e9"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let uid = null;
+
+/* ---------------- ログイン確認 ---------------- */
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) {
+    location.href = "index.html";
+    return;
+  }
+
+  uid = user.uid;
+
+  const snap = await get(ref(db, "members/" + uid));
+  const data = snap.val();
+
+  document.getElementById("myPoint").textContent =
+    data.point + " pt";
+});
+
+/* ---------------- ランキング ---------------- */
+document.getElementById("rankButton").onclick = () => {
+
+  const box = document.getElementById("rankList");
+
+  onValue(ref(db,"members"), snap => {
+
+    const data = snap.val() || {};
+    box.innerHTML = "";
+
+    const arr = Object.values(data)
+      .filter(u => !u.banned)
+      .map(u => ({
+        name: u.name,
+        point: Number(u.point || 0)
+      }))
+      .sort((a,b)=>b.point-a.point);
+
+    arr.forEach((u,i)=>{
+      const div = document.createElement("div");
+      div.textContent = `${i+1}位 ${u.name} : ${u.point}`;
+      box.appendChild(div);
+    });
+  });
+};
+
+/* ---------------- 履歴（自分のみ） ---------------- */
+document.getElementById("logButton").onclick = () => {
+
+  const box = document.getElementById("logList");
+
+  onValue(ref(db,"logs/"+uid), snap => {
+
+    const data = snap.val() || {};
+    box.innerHTML = "";
+
+    Object.values(data).forEach(l => {
+      const div = document.createElement("div");
+      div.textContent = `${l.action} / ${new Date(l.time).toLocaleString()}`;
+      box.appendChild(div);
+    });
+  });
+};
+
+</script>
+
+</body>
+</html>
