@@ -10,6 +10,10 @@
 
 <h1>管理者ページ</h1>
 
+<button id="logoutBtn">ログアウト</button>
+
+<hr>
+
 <h2>ユーザー選択</h2>
 <select id="userSelect"></select>
 
@@ -59,19 +63,25 @@ const db = getDatabase(app);
 
 let currentUser = null;
 
-/* ---------------- ログインチェック ---------------- */
-onAuthStateChanged(auth, async (user) => {
+/* ---------------- 認証チェック ---------------- */
+onAuthStateChanged(auth, (user) => {
 
   if (!user) {
-    location.href = "index.html";
+    location.href = "login.html";
     return;
   }
 
   currentUser = user;
 });
 
+/* ---------------- ログアウト ---------------- */
+document.getElementById("logoutBtn").onclick = async () => {
+  await signOut(auth);
+  location.href = "login.html";
+};
+
 /* ---------------- ユーザー一覧 ---------------- */
-onValue(ref(db,"members"), snap => {
+onValue(ref(db, "members"), snap => {
 
   const data = snap.val() || {};
   const select = document.getElementById("userSelect");
