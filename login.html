@@ -14,6 +14,7 @@
 <input id="password" type="password" placeholder="パスワード"><br><br>
 
 <button id="loginBtn">ログイン</button>
+<button id="registerBtn">新規登録</button>
 
 <p id="msg"></p>
 
@@ -37,6 +38,7 @@ const auth = getAuth(app);
 
 const msg = document.getElementById("msg");
 
+/* ---------------- ログイン ---------------- */
 document.getElementById("loginBtn").onclick = async () => {
 
   const email = document.getElementById("email").value;
@@ -52,13 +54,22 @@ document.getElementById("loginBtn").onclick = async () => {
 
     msg.textContent = "成功";
 
-    // indexへ移動（権限判定へ）
     location.href = "index.html";
 
   } catch (e) {
     msg.textContent = "ログイン失敗: " + e.message;
   }
 };
+
+/* ---------------- 新規登録へ移動 ---------------- */
+document.getElementById("registerBtn").onclick = () => {
+  location.href = "register.html";
+};
+
+</script>
+
+</body>
+</html>
 
 </script>
 
