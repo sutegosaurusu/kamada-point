@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -97,6 +96,7 @@ let isAdmin = false;
 
 let logUnsub = null;
 let rankUnsub = null;
+let authReady = false;
 
 /* ---------------- 会員一覧 ---------------- */
 onValue(ref(db,"members"), snap => {
@@ -112,7 +112,7 @@ onValue(ref(db,"members"), snap => {
     const u = data[uid];
 
     const p = document.createElement("p");
-    p.textContent = `${u.name} : ${u.point || 0}pt ${u.banned === true ? "🚫BAN" : ""}`;
+    p.textContent = `${u.name} : ${u.point || 0}pt ${u.banned ? "🚫BAN" : ""}`;
     list.appendChild(p);
 
     const opt = document.createElement("option");
@@ -124,6 +124,8 @@ onValue(ref(db,"members"), snap => {
 
 /* ---------------- ログイン ---------------- */
 onAuthStateChanged(auth, async user => {
+
+  authReady = true;
 
   if (!user) {
     currentUser = null;
@@ -138,53 +140,47 @@ onAuthStateChanged(auth, async user => {
   const snap = await get(ref(db,"members/"+user.uid));
 
   if (!snap.exists()) {
-    currentUser = null;
-    isAdmin = false;
+    await signOut(auth);
     return;
   }
 
   const data = snap.val();
 
-  /* ---------------- BAN処理 ---------------- */
-  if (data?.banned === true) {
-
+  /* BANチェック */
+  if (data.banned === true) {
     alert("BANされています");
-
     await signOut(auth);
-
     currentUser = null;
     isAdmin = false;
-
-    document.getElementById("adminPanel").style.display = "none";
-    document.getElementById("userPanel").style.display = "none";
-
     return;
   }
-// ★テスト用（ここに入れる）
-isAdmin = true;
-document.getElementById("adminPanel").style.display = "block";
-  /* ---------------- 管理者判定（修正済み） ---------------- */
-  isAdmin = Boolean(data.admin);
+
+  isAdmin = data.admin === true;
 
   document.getElementById("adminPanel").style.display = isAdmin ? "block" : "none";
   document.getElementById("userPanel").style.display = isAdmin ? "none" : "block";
 });
 
+/* ---------------- 管理者チェック ---------------- */
+function adminOnly() {
+  if (!isAdmin || !currentUser) return false;
+  return true;
+}
+
 /* ---------------- ＋ポイント ---------------- */
 document.getElementById("addButton").onclick = async () => {
 
-  if (!isAdmin) return;
+  if (!adminOnly()) return;
 
   const uid = document.getElementById("userSelect").value;
   const val = Number(document.getElementById("addPoint").value);
 
-  if (!uid || val <= 0) return;
+  if (!uid || !val || val <= 0) return;
 
   const r = ref(db,"members/"+uid);
   const s = await get(r);
 
-  const data = s.val() || {};
-  const current = Number(data.point || 0);
+  const current = Number(s.val()?.point || 0);
 
   await update(r,{
     point: current + val
@@ -200,18 +196,17 @@ document.getElementById("addButton").onclick = async () => {
 /* ---------------- －ポイント ---------------- */
 document.getElementById("minusButton").onclick = async () => {
 
-  if (!isAdmin) return;
+  if (!adminOnly()) return;
 
   const uid = document.getElementById("userSelect").value;
   const val = Number(document.getElementById("minusPoint").value);
 
-  if (!uid || val <= 0) return;
+  if (!uid || !val || val <= 0) return;
 
   const r = ref(db,"members/"+uid);
   const s = await get(r);
 
-  const data = s.val() || {};
-  const current = Number(data.point || 0);
+  const current = Number(s.val()?.point || 0);
 
   await update(r,{
     point: current - val
@@ -227,7 +222,7 @@ document.getElementById("minusButton").onclick = async () => {
 /* ---------------- BAN ---------------- */
 document.getElementById("banButton").onclick = async () => {
 
-  if (!isAdmin) return;
+  if (!adminOnly()) return;
 
   const uid = document.getElementById("userSelect").value;
   if (!uid) return;
@@ -242,7 +237,7 @@ document.getElementById("banButton").onclick = async () => {
 /* ---------------- BAN解除 ---------------- */
 document.getElementById("unbanButton").onclick = async () => {
 
-  if (!isAdmin) return;
+  if (!adminOnly()) return;
 
   const uid = document.getElementById("userSelect").value;
   if (!uid) return;
@@ -316,6 +311,8 @@ document.getElementById("registerButton").onclick = async () => {
   const name = document.getElementById("name").value;
   const email = document.getElementById("email").value;
   const pass = document.getElementById("password").value;
+
+  if (!name || !email || !pass) return;
 
   const user = await createUserWithEmailAndPassword(auth,email,pass);
 
