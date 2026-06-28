@@ -35,9 +35,10 @@ onAuthStateChanged(auth, async (user) => {
 
   const status = document.getElementById("status");
 
+  // ① 未ログイン → 新規登録へ（ここが追加部分）
   if (!user) {
-    status.textContent = "未ログインです";
-    location.href = "login.html";
+    status.textContent = "未ログイン → 新規登録へ移動";
+    location.href = "register.html";
     return;
   }
 
@@ -47,6 +48,7 @@ onAuthStateChanged(auth, async (user) => {
 
   if (!snap.exists()) {
     status.textContent = "ユーザーデータなし";
+    location.href = "register.html";
     return;
   }
 
