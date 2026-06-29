@@ -168,8 +168,9 @@ document.getElementById("addButton").onclick = async () => {
     by: currentUser.uid,
     time: Date.now()
   });
+  showToast(val + "ポイント追加しました");
 };
-showToast(val + "ポイント追加しました");
+
 /* ---------------- ポイント減少 ---------------- */
 document.getElementById("minusButton").onclick = async () => {
 
@@ -192,8 +193,9 @@ document.getElementById("minusButton").onclick = async () => {
     by: currentUser.uid,
     time: Date.now()
   });
+  showToast(val + "ポイント減少しました");
 };
-showToast(val + "ポイント減少しました");
+
 /* ---------------- BAN ---------------- */
 document.getElementById("banButton").onclick = async () => {
 
