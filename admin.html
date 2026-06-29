@@ -63,8 +63,8 @@ const db = getDatabase(app);
 
 let currentUser = null;
 
-/* ---------------- 認証チェック ---------------- */
-onAuthStateChanged(auth, (user) => {
+/* ---------------- 認証・管理者チェック ---------------- */
+onAuthStateChanged(auth, async (user) => {
 
   if (!user) {
     location.href = "login.html";
@@ -72,6 +72,34 @@ onAuthStateChanged(auth, (user) => {
   }
 
   currentUser = user;
+
+  // 自分の情報を取得
+  const snap = await get(ref(db, "members/" + user.uid));
+
+  if (!snap.exists()) {
+    await signOut(auth);
+    location.href = "login.html";
+    return;
+  }
+
+  const data = snap.val();
+
+  // BANされていたらログアウト
+  if (data.banned === true) {
+    alert("BANされています");
+    await signOut(auth);
+    location.href = "login.html";
+    return;
+  }
+
+  // 管理者以外はログイン画面へ
+  if (data.admin !== true) {
+    alert("管理者ではありません");
+    await signOut(auth);
+    location.href = "login.html";
+    return;
+  }
+
 });
 
 /* ---------------- ログアウト ---------------- */
