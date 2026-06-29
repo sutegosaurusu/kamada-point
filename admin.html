@@ -62,21 +62,6 @@
 <h2>履歴</h2>
 <button id="logButton">履歴表示</button>
 <div id="logList"></div>
-  /* ---------------- 通知 ---------------- */
-function showToast(message) {
-
-  const toast = document.getElementById("toast");
-
-  toast.textContent = message;
-  toast.style.display = "block";
-
-  clearTimeout(window.toastTimer);
-
-  window.toastTimer = setTimeout(() => {
-    toast.style.display = "none";
-  }, 3000);
-
-}
 
 <script type="module">
 
@@ -286,6 +271,22 @@ document.getElementById("logButton").onclick = () => {
   });
   
 };
+    /* ---------------- 通知 ---------------- */
+function showToast(message) {
+
+  const toast = document.getElementById("toast");
+
+  toast.textContent = message;
+  toast.style.display = "block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer = setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+
+}
+
 
 </script>
 
