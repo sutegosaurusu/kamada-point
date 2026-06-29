@@ -5,9 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>管理者ページ</title>
 </head>
+  <style>
+#toast{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#333;
+  color:white;
+  padding:12px 24px;
+  border-radius:8px;
+  display:none;
+  font-size:18px;
+  z-index:9999;
+}
+</style>
 
 <body>
-
+<div id="toast"></div>
+  
   
 <h1>管理者ページ</h1>
 
@@ -46,6 +62,21 @@
 <h2>履歴</h2>
 <button id="logButton">履歴表示</button>
 <div id="logList"></div>
+  /* ---------------- 通知 ---------------- */
+function showToast(message) {
+
+  const toast = document.getElementById("toast");
+
+  toast.textContent = message;
+  toast.style.display = "block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer = setTimeout(() => {
+    toast.style.display = "none";
+  }, 3000);
+
+}
 
 <script type="module">
 
