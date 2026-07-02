@@ -163,7 +163,7 @@ document.getElementById("addButton").onclick = async () => {
     point: current + val
   });
 
-  push(ref(db, "logs/" + uid), {
+ await push(ref(db, "logs/" + uid), {
     action: "+" + val,
     by: currentUser.uid,
     time: Date.now()
@@ -188,7 +188,7 @@ document.getElementById("minusButton").onclick = async () => {
     point: current - val
   });
 
-  push(ref(db, "logs/" + uid), {
+ await push(ref(db, "logs/" + uid), {
     action: "-" + val,
     by: currentUser.uid,
     time: Date.now()
