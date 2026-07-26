@@ -336,7 +336,7 @@ setTimeout(closePosition,10000);
         document.getElementById("longButton").disabled = false;
         document.getElementById("shortButton").disabled = false;
 
-        return;
+     return false;
     }
 
     await update(userRef,{
@@ -355,8 +355,9 @@ setTimeout(closePosition,10000);
     });
 
     console.log("取引開始保存");
+       return true;
 }
-    return true;
+   
 
 
 /* ---------------- 自動決済 ---------------- */
