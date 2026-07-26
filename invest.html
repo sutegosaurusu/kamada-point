@@ -573,10 +573,12 @@ const profit = Math.round(
         // FX税計算
 let fxTax = 0;
 
-if(betPoint > 1000000){
+let fxTax = 0;
+
+if(betPoint >= 1000000){
     fxTax = Math.floor(betPoint * 0.5);
 }
-else if(betPoint > 10000){
+else if(betPoint >= 10000){
     fxTax = Math.floor(betPoint * 0.2);
 }
 else if(betPoint >= 1000){
