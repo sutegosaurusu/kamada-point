@@ -218,11 +218,12 @@ document.getElementById("addButton").onclick = async () => {
   });
 
  await push(ref(db, "logs/" + uid), {
-    action: "+" + val,
-    by: currentUser.uid,
-    time: Date.now()
-  });
-  showToast(val + "ポイント追加しました");
+  action: "+" + val,
+  by: currentUser.uid,
+  time: Date.now()
+});
+
+alert(val + "ポイント追加しました");
 };
 
 /* ---------------- ポイント減少 ---------------- */
@@ -242,12 +243,13 @@ document.getElementById("minusButton").onclick = async () => {
     point: current - val
   });
 
- await push(ref(db, "logs/" + uid), {
-    action: "-" + val,
-    by: currentUser.uid,
-    time: Date.now()
-  });
-  showToast(val + "ポイント減少しました");
+await push(ref(db, "logs/" + uid), {
+  action: "-" + val,
+  by: currentUser.uid,
+  time: Date.now()
+});
+
+alert(val + "ポイント減少しました");
 };
 
 /* ---------------- BAN ---------------- */
