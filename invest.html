@@ -78,7 +78,31 @@ async function updatePrice(){
 
 }
 
+async function updatePrice(){
+
+    try{
+
+        const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+
+        const data = await res.json();
+
+        document.getElementById("price").textContent =
+            Number(data.price).toLocaleString() + " USDT";
+
+    }catch(e){
+
+        console.error(e);
+
+        document.getElementById("price").textContent =
+            "取得失敗";
+
+    }
+
+}
+
 updatePrice();
+
+setInterval(updatePrice,5000);
 
 setInterval(updatePrice,5000);
 
