@@ -1,85 +1,344 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>新規登録</title>
+
+<title>鎌田ポイント 新規登録</title>
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+
+body{
+
+    margin:0;
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:linear-gradient(135deg,#6dd5ed,#2193b0);
+
+    font-family:sans-serif;
+
+}
+
+
+
+/* 登録カード */
+
+.container{
+
+    width:90%;
+
+    max-width:400px;
+
+    background:white;
+
+    padding:35px 25px;
+
+    border-radius:30px;
+
+    text-align:center;
+
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+
+}
+
+
+
+/* タイトル */
+
+h1{
+
+    color:#2193b0;
+
+    font-size:27px;
+
+    margin-bottom:30px;
+
+}
+
+
+
+/* 入力欄 */
+
+input{
+
+    width:100%;
+
+    height:55px;
+
+    padding:0 15px;
+
+    margin-bottom:15px;
+
+    border-radius:15px;
+
+    border:2px solid #ddd;
+
+    font-size:18px;
+
+}
+
+
+
+input:focus{
+
+    outline:none;
+
+    border-color:#2193b0;
+
+}
+
+
+
+/* 登録ボタン */
+
+button{
+
+    width:100%;
+
+    height:60px;
+
+    margin-top:10px;
+
+    border:none;
+
+    border-radius:30px;
+
+    background:#ffb347;
+
+    color:white;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.2s;
+
+}
+
+
+
+button:active{
+
+    transform:scale(0.95);
+
+}
+
+
+
+/* メッセージ */
+
+#msg{
+
+    margin-top:20px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    color:#e74c3c;
+
+}
+
+
+</style>
+
+
 </head>
+
+
 
 <body>
 
-<h1>新規会員登録</h1>
 
-<input id="name" placeholder="名前"><br><br>
-<input id="email" placeholder="メールアドレス"><br><br>
-<input id="password" type="password" placeholder="パスワード"><br><br>
+<div class="container">
 
-<button id="registerBtn">登録</button>
+
+<h1>💰 鎌田ポイント<br>新規登録</h1>
+
+
+<input id="name" placeholder="名前">
+
+
+<input id="email" placeholder="メールアドレス">
+
+
+<input id="password" type="password" placeholder="パスワード">
+
+
+<button id="registerBtn">
+登録
+</button>
+
 
 <p id="msg"></p>
 
+
+</div>
+
+
+
+
+
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+import { initializeApp } from 
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+
+import { getAuth, createUserWithEmailAndPassword } from 
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+
+import { getDatabase, ref, set } from 
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+
 
 const firebaseConfig = {
+
   apiKey: "AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+
   authDomain: "kamadapoint.firebaseapp.com",
+
   databaseURL: "https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+
   projectId: "kamadapoint",
+
   storageBucket: "kamadapoint.firebasestorage.app",
+
   messagingSenderId: "601769416524",
+
   appId: "1:601769416524:web:0be49ce5a0baf87f75e1e9"
+
 };
 
+
+
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
 const db = getDatabase(app);
+
+
 
 const msg = document.getElementById("msg");
 
-document.getElementById("registerBtn").onclick = async () => {
 
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
 
-  if (!name || !email || !password) {
-    msg.textContent = "全て入力してください";
+document.getElementById("registerBtn").onclick = async()=>{
+
+
+const name =
+document.getElementById("name").value;
+
+
+const email =
+document.getElementById("email").value;
+
+
+const password =
+document.getElementById("password").value;
+
+
+
+if(!name || !email || !password){
+
+    msg.textContent="全て入力してください";
+
     return;
-  }
 
-  try {
+}
 
-    // ① Firebase Authでアカウント作成
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-    const user = userCredential.user;
 
-    // ② Realtime Databaseに保存
-    await set(ref(db, "members/" + user.uid), {
-      name: name,
-      email: email,
-      point: 0,
-      admin: false,
-      banned: false
-    });
+try{
 
-    msg.textContent = "登録成功";
 
-    // ログイン画面へ
-    setTimeout(() => {
-      location.href = "login.html";
-    }, 1000);
+const userCredential =
+await createUserWithEmailAndPassword(
+auth,
+email,
+password
+);
 
-  } catch (e) {
-    msg.textContent = "登録失敗: " + e.message;
-  }
+
+
+const user =
+userCredential.user;
+
+
+
+await set(
+ref(db,"members/"+user.uid),
+{
+
+name:name,
+
+email:email,
+
+point:0,
+
+admin:false,
+
+banned:false
+
+}
+
+);
+
+
+
+msg.textContent="登録成功";
+
+
+
+setTimeout(()=>{
+
+location.href="login.html";
+
+},1000);
+
+
+
+}catch(e){
+
+
+msg.textContent="登録失敗";
+
+
+console.log(e);
+
+
+}
+
+
+
 };
+
+
 
 </script>
 
+
 </body>
+
 </html>
