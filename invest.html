@@ -360,7 +360,7 @@ const snap = await get(userRef);
 let currentPoint = Number(snap.val().point || 0);
 
 await update(userRef,{
-    point: currentPoint + profit
+    point: currentPoint + betPoint + profit
 });
 
 
