@@ -25,8 +25,9 @@ button{
 
 <h1>投資</h1>
 
-<p>ここにチャートが表示されます。</p>
-
+<div class="tradingview-widget-container">
+  <div id="tradingview_chart"></div>
+</div>
 <hr>
 
 <h2>現在価格</h2>
@@ -51,6 +52,21 @@ placeholder="投資ポイント">
 <button id="sellButton">
 売り（SHORT）
 </button>
+    <script src="https://s3.tradingview.com/tv.js"></script>
+
+<script>
+new TradingView.widget({
+    width: "100%",
+    height: 600,
+    symbol: "FX:USDJPY",
+    interval: "1",
+    timezone: "Asia/Tokyo",
+    theme: "light",
+    style: "1",
+    locale: "ja",
+    container_id: "tradingview_chart"
+});
+</script>
 
 </body>
 </html>
