@@ -148,8 +148,9 @@ let myPoint = 0;
         return;
     }
 
-    uid = user.uid;
-checkPosition();
+ uid = user.uid;
+
+await checkPosition();
     const snap = await get(ref(db, "members/" + uid));
 
     if (!snap.exists()) {
