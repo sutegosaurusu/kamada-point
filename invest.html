@@ -6,6 +6,7 @@
 <title>投資</title>
 
 <style>
+
 body{
     font-family:sans-serif;
     margin:20px;
@@ -14,6 +15,27 @@ body{
 h1{
     margin-bottom:20px;
 }
+
+button{
+    padding:10px 20px;
+    margin:5px;
+}
+
+input{
+    padding:8px;
+    width:180px;
+}
+
+#price{
+    font-size:28px;
+    font-weight:bold;
+}
+
+#status{
+    font-size:20px;
+    color:blue;
+}
+
 </style>
 
 </head>
@@ -29,7 +51,10 @@ h1{
 <hr>
 
 <h2>現在価格</h2>
-    <hr>
+
+<div id="price">取得中...</div>
+
+<hr>
 
 <h2>投資</h2>
 
@@ -50,11 +75,13 @@ SHORT
 
 <hr>
 
-<div id="status">
-ポジションなし
-</div>
+<h2>状態</h2>
 
-<div id="price">取得中...</div>
+<div id="status">
+
+ポジションなし
+
+</div>
 
 <script src="https://s3.tradingview.com/tv.js"></script>
 
@@ -88,30 +115,30 @@ allow_symbol_change:false
 
 });
 
-</script>
-    <script>
-        let position = null;
-let entryPrice = 0;
-let betPoint = 0;
+let position=null;
 
+let entryPrice=0;
+
+let betPoint=0;
 
 async function updatePrice(){
 
     try{
 
-        const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+        const res=await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
 
-        const data = await res.json();
+        const data=await res.json();
 
-        document.getElementById("price").textContent =
-            Number(data.price).toLocaleString() + " USDT";
+        document.getElementById("price").textContent=
+        Number(data.price).toLocaleString()+" USDT";
 
-    }catch(e){
+    }
+
+    catch(e){
 
         console.error(e);
 
-        document.getElementById("price").textContent =
-            "取得失敗";
+        document.getElementById("price").textContent="取得失敗";
 
     }
 
@@ -120,37 +147,26 @@ async function updatePrice(){
 updatePrice();
 
 setInterval(updatePrice,5000);
+    /* ---------------- LONG ---------------- */
 
-</script>
-    document.getElementById("longButton").onclick = () => {
-async function closePosition(){
+document.getElementById("longButton").onclick = () => {
 
-    const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
-
-    const data = await res.json();
-
-    const exitPrice = Number(data.price);
-
-    let rate = (exitPrice - entryPrice) / entryPrice;
-
-    const profit = Math.round(betPoint * rate);
-
-    document.getElementById("status").textContent =
-        `決済完了　損益 ${profit} pt`;
-
-    position = null;
-
-}
     if(position){
+
         alert("すでにポジションを保有しています");
+
         return;
+
     }
 
     betPoint = Number(document.getElementById("bet").value);
 
     if(betPoint <= 0){
+
         alert("投資ポイントを入力してください");
+
         return;
+
     }
 
     entryPrice = Number(
@@ -162,11 +178,143 @@ async function closePosition(){
     position = "LONG";
 
     document.getElementById("status").textContent =
-        "LONG保有中";
+    "LONG保有中（10秒後に自動決済）";
+position = "LONG";
+
+document.getElementById("status").textContent =
+"LONG保有中（10秒後に自動決済）";
+
+// ここを追加
+document.getElementById("longButton").disabled = true;
+document.getElementById("shortButton").disabled = true;
+
+setTimeout(closePosition,10000);
+    setTimeout(closePosition,10000);
+
+};
+
+
+/* ---------------- SHORT ---------------- */
+
+document.getElementById("shortButton").onclick = () => {
+
+    if(position){
+
+        alert("すでにポジションを保有しています");
+
+        return;
+
+    }
+
+    betPoint = Number(document.getElementById("bet").value);
+
+    if(betPoint <= 0){
+
+        alert("投資ポイントを入力してください");
+
+        return;
+
+    }
+
+    entryPrice = Number(
+        document.getElementById("price").textContent
+        .replace(/,/g,"")
+        .replace(" USDT","")
+    );
+
+    position = "SHORT";
+
+    document.getElementById("status").textContent =
+    "SHORT保有中（10秒後に自動決済）";
+    position = "SHORT";
+
+document.getElementById("status").textContent =
+"SHORT保有中（10秒後に自動決済）";
+
+// ここを追加
+document.getElementById("longButton").disabled = true;
+document.getElementById("shortButton").disabled = true;
+
+setTimeout(closePosition,10000);
 
     setTimeout(closePosition,10000);
 
 };
 
+
+/* ---------------- 自動決済 ---------------- */
+
+async function closePosition(){
+
+    try{
+
+        const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+
+        const data = await res.json();
+
+        const exitPrice = Number(data.price);
+
+        let rate = 0;
+
+        if(position==="LONG"){
+
+            rate = (exitPrice-entryPrice)/entryPrice;
+
+        }else{
+
+            rate = (entryPrice-exitPrice)/entryPrice;
+
+        }
+
+        const profit = Math.round(betPoint*rate);
+
+        let text="";
+
+        if(profit>=0){
+
+            text="利益 +" + profit + " pt";
+
+        }else{
+
+            text="損失 " + profit + " pt";
+
+        }
+
+        document.getElementById("status").textContent =
+        "決済完了　" + text;
+
+        alert("10秒経過\n\n"+text);
+
+        position = null;
+
+        entryPrice = 0;
+
+        betPoint = 0;
+        position = null;
+
+entryPrice = 0;
+
+betPoint = 0;
+
+// ここを追加
+document.getElementById("longButton").disabled = false;
+document.getElementById("shortButton").disabled = false;
+
+    }
+
+    catch(e){
+
+        console.error(e);
+
+        document.getElementById("status").textContent =
+        "決済エラー";
+
+    }
+
+}
+
+</script>
+
 </body>
+
 </html>
