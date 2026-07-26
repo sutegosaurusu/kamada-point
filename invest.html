@@ -570,6 +570,22 @@ const gameMultiplier = 1000;
 const profit = Math.round(
     betPoint * rate * leverage * gameMultiplier
 );
+        // FX税計算
+let fxTax = 0;
+
+if(betPoint > 1000000){
+    fxTax = Math.floor(betPoint * 0.5);
+}
+else if(betPoint > 10000){
+    fxTax = Math.floor(betPoint * 0.2);
+}
+else if(betPoint >= 1000){
+    fxTax = Math.floor(betPoint * 0.05);
+}
+
+
+// 税金を利益から引く
+const afterTaxProfit = profit - fxTax;
         let text="";
 
         if(profit>=0){
@@ -589,20 +605,22 @@ const snap = await get(userRef);
 let currentPoint = Number(snap.val().point || 0);
 
 await update(userRef,{
-    point: currentPoint + betPoint + profit
+    point: currentPoint + betPoint + afterTaxProfit
 });
-
+        
 // 表示ポイント更新
-myPoint = currentPoint + betPoint + profit;
-
+myPoint = currentPoint + betPoint + afterTaxProfit;
 document.getElementById("myPoint").textContent =
 myPoint + " pt";
         const historyRef = push(ref(db,"tradeHistory/"+uid));
 
+const historyRef = push(ref(db,"tradeHistory/"+uid));
+
 await set(historyRef,{
     type: position,
     bet: betPoint,
-    profit: profit,
+    profit: afterTaxProfit,
+    tax: fxTax,
     entryPrice: entryPrice,
     exitPrice: exitPrice,
     time: Date.now()
