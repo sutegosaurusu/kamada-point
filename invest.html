@@ -637,7 +637,12 @@ console.log("削除する場所", positionRef);
       document.getElementById("status").textContent =
 "決済完了　" + text;
 
-alert("10秒経過\n\n"+text);
+alert(
+    "10秒経過\n\n" +
+    "利益: " + (profit >= 0 ? "+" : "") + profit + " pt\n" +
+    "FX税: -" + fxTax + " pt\n" +
+    "最終利益: " + (afterTaxProfit >= 0 ? "+" : "") + afterTaxProfit + " pt"
+);
         if(profitTimer){
 
     clearInterval(profitTimer);
