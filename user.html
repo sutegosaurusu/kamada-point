@@ -378,18 +378,13 @@ document.getElementById("giveButton").onclick=async()=>{
 
   }
 
-  await update(ref(db,"members/"+uid),{
+  const updates={};
 
-    point:myNow-point
+updates["members/"+uid+"/point"] = myNow - point;
 
-  });
+updates["members/"+target+"/point"] = Number(other.point || 0) + point;
 
-  await update(ref(db,"members/"+target),{
-
-    point:Number(other.point||0)+point
-
-  });
-
+await update(ref(db), updates);
   await push(ref(db,"logs/"+uid),{
 
     action:`${other.name}へ${point}pt譲渡`,
