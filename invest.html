@@ -459,8 +459,12 @@ return true;
         Number(document.getElementById("leverage").value);
 
 
-        const profit =
-        Math.round(betPoint * rate * leverage);
+       const gameMultiplier = 1000;
+
+const profit =
+Math.round(
+    betPoint * rate * leverage * gameMultiplier
+);
 
 
         const profitElement = document.getElementById("profit");
