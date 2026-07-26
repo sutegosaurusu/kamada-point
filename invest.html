@@ -35,6 +35,10 @@ input{
     font-size:20px;
     color:blue;
 }
+    #profit{
+    font-size:22px;
+    font-weight:bold;
+}
 
 </style>
 
@@ -459,12 +463,23 @@ return true;
         Math.round(betPoint * rate * leverage);
 
 
-        document.getElementById("profit").textContent =
-        "現在損益：" +
-        (profit >= 0 ? "+" : "") +
-        profit +
-        " pt";
+        const profitElement = document.getElementById("profit");
 
+profitElement.textContent =
+"現在損益：" +
+(profit >= 0 ? "+" : "") +
+profit +
+" pt";
+
+if(profit >= 0){
+
+    profitElement.style.color = "red";
+
+}else{
+
+    profitElement.style.color = "blue";
+
+}
     }
 
     catch(e){
