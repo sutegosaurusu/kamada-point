@@ -98,7 +98,7 @@ SHORT
 
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { getDatabase, ref, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, get, update, push, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     const firebaseConfig = {
   apiKey: "AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
   authDomain: "kamadapoint.firebaseapp.com",
@@ -170,6 +170,7 @@ let position=null;
 let entryPrice=0;
 
 let betPoint=0;
+    let positionRef = null;
 
 async function updatePrice(){
 
@@ -347,18 +348,16 @@ setTimeout(closePosition,10000);
 
 
     // ポジション保存
-    const tradeRef = push(ref(db,"positions/"+uid));
+  const tradeRef = push(ref(db,"positions/"+uid));
 
-    await set(tradeRef,{
-        type:type,
-        bet:betPoint,
-        entryPrice:entryPrice,
-        startTime:Date.now()
-    });
+positionRef = tradeRef;
 
-    console.log("取引開始保存");
-       return true;
-}
+await set(tradeRef,{
+    type:type,
+    bet:betPoint,
+    entryPrice:entryPrice,
+    startTime:Date.now()
+});
    
 
 
@@ -417,6 +416,14 @@ await set(historyRef,{
     exitPrice: exitPrice,
     time: Date.now()
 });
+        // ポジション削除
+if(positionRef){
+
+    await remove(positionRef);
+
+    positionRef = null;
+
+}
 
       document.getElementById("status").textContent =
 "決済完了　" + text;
