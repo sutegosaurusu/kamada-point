@@ -98,6 +98,9 @@ SHORT
 </div>
 
 <div id="countdown"></div>
+    <div id="profit">
+現在損益：0 pt
+</div>
     <hr>
 
 <h2>取引履歴</h2>
@@ -191,8 +194,10 @@ let position=null;
 let entryPrice=0;
 
 let betPoint=0;
-    let positionRef = null;
+   
+let positionRef = null;
 
+let profitTimer = null;
 async function updatePrice(){
 
     try{
@@ -289,6 +294,7 @@ if(!success){
 
 position = "LONG";
 
+    profitTimer = setInterval(updateProfit,1000);
 document.getElementById("status").textContent =
 "LONG保有中（10秒後に自動決済）";
 document.getElementById("longButton").disabled = true;
@@ -333,6 +339,7 @@ if(!success){
 }
 
 position = "SHORT";
+    profitTimer = setInterval(updateProfit,1000);
 
 document.getElementById("status").textContent =
 "SHORT保有中（10秒後に自動決済）";
@@ -415,6 +422,58 @@ return true;
 
 }
 
+    async function updateProfit(){
+
+    if(!position){
+        return;
+    }
+
+    try{
+
+        const res = await fetch(
+            "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+        );
+
+        const data = await res.json();
+
+        const nowPrice = Number(data.price);
+
+        let rate = 0;
+
+        if(position === "LONG"){
+
+            rate = (nowPrice - entryPrice) / entryPrice;
+
+        }else{
+
+            rate = (entryPrice - nowPrice) / entryPrice;
+
+        }
+
+
+        const leverage =
+        Number(document.getElementById("leverage").value);
+
+
+        const profit =
+        Math.round(betPoint * rate * leverage);
+
+
+        document.getElementById("profit").textContent =
+        "現在損益：" +
+        (profit >= 0 ? "+" : "") +
+        profit +
+        " pt";
+
+    }
+
+    catch(e){
+
+        console.error(e);
+
+    }
+
+}
 
 /* ---------------- 自動決済 ---------------- */
 
@@ -493,6 +552,13 @@ console.log("削除する場所", positionRef);
 "決済完了　" + text;
 
 alert("10秒経過\n\n"+text);
+        if(profitTimer){
+
+    clearInterval(profitTimer);
+
+    profitTimer = null;
+
+}
 
 position = null;
 entryPrice = 0;
