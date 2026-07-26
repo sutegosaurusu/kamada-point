@@ -146,14 +146,57 @@ let myPoint = 0;
     }
 
     uid = user.uid;
-
+checkPosition();
     const snap = await get(ref(db, "members/" + uid));
 
     if (!snap.exists()) {
         alert("ユーザー情報がありません");
         return;
     }
+async function checkPosition(){
 
+    const snap = await get(ref(db,"positions/"+uid));
+
+    if(!snap.exists()){
+        return;
+    }
+
+    const data = snap.val();
+
+    const key = Object.keys(data)[0];
+    const trade = data[key];
+
+    position = trade.type;
+    betPoint = trade.bet;
+    entryPrice = trade.entryPrice;
+
+    positionRef = ref(db,"positions/"+uid+"/"+key);
+
+    document.getElementById("status").textContent =
+    position + "保有中";
+
+    document.getElementById("longButton").disabled = true;
+    document.getElementById("shortButton").disabled = true;
+
+   profitTimer = setInterval(updateProfit,1000);
+
+let elapsed = Math.floor(
+    (Date.now() - trade.startTime) / 1000
+);
+
+let remaining = 10 - elapsed;
+
+if(remaining <= 0){
+
+    closePosition();
+
+}else{
+
+    startCountdown(remaining);
+
+}
+
+}
    myPoint = Number(snap.val().point || 0);
 
 console.log("現在のポイント:", myPoint);
@@ -397,9 +440,7 @@ return true;
 
 }
 
-    function startCountdown(){
-
-    let seconds = 10;
+   function startCountdown(seconds = 10){
 
     document.getElementById("countdown").textContent =
     "残り " + seconds + "秒";
