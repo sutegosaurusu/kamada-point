@@ -93,11 +93,11 @@ SHORT
 <hr>
 
 <h2>状態</h2>
-    <div id="status">
-
+   <div id="status">
 ポジションなし
-
 </div>
+
+<div id="countdown"></div>
     <hr>
 
 <h2>取引履歴</h2>
@@ -294,7 +294,7 @@ document.getElementById("status").textContent =
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
 
-setTimeout(closePosition,10000);
+startCountdown();
 };
 
 
@@ -339,7 +339,7 @@ document.getElementById("status").textContent =
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
 
-setTimeout(closePosition,10000);
+startCountdown();
 
 };
   async function startTrade(type){
@@ -385,7 +385,35 @@ console.log("取引開始保存");
 return true;
 
 }
-   
+
+    function startCountdown(){
+
+    let seconds = 10;
+
+    document.getElementById("countdown").textContent =
+    "残り " + seconds + "秒";
+
+    const timer = setInterval(()=>{
+
+        seconds--;
+
+        document.getElementById("countdown").textContent =
+        "残り " + seconds + "秒";
+
+        if(seconds <= 0){
+
+            clearInterval(timer);
+
+            document.getElementById("countdown").textContent =
+            "";
+
+            closePosition();
+
+        }
+
+    },1000);
+
+}
 
 
 /* ---------------- 自動決済 ---------------- */
