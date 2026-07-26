@@ -175,22 +175,15 @@ document.getElementById("longButton").onclick = () => {
         .replace(" USDT","")
     );
 
-    position = "LONG";
-
-    document.getElementById("status").textContent =
-    "LONG保有中（10秒後に自動決済）";
-position = "LONG";
+   position = "LONG";
 
 document.getElementById("status").textContent =
 "LONG保有中（10秒後に自動決済）";
 
-// ここを追加
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
 
 setTimeout(closePosition,10000);
-    setTimeout(closePosition,10000);
-
 };
 
 
@@ -222,22 +215,15 @@ document.getElementById("shortButton").onclick = () => {
         .replace(" USDT","")
     );
 
-    position = "SHORT";
-
-    document.getElementById("status").textContent =
-    "SHORT保有中（10秒後に自動決済）";
-    position = "SHORT";
+   position = "SHORT";
 
 document.getElementById("status").textContent =
 "SHORT保有中（10秒後に自動決済）";
 
-// ここを追加
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
 
 setTimeout(closePosition,10000);
-
-    setTimeout(closePosition,10000);
 
 };
 
@@ -280,26 +266,17 @@ async function closePosition(){
 
         }
 
-        document.getElementById("status").textContent =
-        "決済完了　" + text;
+      document.getElementById("status").textContent =
+"決済完了　" + text;
 
-        alert("10秒経過\n\n"+text);
+alert("10秒経過\n\n"+text);
 
-        position = null;
-
-        entryPrice = 0;
-
-        betPoint = 0;
-        position = null;
-
+position = null;
 entryPrice = 0;
-
 betPoint = 0;
 
-// ここを追加
 document.getElementById("longButton").disabled = false;
 document.getElementById("shortButton").disabled = false;
-
     }
 
     catch(e){
