@@ -76,6 +76,13 @@ SHORT
 <hr>
 
 <h2>状態</h2>
+    <hr>
+
+<h2>取引履歴</h2>
+
+<div id="history">
+読み込み中...
+</div>
 
 <div id="status">
 
@@ -127,6 +134,7 @@ let myPoint = 0;
     console.log("現在のポイント:", myPoint);
 
 });
+    
 new TradingView.widget({
 
 container_id:"tradingview_chart",
@@ -187,6 +195,41 @@ async function updatePrice(){
 updatePrice();
 
 setInterval(updatePrice,5000);
+    async function loadHistory(){
+
+    const snap = await get(ref(db,"tradeHistory/"+uid));
+
+    const history = document.getElementById("history");
+
+    if(!snap.exists()){
+
+        history.textContent="履歴なし";
+        return;
+
+    }
+
+    history.innerHTML="";
+
+    const data = snap.val();
+
+    Object.values(data).reverse().forEach(trade=>{
+
+        const div=document.createElement("div");
+
+        div.textContent =
+        trade.type +
+        " | 投資:" +
+        trade.bet +
+        "pt | 結果:" +
+        (trade.profit>=0 ? "+" : "") +
+        trade.profit +
+        "pt";
+
+        history.appendChild(div);
+
+    });
+
+}
     /* ---------------- LONG ---------------- */
 
 document.getElementById("longButton").onclick = async () => {
