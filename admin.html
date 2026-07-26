@@ -30,7 +30,16 @@
 <button id="logoutBtn">ログアウト</button>
 
 <hr>
+<h2>お知らせ変更</h2>
+<hr>
+<textarea id="noticeText" rows="4" cols="40"
+placeholder="ここにお知らせを書く"></textarea>
 
+<br>
+
+<button id="saveNotice">
+お知らせ保存
+</button>
 <h2>ユーザー選択</h2>
 <select id="userSelect"></select>
 
@@ -94,8 +103,8 @@ import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/fi
 import {
   getDatabase,
   ref,
-  onValue,
   get,
+  onValue,
   update,
   push,
   set
@@ -113,6 +122,20 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
+  document.getElementById("saveNotice").onclick = async()=>{
+
+  const text = document.getElementById("noticeText").value;
+
+  if(!text){
+    alert("文章を入力してください");
+    return;
+  }
+
+  await set(ref(db,"notice/text"),text);
+
+  alert("お知らせを更新しました");
+
+};
 
 let currentUser = null;
 
