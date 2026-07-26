@@ -6,18 +6,99 @@
 <title>管理者ページ</title>
 </head>
   <style>
+body{
+    font-family:"Arial","Noto Sans JP",sans-serif;
+    margin:0;
+    padding:20px;
+    background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
+    color:#333;
+}
+
+h1{
+    text-align:center;
+    color:#ff5c9a;
+    font-size:32px;
+    margin-bottom:25px;
+}
+
+h2{
+    color:#555;
+    border-left:6px solid #ff7eb3;
+    padding-left:12px;
+    margin-top:25px;
+}
+
+button{
+    padding:12px 25px;
+    margin:5px;
+    border:none;
+    border-radius:25px;
+    background:linear-gradient(135deg,#ff7eb3,#ff65a3);
+    color:white;
+    font-weight:bold;
+    font-size:15px;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(255,100,160,0.3);
+    transition:.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+}
+
+input,select,textarea{
+    padding:12px;
+    border-radius:15px;
+    border:2px solid #ffd1e3;
+    background:white;
+    font-size:16px;
+    box-sizing:border-box;
+}
+
+textarea{
+    width:100%;
+    max-width:600px;
+    resize:vertical;
+}
+
+select{
+    width:250px;
+}
+
+input{
+    width:200px;
+}
+
 #toast{
-  position:fixed;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#333;
-  color:white;
-  padding:12px 24px;
-  border-radius:8px;
-  display:none;
-  font-size:18px;
-  z-index:9999;
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#ff6fae;
+    color:white;
+    padding:14px 30px;
+    border-radius:30px;
+    display:none;
+    z-index:9999;
+    font-size:18px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+#rankList,
+#logList{
+    background:white;
+    padding:18px;
+    border-radius:20px;
+    margin-top:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+    line-height:1.8;
+}
+
+hr{
+    border:none;
+    height:2px;
+    background:#ffd1e3;
+    margin:25px 0;
 }
 </style>
 
