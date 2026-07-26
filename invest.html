@@ -214,12 +214,16 @@ document.getElementById("longButton").onclick = async () => {
         .replace(" USDT","")
     );
 
-   position = "LONG";
+ const success = await startTrade("LONG");
+
+if(!success){
+    return;
+}
+
+position = "LONG";
 
 document.getElementById("status").textContent =
 "LONG保有中（10秒後に自動決済）";
-    await startTrade("LONG");
-
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
 
@@ -255,20 +259,49 @@ document.getElementById("shortButton").onclick = async () => {
         .replace(" USDT","")
     );
 
-   position = "SHORT";
+  const success = await startTrade("SHORT");
+
+if(!success){
+    return;
+}
+
+position = "SHORT";
 
 document.getElementById("status").textContent =
 "SHORT保有中（10秒後に自動決済）";
-    await startTrade("SHORT");
-
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
 
 setTimeout(closePosition,10000);
 
 };
-    async function startTrade(type){
+  async function startTrade(type){
 
+    // ポイントを減らす
+    const userRef = ref(db,"members/" + uid);
+
+    const snap = await get(userRef);
+
+    let currentPoint = Number(snap.val().point || 0);
+
+    if(currentPoint < betPoint){
+
+        alert("ポイント不足です");
+
+        position = null;
+
+        document.getElementById("longButton").disabled = false;
+        document.getElementById("shortButton").disabled = false;
+
+        return;
+    }
+
+    await update(userRef,{
+        point: currentPoint - betPoint
+    });
+
+
+    // ポジション保存
     const tradeRef = push(ref(db,"positions/"+uid));
 
     await set(tradeRef,{
@@ -280,7 +313,7 @@ setTimeout(closePosition,10000);
 
     console.log("取引開始保存");
 }
-
+    return true;
 
 
 /* ---------------- 自動決済 ---------------- */
@@ -307,8 +340,7 @@ async function closePosition(){
 
         }
 
-        const profit = Math.round(betPoint*rate);
-
+       const profit = Math.round(betPoint * rate * 5);
         let text="";
 
         if(profit>=0){
@@ -320,6 +352,17 @@ async function closePosition(){
             text="損失 " + profit + " pt";
 
         }
+        // ポイント更新
+const userRef = ref(db, "members/" + uid);
+
+const snap = await get(userRef);
+
+let currentPoint = Number(snap.val().point || 0);
+
+await update(userRef,{
+    point: currentPoint + profit
+});
+
 
       document.getElementById("status").textContent =
 "決済完了　" + text;
