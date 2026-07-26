@@ -43,7 +43,13 @@ input{
 <body>
 
 <h1>投資</h1>
+<h2>現在ポイント</h2>
 
+<div id="myPoint">
+読み込み中...
+</div>
+
+<hr>
 <h2>BTCチャート</h2>
 
 <div id="tradingview_chart"></div>
@@ -141,10 +147,14 @@ let myPoint = 0;
         return;
     }
 
-    myPoint = Number(snap.val().point || 0);
+   myPoint = Number(snap.val().point || 0);
 
-    console.log("現在のポイント:", myPoint);
-        loadHistory();
+console.log("現在のポイント:", myPoint);
+
+document.getElementById("myPoint").textContent =
+myPoint + " pt";
+
+loadHistory();
 
 });
     
