@@ -81,6 +81,23 @@ setInterval(() => {
 
 },1000);
 </script>
+<script>
+async function updatePrice(){
 
+    const res = await fetch("https://api.exchangerate.host/live?source=USD&currencies=JPY");
+
+    const data = await res.json();
+
+    const price = data.quotes.USDJPY;
+
+    document.getElementById("price").textContent =
+        price.toFixed(3) + " 円";
+}
+
+updatePrice();
+
+setInterval(updatePrice,5000);
+
+</script>
 </body>
 </html>
