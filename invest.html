@@ -104,7 +104,29 @@ import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/fir
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
+let uid = "";
+let myPoint = 0;
+    onAuthStateChanged(auth, async (user) => {
 
+    if (!user) {
+        location.href = "login.html";
+        return;
+    }
+
+    uid = user.uid;
+
+    const snap = await get(ref(db, "members/" + uid));
+
+    if (!snap.exists()) {
+        alert("ユーザー情報がありません");
+        return;
+    }
+
+    myPoint = Number(snap.val().point || 0);
+
+    console.log("現在のポイント:", myPoint);
+
+});
 new TradingView.widget({
 
 container_id:"tradingview_chart",
