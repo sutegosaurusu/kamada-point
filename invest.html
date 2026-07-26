@@ -418,7 +418,7 @@ await set(historyRef,{
 });
         // ポジション削除
 if(positionRef){
-
+console.log("削除する場所", positionRef);
     await remove(positionRef);
 
     positionRef = null;
