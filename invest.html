@@ -64,6 +64,17 @@ id="bet"
 placeholder="投資ポイント">
 
 <br><br>
+    <h3>レバレッジ</h3>
+
+<select id="leverage">
+    <option value="5">5倍</option>
+    <option value="10">10倍</option>
+    <option value="25">25倍</option>
+    <option value="50">50倍</option>
+    <option value="100">100倍</option>
+</select>
+
+<br><br>
 
 <button id="longButton">
 LONG
@@ -391,7 +402,9 @@ async function closePosition(){
 
         }
 
-       const profit = Math.round(betPoint * rate * 5);
+      const leverage = Number(document.getElementById("leverage").value);
+
+const profit = Math.round(betPoint * rate * leverage);
         let text="";
 
         if(profit>=0){
