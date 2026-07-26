@@ -66,6 +66,20 @@ new TradingView.widget({
     locale: "ja",
     container_id: "tradingview_chart"
 });
+    const widget = document.getElementById("price");
+
+setInterval(() => {
+
+    const price =
+        document.querySelector(".tv-symbol-price-quote__value");
+
+    if(price){
+
+        widget.textContent = price.innerText + " 円";
+
+    }
+
+},1000);
 </script>
 
 </body>
