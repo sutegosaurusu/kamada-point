@@ -8,26 +8,49 @@
 <style>
 
 body{
-    font-family:sans-serif;
-    margin:20px;
+    font-family:"Arial","Noto Sans JP",sans-serif;
+    margin:0;
+    padding:20px;
+    background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
+    color:#333;
 }
-#notice{
-    margin:10px 0;
-    padding:12px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    background:#fff8dc;
-    font-weight:bold;
-    font-size:16px;
+
+h1{
+    text-align:center;
+    color:#ff5c9a;
+    font-size:32px;
+    margin-bottom:25px;
 }
+
+h2{
+    color:#555;
+    border-left:6px solid #ff7eb3;
+    padding-left:10px;
+}
+
 button{
-    padding:8px 18px;
+    padding:12px 25px;
     margin:5px;
+    border:none;
+    border-radius:25px;
+    background:linear-gradient(135deg,#ff7eb3,#ff65a3);
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 4px 10px rgba(255,100,160,0.3);
+    transition:.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
 }
 
 input,select{
-    padding:6px;
-    margin:5px;
+    padding:12px;
+    border-radius:15px;
+    border:2px solid #ffd1e3;
+    background:white;
+    font-size:16px;
 }
 
 #toast{
@@ -35,13 +58,60 @@ input,select{
     top:20px;
     left:50%;
     transform:translateX(-50%);
-    background:#333;
+    background:#ff6fae;
     color:white;
-    padding:12px 24px;
-    border-radius:8px;
+    padding:14px 30px;
+    border-radius:30px;
     display:none;
     z-index:9999;
     font-size:18px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+#notice{
+    margin:15px 0;
+    padding:15px;
+    border-radius:20px;
+    background:#fff;
+    border:3px solid #ffe0ef;
+    color:#ff4f91;
+    font-weight:bold;
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+
+#myPoint{
+    background:white;
+    padding:20px;
+    border-radius:25px;
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+    color:#ff5c9a;
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+
+#rankList,
+#logList{
+    background:white;
+    padding:15px;
+    border-radius:20px;
+    margin-top:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.08);
+}
+
+hr{
+    border:none;
+    height:2px;
+    background:#ffd1e3;
+    margin:25px 0;
+}
+
+select{
+    width:220px;
+}
+
+input{
+    width:180px;
 }
 
 </style>
