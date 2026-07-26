@@ -435,7 +435,14 @@ let currentPoint = Number(snap.val().point || 0);
 
 await update(userRef,{
     point: currentPoint + betPoint + profit
-});const historyRef = push(ref(db,"tradeHistory/"+uid));
+});
+
+// 表示ポイント更新
+myPoint = currentPoint + betPoint + profit;
+
+document.getElementById("myPoint").textContent =
+myPoint + " pt";
+        const historyRef = push(ref(db,"tradeHistory/"+uid));
 
 await set(historyRef,{
     type: position,
