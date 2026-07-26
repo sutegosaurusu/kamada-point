@@ -1,77 +1,312 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ログイン</title>
+
+<title>鎌田ポイント ログイン</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#6dd5ed,#2193b0);
+    font-family:sans-serif;
+}
+
+/* ログインカード */
+.container{
+
+    width:90%;
+    max-width:400px;
+
+    background:white;
+
+    padding:35px 25px;
+
+    border-radius:30px;
+
+    text-align:center;
+
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+
+/* タイトル */
+
+h1{
+
+    color:#2193b0;
+
+    font-size:28px;
+
+    margin-bottom:30px;
+
+}
+
+
+/* 入力欄 */
+
+input{
+
+    width:100%;
+
+    height:55px;
+
+    padding:0 15px;
+
+    margin-bottom:15px;
+
+    border-radius:15px;
+
+    border:2px solid #ddd;
+
+    font-size:18px;
+
+}
+
+
+input:focus{
+
+    border-color:#2193b0;
+
+    outline:none;
+
+}
+
+
+/* ボタン */
+
+button{
+
+    width:100%;
+
+    height:60px;
+
+    margin-top:12px;
+
+    border:none;
+
+    border-radius:30px;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:0.2s;
+
+}
+
+
+/* ログイン */
+
+#loginBtn{
+
+    background:#2193b0;
+
+    color:white;
+
+}
+
+
+/* 新規登録 */
+
+#registerBtn{
+
+    background:#ffb347;
+
+    color:white;
+
+}
+
+
+/* 押した時 */
+
+button:active{
+
+    transform:scale(0.95);
+
+}
+
+
+/* メッセージ */
+
+#msg{
+
+    margin-top:20px;
+
+    font-size:16px;
+
+    color:#e74c3c;
+
+    font-weight:bold;
+
+}
+
+
+</style>
+
 </head>
+
 
 <body>
 
-<h1>ログイン</h1>
 
-<input id="email" placeholder="メールアドレス"><br><br>
-<input id="password" type="password" placeholder="パスワード"><br><br>
+<div class="container">
 
-<button id="loginBtn">ログイン</button>
-<button id="registerBtn">新規登録</button>
+
+<h1>💰 鎌田ポイント</h1>
+
+
+<input id="email" placeholder="メールアドレス">
+
+
+<input id="password" type="password" placeholder="パスワード">
+
+
+<button id="loginBtn">
+ログイン
+</button>
+
+
+<button id="registerBtn">
+新規登録
+</button>
+
 
 <p id="msg"></p>
 
+
+</div>
+
+
+
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { initializeApp } from 
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+
+import { getAuth, signInWithEmailAndPassword } from 
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+
 
 const firebaseConfig = {
+
   apiKey: "AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+
   authDomain: "kamadapoint.firebaseapp.com",
+
   databaseURL: "https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+
   projectId: "kamadapoint",
+
   storageBucket: "kamadapoint.firebasestorage.app",
+
   messagingSenderId: "601769416524",
+
   appId: "1:601769416524:web:0be49ce5a0baf87f75e1e9"
+
 };
 
+
+
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
+
 
 const msg = document.getElementById("msg");
 
-/* ---------------- ログイン ---------------- */
-document.getElementById("loginBtn").onclick = async () => {
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
 
-  if (!email || !password) {
-    msg.textContent = "入力してください";
+/* ログイン */
+
+document.getElementById("loginBtn").onclick = async()=>{
+
+
+const email =
+document.getElementById("email").value;
+
+
+const password =
+document.getElementById("password").value;
+
+
+
+if(!email || !password){
+
+    msg.textContent="入力してください";
+
     return;
-  }
 
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
+}
 
-    msg.textContent = "成功";
 
-    location.href = "index.html";
 
-  } catch (e) {
-    msg.textContent = "ログイン失敗: " + e.message;
-  }
+try{
+
+
+await signInWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+
+msg.textContent="ログイン成功";
+
+
+location.href="index.html";
+
+
+
+}catch(e){
+
+
+msg.textContent=
+"ログイン失敗";
+
+
+console.log(e);
+
+
+}
+
+
+
 };
 
-/* ---------------- 新規登録へ移動 ---------------- */
-document.getElementById("registerBtn").onclick = () => {
-  location.href = "register.html";
+
+
+/* 新規登録 */
+
+document.getElementById("registerBtn").onclick=()=>{
+
+
+location.href="register.html";
+
+
 };
+
 
 </script>
 
-</body>
-</html>
-
-</script>
 
 </body>
+
 </html>
