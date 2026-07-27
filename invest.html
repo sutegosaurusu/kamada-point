@@ -578,25 +578,24 @@ const gameMultiplier = 1000;
 const profit = Math.round(
     betPoint * rate * leverage * gameMultiplier
 );
-   // FX税計算
+ // FX税計算
 let fxTax = 0;
 
-// 利益があるときだけ税金
-if (profit > 0) {
+// 掛け金＋利益（口座に戻る総額）
+const totalReturn = betPoint + profit;
 
-    if (profit >= 1000000) {
-        fxTax = Math.floor(profit * 0.5);
-    }
-    else if (profit >= 10000) {
-        fxTax = Math.floor(profit * 0.2);
-    }
-    else if (profit >= 1000) {
-        fxTax = Math.floor(profit * 0.1);
-    }
-
+// 戻る総額に課税
+if (totalReturn >= 1000000) {
+    fxTax = Math.floor(totalReturn * 0.5);
+}
+else if (totalReturn >= 10000) {
+    fxTax = Math.floor(totalReturn * 0.2);
+}
+else if (totalReturn >= 1000) {
+    fxTax = Math.floor(totalReturn * 0.1);
 }
 
-// 税金を利益から引く
+// 税引き後の利益
 const afterTaxProfit = profit - fxTax;
 
 let text = "";
@@ -628,7 +627,8 @@ const historyRef = push(ref(db,"tradeHistory/"+uid));
 await set(historyRef,{
     type: position,
     bet: betPoint,
-    profit: afterTaxProfit,
+    profit: profit,                  
+    afterTaxProfit: afterTaxProfit,  
     tax: fxTax,
     entryPrice: entryPrice,
     exitPrice: exitPrice,
