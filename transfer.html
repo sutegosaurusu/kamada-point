@@ -37,6 +37,26 @@ placeholder="譲渡ポイント">
 <button id="giveButton">
 譲渡する
 </button>
+  <hr>
+
+<h2>特別譲渡（手数料50%）</h2>
+
+<select id="specialGiveUser">
+    <option value="">譲渡先を選択</option>
+</select>
+
+<br><br>
+
+<input
+type="number"
+id="specialGivePoint"
+placeholder="送るポイント">
+
+<br><br>
+
+<button id="specialGiveButton">
+特別譲渡する
+</button>
 <h1>ポイント譲渡</h1>
   <hr>
 
@@ -92,6 +112,7 @@ const db = getDatabase(app);
 let uid = null;
 let myPoint = 0;
 let sending = false;
+  let specialSending = false;
 // ログイン確認
 onAuthStateChanged(auth, async(user)=>{
 
@@ -145,6 +166,8 @@ onValue(ref(db,"members"), (snap)=>{
     const data = snap.val() || {};
 
     const select = document.getElementById("giveUser");
+  const specialSelect =
+document.getElementById("specialGiveUser");
 
     select.innerHTML =
     "<option value=''>譲渡先を選択</option>";
@@ -164,6 +187,14 @@ onValue(ref(db,"members"), (snap)=>{
         option.textContent = data[id].name;
 
         select.appendChild(option);
+      const option2 =
+document.createElement("option");
+
+option2.value=id;
+
+option2.textContent=data[id].name;
+
+specialSelect.appendChild(option2);
 
     }
 
@@ -547,6 +578,138 @@ if(result.committed){
 };
 
 });
+  document.getElementById("specialGiveButton").onclick = async()=>{
+
+
+if(specialSending){
+alert("処理中です");
+return;
+}
+
+specialSending=true;
+
+
+const target =
+document.getElementById("specialGiveUser").value;
+
+
+const point =
+Math.floor(
+Number(document.getElementById("specialGivePoint").value)
+);
+
+
+if(!target){
+
+alert("相手を選択してください");
+
+specialSending=false;
+
+return;
+
+}
+
+
+if(point<=0){
+
+alert("1ポイント以上入力してください");
+
+specialSending=false;
+
+return;
+
+}
+
+
+if(myPoint < point){
+
+alert("ポイント不足です");
+
+specialSending=false;
+
+return;
+
+}
+
+
+const receivePoint =
+Math.floor(point / 2);
+
+
+if(!confirm(
+point+
+"ポイント送ります。\n\n"+
+"相手の受取:\n"+
+receivePoint+
+"pt\n\n"+
+"手数料:\n"+
+(point-receivePoint)+
+"pt"
+)){
+
+specialSending=false;
+
+return;
+
+}
+
+
+const result =
+await runTransaction(ref(db,"members"),(members)=>{
+
+
+const me = members[uid];
+
+const other = members[target];
+
+
+if(!me || !other){
+
+return;
+
+}
+
+
+if(Number(me.point)<point){
+
+return;
+
+}
+
+
+// 自分から全額減る
+
+me.point =
+Number(me.point)-point;
+
+
+// 相手は半分受取
+
+other.point =
+Number(other.point)+receivePoint;
+
+
+return members;
+
+
+});
+
+
+if(result.committed){
+
+alert("特別譲渡しました");
+
+}else{
+
+alert("失敗しました");
+
+}
+
+
+specialSending=false;
+
+
+};
 </script>
 </body>
 
