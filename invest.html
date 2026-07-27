@@ -247,11 +247,12 @@ let entryPrice = 0;
 
 let betPoint = 0;
 
-let leverage = 0;   // ←追加
+let leverage = 0;   
 
 let positionRef = null;
 
 let profitTimer = null;
+    let closing = false;
 async function updatePrice(){
 
     try{
@@ -546,6 +547,12 @@ if(profit >= 0){
 
 async function closePosition(){
 
+    if(closing){
+        return;
+    }
+
+    closing = true;
+
     try{
 
         const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
@@ -656,10 +663,11 @@ alert(
 position = null;
 entryPrice = 0;
 betPoint = 0;
+closing = false;
 
 document.getElementById("longButton").disabled = false;
 document.getElementById("shortButton").disabled = false;
-        document.getElementById("leverage").disabled = false;
+document.getElementById("leverage").disabled = false;
     }
 
     catch(e){
@@ -668,6 +676,7 @@ document.getElementById("shortButton").disabled = false;
 
         document.getElementById("status").textContent =
         "決済エラー";
+        closing = false;
 
     }
 
