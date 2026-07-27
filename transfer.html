@@ -259,10 +259,9 @@ if(targetSnap.val().banned === true){
 const result = await runTransaction(ref(db,"members"), (members)=>{
 
 
+  // データが存在しない
   if(!members){
-
     return;
-
   }
 
 
@@ -271,48 +270,62 @@ const result = await runTransaction(ref(db,"members"), (members)=>{
   const other = members[target];
 
 
+  // ユーザーが存在しない
   if(!me || !other){
-
     return;
-
   }
 
 
-  const beforeTotal =
-    Number(me.point || 0)
-    +
+  const myBefore =
+    Number(me.point || 0);
+
+  const otherBefore =
     Number(other.point || 0);
 
 
+  // 譲渡前合計
+  const beforeTotal =
+    myBefore + otherBefore;
 
-  // 残高確認
 
-  if(Number(me.point || 0) < point){
-
+  // 自分のポイント不足
+  if(myBefore < point){
     return;
+  }
 
+
+  // マイナス防止
+  if(myBefore - point < 0){
+    return;
   }
 
 
   // ポイント移動
 
   me.point =
-    Number(me.point || 0) - point;
+    myBefore - point;
 
 
   other.point =
-    Number(other.point || 0) + point;
+    otherBefore + point;
 
 
 
-  const afterTotal =
-    Number(me.point)
-    +
+  // 譲渡後確認
+
+  const myAfter =
+    Number(me.point);
+
+  const otherAfter =
     Number(other.point);
 
 
 
-  // 合計チェック
+  // 合計値チェック
+
+  const afterTotal =
+    myAfter + otherAfter;
+
 
   if(beforeTotal !== afterTotal){
 
@@ -321,8 +334,23 @@ const result = await runTransaction(ref(db,"members"), (members)=>{
   }
 
 
-  return members;
+  // 異常値防止
 
+  if(myAfter < 0){
+
+    return;
+
+  }
+
+
+  if(otherAfter < 0){
+
+    return;
+
+  }
+
+
+  return members;
 
 });
 
