@@ -38,7 +38,13 @@ placeholder="譲渡ポイント">
 譲渡する
 </button>
 <h1>ポイント譲渡</h1>
+  <hr>
 
+<h2>譲渡履歴</h2>
+
+<div id="transferLog">
+読み込み中...
+</div>
 <button onclick="location.href='user.html'">
 戻る
 </button>
@@ -160,6 +166,35 @@ onValue(ref(db,"members"), (snap)=>{
         select.appendChild(option);
 
     }
+
+});
+  });
+
+// 譲渡履歴表示
+onValue(ref(db,"logs/"+uid), (snap)=>{
+
+  const data = snap.val() || {};
+
+  const box =
+  document.getElementById("transferLog");
+
+  box.innerHTML="";
+
+  Object.values(data)
+  .sort((a,b)=>b.time-a.time)
+  .forEach(log=>{
+
+    const div =
+    document.createElement("div");
+
+    div.textContent =
+    log.action+
+    "　"+
+    new Date(log.time).toLocaleString();
+
+    box.appendChild(div);
+
+  });
 
 });
   document.getElementById("giveButton").onclick = async()=>{
