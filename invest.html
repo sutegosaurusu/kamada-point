@@ -348,11 +348,12 @@ if(!success){
 
 position = "LONG";
 
-    profitTimer = setInterval(updateProfit,1000);
+profitTimer = setInterval(updateProfit,1000);
 document.getElementById("status").textContent =
 "LONG保有中（10秒後に自動決済）";
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
+document.getElementById("leverage").disabled = true; // ←追加
 
 startCountdown();
 };
@@ -394,12 +395,13 @@ if(!success){
 }
 
 position = "SHORT";
-    profitTimer = setInterval(updateProfit,1000);
+profitTimer = setInterval(updateProfit,1000);
 
 document.getElementById("status").textContent =
 "SHORT保有中（10秒後に自動決済）";
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
+document.getElementById("leverage").disabled = true; // ←追加
 
 startCountdown();
 
@@ -502,10 +504,6 @@ return true;
             rate = (entryPrice - nowPrice) / entryPrice;
 
         }
-
-
-        const leverage =
-        Number(document.getElementById("leverage").value);
 
 
        const gameMultiplier = 1000;
