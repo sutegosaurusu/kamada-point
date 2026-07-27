@@ -12,7 +12,31 @@ content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
+<h2>現在のポイント</h2>
 
+<div id="myPoint">
+読み込み中...
+</div>
+  <hr>
+
+<h2>譲渡先</h2>
+
+<select id="giveUser">
+    <option value="">譲渡先を選択</option>
+</select>
+
+<br><br>
+
+<input
+type="number"
+id="givePoint"
+placeholder="譲渡ポイント">
+
+<br><br>
+
+<button id="giveButton">
+譲渡する
+</button>
 <h1>ポイント譲渡</h1>
 
 <button onclick="location.href='user.html'">
@@ -20,16 +44,350 @@ content="width=device-width, initial-scale=1.0">
 </button>
 <script type="module">
 
-// Firebaseのimport
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
-// initializeApp
+import {
+  getAuth,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// getAuth
+import {
+  getDatabase,
+  ref,
+  get,
+  onValue,
+  push,
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+const firebaseConfig = {
 
-// getDatabase
+  apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
 
-// firebaseConfig
+  authDomain:"kamadapoint.firebaseapp.com",
 
+  databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+  projectId:"kamadapoint",
+
+  storageBucket:"kamadapoint.firebasestorage.app",
+
+  messagingSenderId:"601769416524",
+
+  appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
+
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let uid = null;
+let myPoint = 0;
+let sending = false;
+// ログイン確認
+onAuthStateChanged(auth, async(user)=>{
+
+  // ログインしていなければログイン画面へ
+  if(!user){
+    location.href="login.html";
+    return;
+  }
+
+  uid = user.uid;
+
+  // 自分の情報を取得
+  const snap = await get(ref(db,"members/"+uid));
+
+  if(!snap.exists()){
+    location.href="login.html";
+    return;
+  }
+
+  const data = snap.val();
+
+  // BANされているか確認
+  if(data.banned === true){
+    alert("BANされています");
+    location.href="login.html";
+    return;
+  }
+
+  // 自分のポイント表示
+  myPoint = Number(data.point || 0);
+
+  document.getElementById("myPoint").textContent =
+    myPoint + " pt";
+
+  // ポイントをリアルタイム更新
+  onValue(ref(db,"members/"+uid), (snap)=>{
+
+    const d = snap.val();
+
+    if(!d) return;
+
+    myPoint = Number(d.point || 0);
+
+    document.getElementById("myPoint").textContent =
+      myPoint + " pt";
+
+  });
+  // 譲渡先一覧
+onValue(ref(db,"members"), (snap)=>{
+
+    const data = snap.val() || {};
+
+    const select = document.getElementById("giveUser");
+
+    select.innerHTML =
+    "<option value=''>譲渡先を選択</option>";
+
+    for(const id in data){
+
+        // 自分は表示しない
+        if(id === uid) continue;
+
+        // BANユーザーは表示しない
+        if(data[id].banned === true) continue;
+
+        const option = document.createElement("option");
+
+        option.value = id;
+
+        option.textContent = data[id].name;
+
+        select.appendChild(option);
+
+    }
+
+});
+  document.getElementById("giveButton").onclick = async()=>{
+    if(sending){
+
+  alert("譲渡処理中です");
+
+  return;
+
+}
+
+sending = true;
+
+  const target =
+    document.getElementById("giveUser").value;
+
+  const point =
+Math.floor(
+Number(document.getElementById("givePoint").value)
+);
+    if(target === uid){
+
+  alert("自分には譲渡できません");
+
+  sending=false;
+
+  return;
+
+}
+
+
+  if(!target){
+
+    alert("譲渡先を選択してください");
+    return;
+
+  }
+
+
+  if(point <= 0){
+
+    alert("1ポイント以上入力してください");
+    return;
+
+  }
+
+
+  if(point > 1000){
+
+    alert("1回の譲渡上限は1000ポイントです");
+    return;
+
+  }
+
+
+  if(myPoint < point){
+
+    alert("ポイントが足りません");
+    return;
+
+  }
+
+
+  const targetSnap = await get(ref(db,"members/"+target));
+
+if(!targetSnap.exists()){
+
+  alert("相手が見つかりません");
+  return;
+
+}
+
+
+const targetName = targetSnap.val().name;
+
+const targetSnap =
+await get(ref(db,"members/"+target));
+
+
+if(!targetSnap.exists()){
+
+ alert("相手が存在しません");
+
+ sending=false;
+
+ return;
+
+}
+
+
+if(targetSnap.val().banned === true){
+
+ alert("BANされたユーザーには送れません");
+
+ sending=false;
+
+ return;
+
+}
+
+// Transaction開始
+
+const result = await runTransaction(ref(db,"members"), (members)=>{
+
+
+  if(!members){
+
+    return;
+
+  }
+
+
+  const me = members[uid];
+
+  const other = members[target];
+
+
+  if(!me || !other){
+
+    return;
+
+  }
+
+
+  const beforeTotal =
+    Number(me.point || 0)
+    +
+    Number(other.point || 0);
+
+
+
+  // 残高確認
+
+  if(Number(me.point || 0) < point){
+
+    return;
+
+  }
+
+
+  // ポイント移動
+
+  me.point =
+    Number(me.point || 0) - point;
+
+
+  other.point =
+    Number(other.point || 0) + point;
+
+
+
+  const afterTotal =
+    Number(me.point)
+    +
+    Number(other.point);
+
+
+
+  // 合計チェック
+
+  if(beforeTotal !== afterTotal){
+
+    return;
+
+  }
+
+
+  return members;
+
+
+});
+
+
+if(result.committed){
+
+  // 自分のログ
+  await push(ref(db,"logs/"+uid),{
+
+    action:
+    targetName+
+    "さんへ"+
+    point+
+    "ポイント譲渡",
+
+    time:Date.now()
+
+  });
+
+
+  // 相手のログ
+  await push(ref(db,"logs/"+target),{
+
+    action:
+    "あなたは"+
+    point+
+    "ポイント受け取りました",
+
+    time:Date.now()
+
+  });
+
+
+  alert(
+    targetName+
+    "さんへ"+
+    point+
+    "ポイント譲渡しました"
+  );
+
+
+  // 入力を空にする
+  document.getElementById("givePoint").value="";
+  sending=false;
+
+
+}else{
+
+  alert(
+    "譲渡に失敗しました"
+  );
+
+  sending=false;
+
+}
+
+};
+
+});
 </script>
 </body>
 
