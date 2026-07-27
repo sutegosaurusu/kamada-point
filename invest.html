@@ -171,8 +171,9 @@ async function checkPosition(){
     const trade = data[key];
 
     position = trade.type;
-    betPoint = trade.bet;
-    entryPrice = trade.entryPrice;
+betPoint = trade.bet;
+entryPrice = trade.entryPrice;
+leverage = trade.leverage;
 
     positionRef = ref(db,"positions/"+uid+"/"+key);
 
@@ -372,7 +373,7 @@ document.getElementById("shortButton").onclick = async () => {
     }
 
    betPoint = Number(document.getElementById("bet").value);
-leverage = Number(document.getElementById("leverage").value); // ←追加
+leverage = Number(document.getElementById("leverage").value); 
 
 if(betPoint <= 0){
 
@@ -438,12 +439,12 @@ startCountdown();
 positionRef = tradeRef;
 
 await set(tradeRef,{
-    type:type,
-    bet:betPoint,
-    entryPrice:entryPrice,
-    startTime:Date.now()
+    type: type,
+    bet: betPoint,
+    leverage: leverage,   
+    entryPrice: entryPrice,
+    startTime: Date.now()
 });
-
 console.log("取引開始保存");
 
 return true;
