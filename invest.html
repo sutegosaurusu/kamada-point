@@ -572,35 +572,34 @@ const gameMultiplier = 1000;
 const profit = Math.round(
     betPoint * rate * leverage * gameMultiplier
 );
-        // FX税計算
+   // FX税計算
 let fxTax = 0;
 
+// 利益があるときだけ税金
+if (profit > 0) {
 
+    if (profit >= 1000000) {
+        fxTax = Math.floor(profit * 0.5);
+    }
+    else if (profit >= 10000) {
+        fxTax = Math.floor(profit * 0.2);
+    }
+    else if (profit >= 1000) {
+        fxTax = Math.floor(profit * 0.1);
+    }
 
-if(betPoint >= 1000000){
-    fxTax = Math.floor(betPoint * 0.5);
 }
-else if(betPoint >= 10000){
-    fxTax = Math.floor(betPoint * 0.2);
-}
-else if(betPoint >= 1000){
-    fxTax = Math.floor(betPoint * 0.05);
-}
-
 
 // 税金を利益から引く
 const afterTaxProfit = profit - fxTax;
-        let text="";
 
-        if(profit>=0){
+let text = "";
 
-            text="利益 +" + profit + " pt";
-
-        }else{
-
-            text="損失 " + profit + " pt";
-
-        }
+if (profit >= 0) {
+    text = "利益 +" + profit + " pt";
+} else {
+    text = "損失 " + profit + " pt";
+}
         // ポイント更新
 const userRef = ref(db, "members/" + uid);
 
