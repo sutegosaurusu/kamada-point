@@ -191,28 +191,36 @@ Number(document.getElementById("givePoint").value)
 }
 
 
-  if(!target){
+ if(!target){
 
-    alert("譲渡先を選択してください");
-    return;
+  alert("譲渡先を選択してください");
 
-  }
+  sending=false;
+
+  return;
+
+}
+
+ if(point <= 0){
+
+  alert("1ポイント以上入力してください");
+
+  sending=false;
+
+  return;
+
+}
 
 
-  if(point <= 0){
+if(myPoint < point){
 
-    alert("1ポイント以上入力してください");
-    return;
+  alert("ポイントが足りません");
 
-  }
+  sending=false;
 
+  return;
 
-  if(point > 1000){
-
-    alert("1回の譲渡上限は1000ポイントです");
-    return;
-
-  }
+}
 
 
   if(myPoint < point){
@@ -235,28 +243,14 @@ if(!targetSnap.exists()){
 
 const targetName = targetSnap.val().name;
 
-const targetSnap =
-await get(ref(db,"members/"+target));
-
-
-if(!targetSnap.exists()){
-
- alert("相手が存在しません");
-
- sending=false;
-
- return;
-
-}
-
 
 if(targetSnap.val().banned === true){
 
- alert("BANされたユーザーには送れません");
+  alert("BANされたユーザーには送れません");
 
- sending=false;
+  sending=false;
 
- return;
+  return;
 
 }
 
