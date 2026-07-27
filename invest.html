@@ -240,12 +240,14 @@ allow_symbol_change:false
 
 });
 
-let position=null;
+let position = null;
 
-let entryPrice=0;
+let entryPrice = 0;
 
-let betPoint=0;
-   
+let betPoint = 0;
+
+let leverage = 0;   // ←追加
+
 let positionRef = null;
 
 let profitTimer = null;
@@ -321,9 +323,10 @@ document.getElementById("longButton").onclick = async () => {
 
     }
 
-    betPoint = Number(document.getElementById("bet").value);
+   betPoint = Number(document.getElementById("bet").value);
+leverage = Number(document.getElementById("leverage").value); 
 
-    if(betPoint <= 0){
+if(betPoint <= 0){
 
         alert("投資ポイントを入力してください");
 
@@ -367,9 +370,10 @@ document.getElementById("shortButton").onclick = async () => {
 
     }
 
-    betPoint = Number(document.getElementById("bet").value);
+   betPoint = Number(document.getElementById("bet").value);
+leverage = Number(document.getElementById("leverage").value); // ←追加
 
-    if(betPoint <= 0){
+if(betPoint <= 0){
 
         alert("投資ポイントを入力してください");
 
@@ -563,8 +567,6 @@ async function closePosition(){
 
         }
 
-     const leverage = Number(document.getElementById("leverage").value);
-
 const gameMultiplier = 1000;
 
 const profit = Math.round(
@@ -659,6 +661,7 @@ betPoint = 0;
 
 document.getElementById("longButton").disabled = false;
 document.getElementById("shortButton").disabled = false;
+        document.getElementById("leverage").disabled = false;
     }
 
     catch(e){
