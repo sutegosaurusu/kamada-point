@@ -198,6 +198,85 @@ onValue(ref(db,"logs/"+uid), (snap)=>{
 
 });
   document.getElementById("giveButton").onclick = async()=>{
+
+
+  const targetSelect =
+document.getElementById("giveUser");
+
+const targetName =
+targetSelect.options[targetSelect.selectedIndex].text;
+
+
+if(!confirm(
+
+  targetName+
+  "ニキへ\n\n"+
+  point+
+  "ポイント譲渡するナリonValue(ref(db,"members"), (snap)=>{
+
+    const data = snap.val() || {};
+
+    const select = document.getElementById("giveUser");
+
+    select.innerHTML =
+    "<option value=''>譲渡先を選択</option>";
+
+    for(const id in data){
+
+        // 自分は表示しない
+        if(id === uid) continue;
+
+        // BANユーザーは表示しない
+        if(data[id].banned === true) continue;
+
+        const option = document.createElement("option");
+
+        option.value = id;
+
+        option.textContent = data[id].name;
+
+        select.appendChild(option);
+
+    }
+
+});
+  });
+
+// 譲渡履歴表示
+onValue(ref(db,"logs/"+uid), (snap)=>{
+
+  const data = snap.val() || {};
+
+  const box =
+  document.getElementById("transferLog");
+
+  box.innerHTML="";
+
+  Object.values(data)
+  .sort((a,b)=>b.time-a.time)
+  .forEach(log=>{
+
+    const div =
+    document.createElement("div");
+
+    div.textContent =
+    log.action+
+    "　"+
+    new Date(log.time).toLocaleString();
+
+    box.appendChild(div);
+
+  });
+
+});
+  document.getElementById("giveButton").onclick = async()=>{
+
+
+
+
+
+
+  if(sending){
     if(sending){
 
   alert("譲渡処理中です");
@@ -215,6 +294,29 @@ sending = true;
 Math.floor(
 Number(document.getElementById("givePoint").value)
 );
+    const targetSelect =
+document.getElementById("giveUser");
+
+const targetName =
+targetSelect.options[targetSelect.selectedIndex].text;
+
+
+if(!confirm(
+
+  targetName+
+  "ニキへ\n\n"+
+  point+
+  "ポイント譲渡します。\n\n"+
+  "現在のポイント\n"+
+  myPoint+
+  "pt"
+
+)){
+
+
+  return;
+
+}
     if(target === uid){
 
   alert("自分には譲渡できません");
