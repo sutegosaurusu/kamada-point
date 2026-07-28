@@ -285,6 +285,8 @@ if(snapshot.exists()){
     return;
 }
 
+try{
+
 const userCredential =
 await createUserWithEmailAndPassword(
     auth,
@@ -292,52 +294,30 @@ await createUserWithEmailAndPassword(
     password
 );
 
-
-const user =
-userCredential.user;
-
-
+const user = userCredential.user;
 
 await set(
 ref(db,"members/"+user.uid),
 {
-
-name:name,
-
-email:email,
-
-point:0,
-
-admin:false,
-
-banned:false
-
+    name:name,
+    email:email,
+    point:0,
+    admin:false,
+    banned:false
 }
-
 );
-
-
 
 msg.textContent="登録成功";
 
-
-
 setTimeout(()=>{
-
-location.href="login.html";
-
+    location.href="login.html";
 },1000);
-
-
 
 }catch(e){
 
+    msg.textContent="登録失敗";
 
-msg.textContent="登録失敗";
-
-
-console.log(e);
-
+    console.log(e);
 
 }
 
