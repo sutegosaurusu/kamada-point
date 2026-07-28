@@ -337,7 +337,304 @@ onValue(ref(db, "members"), (snap)=>{
   });
 
 });
+      // 譲渡履歴
+onValue(ref(db,"logs/"+uid),(snap)=>{
 
+  const data = snap.val() || {};
+
+  const box = document.getElementById("transferLog");
+
+  box.innerHTML = "";
+
+  const logs = Object.values(data)
+    .sort((a,b)=>b.time-a.time);
+
+  if(logs.length === 0){
+
+    box.textContent = "履歴はありません";
+
+    return;
+
+  }
+
+  logs.forEach(log=>{
+
+    const div = document.createElement("div");
+
+    div.style.padding = "8px 0";
+    div.style.borderBottom = "1px solid #ffd1e3";
+
+    div.textContent =
+      log.action +
+      "　" +
+      new Date(log.time).toLocaleString();
+
+    box.appendChild(div);
+
+  });
+
+});
+      // ===============================
+// 通常譲渡（前半）
+// ===============================
+
+document.getElementById("giveButton").onclick = async()=>{
+
+  if(sending){
+    alert("譲渡処理中です");
+    return;
+  }
+
+  sending = true;
+
+  const target =
+    document.getElementById("giveUser").value;
+
+  const point =
+    Math.floor(Number(document.getElementById("givePoint").value));
+
+  // 相手未選択
+  if(!target){
+    alert("譲渡先を選択してください");
+    sending = false;
+    return;
+  }
+
+  // 自分には送れない
+  if(target === uid){
+    alert("自分には譲渡できません");
+    sending = false;
+    return;
+  }
+
+  // 数値チェック
+  if(isNaN(point) || point <= 0){
+    alert("1ポイント以上入力してください");
+    sending = false;
+    return;
+  }
+
+  // 最大1000pt
+  if(point > 1000){
+    alert("通常譲渡は1000ptまでです");
+    sending = false;
+    return;
+  }
+
+  // ポイント不足
+  if(myPoint < point){
+    alert("ポイントが足りません");
+    sending = false;
+    return;
+  }
+
+  // 相手取得
+  const targetSnap =
+    await get(ref(db,"members/"+target));
+
+  if(!targetSnap.exists()){
+    alert("相手が見つかりません");
+    sending = false;
+    return;
+  }
+
+  const other = targetSnap.val();
+
+  // BANチェック
+  if(other.banned === true){
+    alert("BANされたユーザーには送れません");
+    sending = false;
+    return;
+  }
+
+  // 確認画面
+  const ok = confirm(
+    other.name +
+    " さんへ\n\n" +
+    point +
+    "pt 譲渡しますか？"
+  );
+
+  if(!ok){
+    sending = false;
+    return;
+  }
+
+  // runTransactionで安全に譲渡
+const result = await runTransaction(ref(db, "members"), (members)=>{
+
+  if(!members) return;
+
+  const me = members[uid];
+  const targetUser = members[target];
+
+  if(!me || !targetUser) return;
+
+  // 最新のポイントで再確認
+  if(Number(me.point || 0) < point){
+    return;
+  }
+
+  // 自分から減らす
+  me.point = Number(me.point || 0) - point;
+
+  // 相手へ加算
+  targetUser.point = Number(targetUser.point || 0) + point;
+
+  return members;
+
+});
+
+if(!result.committed){
+
+  alert("譲渡に失敗しました");
+  sending = false;
+  return;
+
+}
+
+// ログ保存
+await push(ref(db,"logs/"+uid),{
+
+  action:`${other.name}さんへ${point}pt譲渡`,
+  time:Date.now()
+
+});
+
+await push(ref(db,"logs/"+target),{
+  const mySnap = await get(ref(db,"members/"+uid));
+const me = mySnap.val();
+
+action:`${me.name}さんから${point}pt受取`
+  time:Date.now()
+
+});
+
+alert("譲渡が完了しました！");
+
+document.getElementById("givePoint").value = "";
+document.getElementById("giveUser").selectedIndex = 0;
+
+sending = false;
+
+};
+// ===============================
+// 特別譲渡（50%受取）
+// ===============================
+
+document.getElementById("specialGiveButton").onclick = async()=>{
+
+  if(specialSending){
+    alert("処理中です");
+    return;
+  }
+
+  specialSending = true;
+
+  const target =
+    document.getElementById("specialGiveUser").value;
+
+  const point =
+    Math.floor(Number(document.getElementById("specialGivePoint").value));
+
+  if(!target){
+    alert("譲渡先を選択してください");
+    specialSending = false;
+    return;
+  }
+
+  if(target === uid){
+    alert("自分には譲渡できません");
+    specialSending = false;
+    return;
+  }
+
+  if(isNaN(point) || point <= 0){
+    alert("1ポイント以上入力してください");
+    specialSending = false;
+    return;
+  }
+
+  if(myPoint < point){
+    alert("ポイントが足りません");
+    specialSending = false;
+    return;
+  }
+
+  const targetSnap = await get(ref(db,"members/"+target));
+
+  if(!targetSnap.exists()){
+    alert("相手が見つかりません");
+    specialSending = false;
+    return;
+  }
+
+  const other = targetSnap.val();
+
+  if(other.banned === true){
+    alert("BANされたユーザーには送れません");
+    specialSending = false;
+    return;
+  }
+
+  const receivePoint = Math.floor(point / 2);
+
+  if(!confirm(
+    `${other.name}さんへ${point}pt送ります。\n\n` +
+    `相手の受取：${receivePoint}pt\n` +
+    `消滅：${point - receivePoint}pt`
+  )){
+    specialSending = false;
+    return;
+  }
+
+  const result = await runTransaction(ref(db,"members"),(members)=>{
+
+    if(!members) return;
+
+    const me = members[uid];
+    const targetUser = members[target];
+
+    if(!me || !targetUser) return;
+
+    if(Number(me.point || 0) < point){
+      return;
+    }
+
+    me.point = Number(me.point || 0) - point;
+    targetUser.point = Number(targetUser.point || 0) + receivePoint;
+
+    return members;
+
+  });
+
+  if(!result.committed){
+    alert("譲渡に失敗しました");
+    specialSending = false;
+    return;
+  }
+
+  const mySnap = await get(ref(db,"members/"+uid));
+  const me = mySnap.val();
+
+  await push(ref(db,"logs/"+uid),{
+    action:`${other.name}さんへ特別譲渡 ${point}pt（相手受取${receivePoint}pt）`,
+    time:Date.now()
+  });
+
+  await push(ref(db,"logs/"+target),{
+    action:`${me.name}さんから特別譲渡 ${receivePoint}pt受取`,
+    time:Date.now()
+  });
+
+  alert("特別譲渡が完了しました！");
+
+  document.getElementById("specialGivePoint").value = "";
+  document.getElementById("specialGiveUser").selectedIndex = 0;
+
+  specialSending = false;
+
+};
 
 
 </script>
