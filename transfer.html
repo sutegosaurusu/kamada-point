@@ -3,26 +3,36 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>ポイント譲渡</title>
 
 </head>
 
 <body>
+
+<button id="backButton">
+← 戻る
+</button>
+
+<h1>ポイント譲渡</h1>
+
+<hr>
+
 <h2>現在のポイント</h2>
 
 <div id="myPoint">
 読み込み中...
 </div>
-  <hr>
 
-<h2>譲渡先</h2>
+<hr>
+
+<h2>通常譲渡</h2>
 
 <select id="giveUser">
-    <option value="">譲渡先を選択</option>
+<option value="">
+譲渡先を選択
+</option>
 </select>
 
 <br><br>
@@ -37,12 +47,15 @@ placeholder="譲渡ポイント">
 <button id="giveButton">
 譲渡する
 </button>
-  <hr>
+
+<hr>
 
 <h2>特別譲渡（手数料50%）</h2>
 
 <select id="specialGiveUser">
-    <option value="">譲渡先を選択</option>
+<option value="">
+譲渡先を選択
+</option>
 </select>
 
 <br><br>
@@ -57,660 +70,26 @@ placeholder="送るポイント">
 <button id="specialGiveButton">
 特別譲渡する
 </button>
-<h1>ポイント譲渡</h1>
-  <hr>
+
+<hr>
+
+<h2>ランキング</h2>
+
+<div id="rankList">
+
+読み込み中...
+
+</div>
+
+<hr>
 
 <h2>譲渡履歴</h2>
 
 <div id="transferLog">
+
 読み込み中...
+
 </div>
-<button onclick="location.href='user.html'">
-戻る
-</button>
-<script type="module">
 
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-  getAuth,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  getDatabase,
-  ref,
-  get,
-  onValue,
-  push,
-  runTransaction
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-const firebaseConfig = {
-
-  apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
-
-  authDomain:"kamadapoint.firebaseapp.com",
-
-  databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-  projectId:"kamadapoint",
-
-  storageBucket:"kamadapoint.firebasestorage.app",
-
-  messagingSenderId:"601769416524",
-
-  appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
-
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
-let uid = null;
-let myPoint = 0;
-let sending = false;
-  let specialSending = false;
-// ログイン確認
-onAuthStateChanged(auth, async(user)=>{
-
-  // ログインしていなければログイン画面へ
-  if(!user){
-    location.href="login.html";
-    return;
-  }
-
-  uid = user.uid;
-
-  // 自分の情報を取得
-  const snap = await get(ref(db,"members/"+uid));
-
-  if(!snap.exists()){
-    location.href="login.html";
-    return;
-  }
-
-  const data = snap.val();
-
-  // BANされているか確認
-  if(data.banned === true){
-    alert("BANされています");
-    location.href="login.html";
-    return;
-  }
-
-  // 自分のポイント表示
-  myPoint = Number(data.point || 0);
-
-  document.getElementById("myPoint").textContent =
-    myPoint + " pt";
-
-  // ポイントをリアルタイム更新
-  onValue(ref(db,"members/"+uid), (snap)=>{
-
-    const d = snap.val();
-
-    if(!d) return;
-
-    myPoint = Number(d.point || 0);
-
-    document.getElementById("myPoint").textContent =
-      myPoint + " pt";
-
-  });
-  // 譲渡先一覧
-onValue(ref(db,"members"), (snap)=>{
-
-    const data = snap.val() || {};
-
-    const select = document.getElementById("giveUser");
-  const specialSelect =
-document.getElementById("specialGiveUser");
-
-    select.innerHTML =
-    "<option value=''>譲渡先を選択</option>";
-
-    for(const id in data){
-
-        // 自分は表示しない
-        if(id === uid) continue;
-
-        // BANユーザーは表示しない
-        if(data[id].banned === true) continue;
-
-        const option = document.createElement("option");
-
-        option.value = id;
-
-        option.textContent = data[id].name;
-
-        select.appendChild(option);
-      const option2 =
-document.createElement("option");
-
-option2.value=id;
-
-option2.textContent=data[id].name;
-
-specialSelect.appendChild(option2);
-
-    }
-
-});
-  });
-
-// 譲渡履歴表示
-onValue(ref(db,"logs/"+uid), (snap)=>{
-
-  const data = snap.val() || {};
-
-  const box =
-  document.getElementById("transferLog");
-
-  box.innerHTML="";
-
-  Object.values(data)
-  .sort((a,b)=>b.time-a.time)
-  .forEach(log=>{
-
-    const div =
-    document.createElement("div");
-
-    div.textContent =
-    log.action+
-    "　"+
-    new Date(log.time).toLocaleString();
-
-    box.appendChild(div);
-
-  });
-
-});
-  document.getElementById("giveButton").onclick = async()=>{
-
-
-  const targetSelect =
-document.getElementById("giveUser");
-
-const targetName =
-targetSelect.options[targetSelect.selectedIndex].text;
-
-
-if(!confirm(
-
-  targetName+
-  "ニキへ\n\n"+
-  point+
-  "ポイント譲渡するナリonValue(ref(db,"members"), (snap)=>{
-
-    const data = snap.val() || {};
-
-    const select = document.getElementById("giveUser");
-
-    select.innerHTML =
-    "<option value=''>譲渡先を選択</option>";
-
-    for(const id in data){
-
-        // 自分は表示しない
-        if(id === uid) continue;
-
-        // BANユーザーは表示しない
-        if(data[id].banned === true) continue;
-
-        const option = document.createElement("option");
-
-        option.value = id;
-
-        option.textContent = data[id].name;
-
-        select.appendChild(option);
-
-    }
-
-});
-  });
-
-// 譲渡履歴表示
-onValue(ref(db,"logs/"+uid), (snap)=>{
-
-  const data = snap.val() || {};
-
-  const box =
-  document.getElementById("transferLog");
-
-  box.innerHTML="";
-
-  Object.values(data)
-  .sort((a,b)=>b.time-a.time)
-  .forEach(log=>{
-
-    const div =
-    document.createElement("div");
-
-    div.textContent =
-    log.action+
-    "　"+
-    new Date(log.time).toLocaleString();
-
-    box.appendChild(div);
-
-  });
-
-});
-  document.getElementById("giveButton").onclick = async()=>{
-
-
-
-
-
-
-  if(sending){
-    if(sending){
-
-  alert("譲渡処理中です");
-
-  return;
-
-}
-
-sending = true;
-
-  const target =
-    document.getElementById("giveUser").value;
-
-  const point =
-Math.floor(
-Number(document.getElementById("givePoint").value)
-);
-    const targetSelect =
-document.getElementById("giveUser");
-
-const targetName =
-targetSelect.options[targetSelect.selectedIndex].text;
-
-
-if(!confirm(
-
-  targetName+
-  "ニキへ\n\n"+
-  point+
-  "ポイント譲渡します。\n\n"+
-  "現在のポイント\n"+
-  myPoint+
-  "pt"
-
-)){
-
-
-  return;
-
-}
-    if(target === uid){
-
-  alert("自分には譲渡できません");
-
-  sending=false;
-
-  return;
-
-}
-
-
- if(!target){
-
-  alert("譲渡先を選択してください");
-
-  sending=false;
-
-  return;
-
-}
-
- if(point <= 0){
-
-  alert("1ポイント以上入力してください");
-
-  sending=false;
-
-  return;
-
-}
-
-
-if(myPoint < point){
-
-  alert("ポイントが足りません");
-
-  sending=false;
-
-  return;
-
-}
-
-
-  if(myPoint < point){
-
-    alert("ポイントが足りません");
-    return;
-
-  }
-
-
-  const targetSnap = await get(ref(db,"members/"+target));
-
-if(!targetSnap.exists()){
-
-  alert("相手が見つかりません");
-  return;
-
-}
-
-
-const targetName = targetSnap.val().name;
-
-
-if(targetSnap.val().banned === true){
-
-  alert("BANされたユーザーには送れません");
-
-  sending=false;
-
-  return;
-
-}
-
-// Transaction開始
-
-const result = await runTransaction(ref(db,"members"), (members)=>{
-
-
-  // データが存在しない
-  if(!members){
-    return;
-  }
-
-
-  const me = members[uid];
-
-  const other = members[target];
-
-
-  // ユーザーが存在しない
-  if(!me || !other){
-    return;
-  }
-
-
-  const myBefore =
-    Number(me.point || 0);
-
-  const otherBefore =
-    Number(other.point || 0);
-
-
-  // 譲渡前合計
-  const beforeTotal =
-    myBefore + otherBefore;
-
-
-  // 自分のポイント不足
-  if(myBefore < point){
-    return;
-  }
-
-
-  // マイナス防止
-  if(myBefore - point < 0){
-    return;
-  }
-
-
-  // ポイント移動
-
-  me.point =
-    myBefore - point;
-
-
-  other.point =
-    otherBefore + point;
-
-
-
-  // 譲渡後確認
-
-  const myAfter =
-    Number(me.point);
-
-  const otherAfter =
-    Number(other.point);
-
-
-
-  // 合計値チェック
-
-  const afterTotal =
-    myAfter + otherAfter;
-
-
-  if(beforeTotal !== afterTotal){
-
-    return;
-
-  }
-
-
-  // 異常値防止
-
-  if(myAfter < 0){
-
-    return;
-
-  }
-
-
-  if(otherAfter < 0){
-
-    return;
-
-  }
-
-
-  return members;
-
-});
-
-
-if(result.committed){
-
-  // 自分のログ
-  await push(ref(db,"logs/"+uid),{
-
-    action:
-    targetName+
-    "さんへ"+
-    point+
-    "ポイント譲渡",
-
-    time:Date.now()
-
-  });
-
-
-  // 相手のログ
-  await push(ref(db,"logs/"+target),{
-
-    action:
-    "あなたは"+
-    point+
-    "ポイント受け取りました",
-
-    time:Date.now()
-
-  });
-
-
-  alert(
-    targetName+
-    "さんへ"+
-    point+
-    "ポイント譲渡しました"
-  );
-
-
-  // 入力を空にする
-  document.getElementById("givePoint").value="";
-  sending=false;
-
-
-}else{
-
-  alert(
-    "譲渡に失敗しました"
-  );
-
-  sending=false;
-
-}
-
-};
-
-});
-  document.getElementById("specialGiveButton").onclick = async()=>{
-
-
-if(specialSending){
-alert("処理中です");
-return;
-}
-
-specialSending=true;
-
-
-const target =
-document.getElementById("specialGiveUser").value;
-
-
-const point =
-Math.floor(
-Number(document.getElementById("specialGivePoint").value)
-);
-
-
-if(!target){
-
-alert("相手を選択してください");
-
-specialSending=false;
-
-return;
-
-}
-
-
-if(point<=0){
-
-alert("1ポイント以上入力してください");
-
-specialSending=false;
-
-return;
-
-}
-
-
-if(myPoint < point){
-
-alert("ポイント不足です");
-
-specialSending=false;
-
-return;
-
-}
-
-
-const receivePoint =
-Math.floor(point / 2);
-
-
-if(!confirm(
-point+
-"ポイント送ります。\n\n"+
-"相手の受取:\n"+
-receivePoint+
-"pt\n\n"+
-"手数料:\n"+
-(point-receivePoint)+
-"pt"
-)){
-
-specialSending=false;
-
-return;
-
-}
-
-
-const result =
-await runTransaction(ref(db,"members"),(members)=>{
-
-
-const me = members[uid];
-
-const other = members[target];
-
-
-if(!me || !other){
-
-return;
-
-}
-
-
-if(Number(me.point)<point){
-
-return;
-
-}
-
-
-// 自分から全額減る
-
-me.point =
-Number(me.point)-point;
-
-
-// 相手は半分受取
-
-other.point =
-Number(other.point)+receivePoint;
-
-
-return members;
-
-
-});
-
-
-if(result.committed){
-
-alert("特別譲渡しました");
-
-}else{
-
-alert("失敗しました");
-
-}
-
-
-specialSending=false;
-
-
-};
-</script>
 </body>
-
 </html>
