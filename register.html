@@ -207,9 +207,15 @@ import { getAuth, createUserWithEmailAndPassword } from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 
-import { getDatabase, ref, set } from 
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  query,
+  orderByChild,
+  equalTo
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 
 const firebaseConfig = {
@@ -261,25 +267,30 @@ document.getElementById("password").value;
 
 
 if(!name || !email || !password){
-
     msg.textContent="全て入力してください";
-
     return;
-
 }
 
+// 同じ名前があるか確認
+const nameQuery = query(
+    ref(db, "members"),
+    orderByChild("name"),
+    equalTo(name)
+);
 
+const snapshot = await get(nameQuery);
 
-try{
-
+if(snapshot.exists()){
+    msg.textContent="その名前は既に登録されています";
+    return;
+}
 
 const userCredential =
 await createUserWithEmailAndPassword(
-auth,
-email,
-password
+    auth,
+    email,
+    password
 );
-
 
 
 const user =
