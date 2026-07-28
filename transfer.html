@@ -276,6 +276,38 @@ onAuthStateChanged(auth, async(user)=>{
 document.getElementById("backButton").onclick = () => {
   location.href = "user.html";
 };
+  // 譲渡先一覧
+onValue(ref(db, "members"), (snap) => {
+
+  const data = snap.val() || {};
+
+  const normal = document.getElementById("giveUser");
+  const special = document.getElementById("specialGiveUser");
+
+  normal.innerHTML = '<option value="">譲渡先を選択</option>';
+  special.innerHTML = '<option value="">譲渡先を選択</option>';
+
+  for(const id in data){
+
+    // 自分は表示しない
+    if(id === uid) continue;
+
+    // BANユーザーは表示しない
+    if(data[id].banned === true) continue;
+
+    const option1 = document.createElement("option");
+    option1.value = id;
+    option1.textContent = data[id].name;
+    normal.appendChild(option1);
+
+    const option2 = document.createElement("option");
+    option2.value = id;
+    option2.textContent = data[id].name;
+    special.appendChild(option2);
+
+  }
+
+});
 
 });
 
