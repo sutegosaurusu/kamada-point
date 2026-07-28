@@ -309,8 +309,36 @@ onValue(ref(db, "members"), (snap) => {
   }
 
 });
+      });
+      // ランキング表示
+onValue(ref(db, "members"), (snap)=>{
+
+  const data = snap.val() || {};
+
+  const box = document.getElementById("rankList");
+
+  box.innerHTML = "";
+
+  const list = Object.values(data)
+    .filter(user => user.banned !== true)
+    .sort((a,b) => Number(b.point || 0) - Number(a.point || 0));
+
+  list.forEach((user,index)=>{
+
+    const div = document.createElement("div");
+
+    div.style.padding = "8px 0";
+
+    div.textContent =
+      `${index + 1}位　${user.name}　${Number(user.point || 0)} pt`;
+
+    box.appendChild(div);
+
+  });
 
 });
+
+
 
 </script>
 
