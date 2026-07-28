@@ -254,8 +254,7 @@ document.getElementById("registerBtn").onclick = async()=>{
 
 
 const name =
-document.getElementById("name").value;
-
+document.getElementById("name").value.trim();
 
 const email =
 document.getElementById("email").value;
@@ -278,15 +277,15 @@ const nameQuery = query(
     equalTo(name)
 );
 
+
+
+try{
 const snapshot = await get(nameQuery);
 
 if(snapshot.exists()){
     msg.textContent="その名前は既に登録されています";
     return;
 }
-
-try{
-
 const userCredential =
 await createUserWithEmailAndPassword(
     auth,
