@@ -234,6 +234,46 @@ let uid = null;
 let myPoint = 0;
 let sending = false;
 let specialSending = false;
+      // ログイン確認
+onAuthStateChanged(auth, async(user)=>{
+
+  if(!user){
+    location.href="login.html";
+    return;
+  }
+
+  uid = user.uid;
+
+  const snap = await get(ref(db,"members/"+uid));
+
+  if(!snap.exists()){
+    location.href="login.html";
+    return;
+  }
+
+  const data = snap.val();
+
+  if(data.banned === true){
+    alert("BANされています");
+    location.href="login.html";
+    return;
+  }
+
+  // 現在ポイント表示
+  onValue(ref(db,"members/"+uid),(snap)=>{
+
+    const d = snap.val();
+
+    if(!d) return;
+
+    myPoint = Number(d.point || 0);
+
+    document.getElementById("myPoint").textContent =
+      myPoint + " pt";
+
+  });
+
+});
 
 </script>
 
