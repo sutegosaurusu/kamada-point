@@ -319,10 +319,10 @@ onValue(ref(db, "members"), (snap)=>{
 
   box.innerHTML = "";
 
-  const list = Object.values(data)
-    .filter(user => user.banned !== true)
-    .sort((a,b) => Number(b.point || 0) - Number(a.point || 0));
-
+ const list = Object.values(data)
+.filter(user => user && user.name)
+.filter(user => user.banned !== true)
+.sort((a,b)=>Number(b.point || 0)-Number(a.point || 0));
   list.forEach((user,index)=>{
 
     const div = document.createElement("div");
@@ -502,11 +502,13 @@ await push(ref(db,"logs/"+uid),{
 
 });
 
-await push(ref(db,"logs/"+target),{
-  const mySnap = await get(ref(db,"members/"+uid));
+const mySnap = await get(ref(db,"members/"+uid));
 const me = mySnap.val();
 
-action:`${me.name}さんから${point}pt受取`
+await push(ref(db,"logs/"+target),{
+
+  action:`${me.name}さんから${point}pt受取`,
+
   time:Date.now()
 
 });
