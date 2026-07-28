@@ -204,34 +204,7 @@ push,
 runTransaction
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-const firebaseConfig = {
 
-apiKey:"あなたのapiKey",
-
-authDomain:"あなたのauthDomain",
-
-databaseURL:"あなたのdatabaseURL",
-
-projectId:"あなたのprojectId",
-
-storageBucket:"あなたのstorageBucket",
-
-messagingSenderId:"あなたのmessagingSenderId",
-
-appId:"あなたのappId"
-
-};
-
-const app = initializeApp(firebaseConfig);
-
-const auth = getAuth(app);
-
-const db = getDatabase(app);
-
-let uid = null;
-let myPoint = 0;
-let sending = false;
-let specialSending = false;
     <script type="module">
 
 import {
