@@ -412,6 +412,104 @@ likes:
 }
 
 );
+  // いいね報酬
+
+const newLikes =
+(post.likes || 0)+1;
+
+
+
+const authorRef =
+ref(db,"members/"+post.uid);
+
+
+const authorSnap =
+await get(authorRef);
+
+
+
+if(authorSnap.exists()){
+
+
+const author =
+authorSnap.val();
+
+
+let addPoint = 1;
+
+
+
+// 10いいねボーナス
+
+if(
+newLikes >= 10 &&
+!post.likeReward10
+){
+
+addPoint += 20;
+
+
+await update(
+ref(
+db,
+"board/threads/"
++threadId+
+"/posts/"
++postId
+),
+{
+
+likeReward10:true
+
+}
+
+);
+
+}
+
+
+
+// 50いいねボーナス
+
+if(
+newLikes >= 50 &&
+!post.likeReward50
+){
+
+addPoint += 200;
+
+
+await update(
+ref(
+db,
+"board/threads/"
++threadId+
+"/posts/"
++postId
+),
+{
+
+likeReward50:true
+
+}
+
+);
+
+}
+
+
+
+// 投稿者へポイント追加
+
+await update(authorRef,{
+
+point:
+(author.point || 0)+addPoint
+
+});
+
+
+}
 
 
 };
