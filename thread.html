@@ -178,6 +178,62 @@ initializeApp(firebaseConfig);
 
 const db =
 getDatabase(app);
+  const app =
+initializeApp(firebaseConfig);
+
+
+const db =
+getDatabase(app);
+
+
+// ↓ここから追加
+
+async function updateRank(uid){
+
+
+const memberRef =
+ref(db,"members/"+uid);
+
+
+const snap =
+await get(memberRef);
+
+
+if(!snap.exists()) return;
+
+
+const member =
+snap.val();
+
+
+
+let rank="新人";
+
+
+
+if(
+member.lastPostDate &&
+Date.now()-member.lastPostDate
+<
+259200000
+){
+
+rank="常連";
+
+}
+
+
+
+await update(memberRef,{
+
+rank:rank
+
+});
+
+
+}
+
+// ↑ここまで追加
   const auth =
 getAuth(app);
 
@@ -584,6 +640,17 @@ name:name,
 time:Date.now()
 
 });
+  // 投稿活動記録
+
+await update(
+ref(db,"members/"+uid),
+{
+
+lastPostDate:Date.now()
+
+}
+);
+  await updateRank(uid);
   // ポイント報酬処理
 
 const today =
