@@ -407,8 +407,10 @@ div.innerHTML=`
 
 ${post.name}
 
-</div>
+<span id="rank-${postId}">
+</span>
 
+</div>
 
 <p>
 
@@ -622,6 +624,41 @@ newLikes
 
 
 };
+  const rankRef =
+ref(db,"members/"+post.uid);
+
+
+get(rankRef)
+.then((snap)=>{
+
+
+if(snap.exists()){
+
+
+const member =
+snap.val();
+
+
+const rank =
+member.rank || "新人";
+
+
+const badge =
+member.badge || "";
+
+
+
+document.getElementById(
+"rank-"+postId
+).innerHTML =
+
+" ["+rank+"] "+badge;
+
+
+}
+
+
+});
 
 
 
