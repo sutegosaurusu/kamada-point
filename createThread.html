@@ -230,7 +230,7 @@ likes:0
 
 
 });
-  // スレ作成報酬
+// 初回スレ作成報酬
 
 const memberRef =
 ref(db,"members/"+uid);
@@ -247,19 +247,33 @@ const member =
 memberSnap.val();
 
 
+
+if(!member.threadCreatedReward){
+
+
 await update(memberRef,{
 
 point:
-(member.point || 0)+10
+(member.point || 0)+10,
+
+threadCreatedReward:true
 
 });
 
 
-alert("スレ作成報酬 +10pt");
+alert("初回スレ作成報酬 +10pt");
+
+
+}else{
+
+
+alert("スレ作成済みのため報酬はありません");
 
 
 }
 
+
+}
 
 
 alert("スレを作成しました");
