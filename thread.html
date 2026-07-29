@@ -128,10 +128,11 @@ getDatabase,
 ref,
 onValue,
 push,
-set
+set,
+get,
+update
 
 }
-
 from
 
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -333,6 +334,91 @@ name:name,
 time:Date.now()
 
 });
+  // ポイント報酬処理
+
+const today =
+new Date().toLocaleDateString();
+
+
+const memberRef =
+ref(db,"members/"+uid);
+
+
+const memberSnap =
+await get(memberRef);
+
+
+if(memberSnap.exists()){
+
+
+const member =
+memberSnap.val();
+
+
+let reward =
+member.boardRewardToday || 0;
+
+
+let rewardDate =
+member.boardRewardDate || "";
+
+
+
+// 日付が変わったらリセット
+
+if(rewardDate !== today){
+
+reward = 0;
+
+}
+
+
+
+// 上限チェック
+
+if(reward < 100){
+
+
+const addPoint =
+Math.min(5,100-reward);
+
+
+
+await update(memberRef,{
+
+point:
+(member.point || 0)+addPoint,
+
+
+boardRewardDate:
+today,
+
+
+boardRewardToday:
+reward+addPoint
+
+
+});
+
+
+alert(
+"掲示板投稿報酬 +"+addPoint+"pt"
+);
+
+
+}else{
+
+
+alert(
+"今日の掲示板報酬上限に達しています"
+);
+
+
+}
+
+
+
+}
 
 
 
