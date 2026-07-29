@@ -129,14 +129,23 @@ ref,
 onValue,
 push,
 set,
-get,
-update
+get
 
 }
 from
-
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+
+import {
+
+getAuth,
+onAuthStateChanged
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
 
@@ -168,6 +177,52 @@ initializeApp(firebaseConfig);
 
 const db =
 getDatabase(app);
+  const auth =
+getAuth(app);
+
+
+let currentUser = null;
+
+let userName = "名無し";
+
+
+onAuthStateChanged(auth,async(user)=>{
+
+
+if(!user){
+
+alert("ログインしてください");
+
+location.href="login.html";
+
+return;
+
+}
+
+
+currentUser=user;
+
+
+
+const userRef =
+ref(db,"members/"+user.uid);
+
+
+
+const snap =
+await get(userRef);
+
+
+
+if(snap.exists()){
+
+userName =
+snap.val().name;
+
+}
+
+
+});
 
 
 
@@ -305,12 +360,14 @@ return;
 
 
 
-// 仮ユーザー
+// ユーザー
 
-const uid="test";
+const uid =
+currentUser.uid;
 
-const name="鎌田";
 
+const name =
+userName;
 
 
 // 投稿場所
