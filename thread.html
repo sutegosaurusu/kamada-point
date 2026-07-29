@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>スレ</title>
+
+<style>
+
+body{
+
+font-family:"Arial","Noto Sans JP",sans-serif;
+padding:20px;
+background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
+
+}
+
+
+.card{
+
+background:white;
+padding:15px;
+margin:10px 0;
+border-radius:15px;
+box-shadow:0 3px 10px #ccc;
+
+}
+
+
+input{
+
+width:80%;
+padding:12px;
+border-radius:10px;
+border:1px solid #ccc;
+
+}
+
+
+button{
+
+padding:10px 20px;
+border:none;
+border-radius:20px;
+background:#ff8fcf;
+color:white;
+
+}
+
+
+.name{
+
+font-weight:bold;
+
+}
+
+
+.time{
+
+font-size:12px;
+color:#777;
+
+}
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<button onclick="location.href='board.html'">
+
+←掲示板へ戻る
+
+</button>
+
+
+<h1 id="title">
+
+読み込み中
+
+</h1>
+
+
+<div id="posts">
+
+</div>
+
+
+
+<hr>
+
+
+<h2>書き込み</h2>
+
+
+<input id="text" placeholder="コメントを書く">
+
+
+<button id="send">
+
+投稿
+
+</button>
+
+
+
+
+<script type="module">
+
+
+import { initializeApp }
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
+import {
+
+getDatabase,
+ref,
+onValue,
+push,
+set
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+
+
+// Firebase設定
+
+const firebaseConfig = {
+
+apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+
+authDomain:"kamadapoint.firebaseapp.com",
+
+databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+projectId:"kamadapoint",
+
+storageBucket:"kamadapoint.firebasestorage.app",
+
+messagingSenderId:"601769416524",
+
+appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
+
+};
+
+
+
+const app =
+initializeApp(firebaseConfig);
+
+
+const db =
+getDatabase(app);
+
+
+
+// URLからスレID取得
+
+const params =
+new URLSearchParams(location.search);
+
+
+const threadId =
+params.get("id");
+
+
+
+// スレデータ
+
+const threadRef =
+ref(db,"board/threads/"+threadId);
+
+
+
+const title =
+document.getElementById("title");
+
+
+const posts =
+document.getElementById("posts");
+
+
+
+
+// スレ読み込み
+
+onValue(threadRef,(snapshot)=>{
+
+
+const data =
+snapshot.val();
+
+
+if(!data){
+
+title.innerHTML="スレがありません";
+
+return;
+
+}
+
+
+
+title.innerHTML=data.title;
+
+
+
+posts.innerHTML="";
+
+
+
+// レス表示
+
+if(data.posts){
+
+Object.values(data.posts)
+.forEach((post)=>{
+
+
+const div =
+document.createElement("div");
+
+
+div.className="card";
+
+
+div.innerHTML=`
+
+<div class="name">
+
+${post.name}
+
+</div>
+
+
+<p>
+
+${post.text}
+
+</p>
+
+
+<div class="time">
+
+${new Date(post.time)
+.toLocaleString()}
+
+</div>
+
+`;
+
+
+
+posts.appendChild(div);
+
+
+
+});
+
+
+}
+
+
+
+});
+
+
+
+// 投稿
+
+document
+.getElementById("send")
+.onclick=async()=>{
+
+
+const text =
+document.getElementById("text").value;
+
+
+
+if(text===""){
+
+alert("文字を入力してください");
+
+return;
+
+}
+
+
+
+// 仮ユーザー
+
+const uid="test";
+
+const name="鎌田";
+
+
+
+// 投稿場所
+
+const postRef =
+push(
+ref(db,
+"board/threads/"+threadId+"/posts")
+);
+
+
+
+await set(postRef,{
+
+text:text,
+
+uid:uid,
+
+name:name,
+
+time:Date.now()
+
+});
+
+
+
+document.getElementById("text").value="";
+
+
+
+};
+
+
+
+</script>
+
+
+</body>
+
+</html>
