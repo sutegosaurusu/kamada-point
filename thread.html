@@ -609,6 +609,25 @@ point:
 (author.point || 0)+addPoint
 
 });
+  // 通知作成
+
+const notificationRef =
+push(
+ref(db,"notifications/"+post.uid)
+);
+
+await set(notificationRef,{
+
+text:
+userName+"さんがあなたの投稿にいいねしました",
+
+point:addPoint,
+
+read:false,
+
+time:Date.now()
+
+});
   await checkMaster(
 post.uid,
 newLikes
