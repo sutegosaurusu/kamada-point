@@ -127,6 +127,15 @@ input{
 <button id="logoutBtn">ログアウト</button>
 
 <hr>
+    <h2>🔔 通知</h2>
+
+<div id="notifications">
+
+通知はありません
+
+</div>
+
+<hr>
 <div id="notice">
 読み込み中...
 </div>
@@ -255,7 +264,54 @@ return;
 }
 
 uid=user.uid;
+/* ---------- いいね通知 ---------- */
 
+onValue(ref(db,"notifications/"+uid),snap=>{
+
+  const box = document.getElementById("notifications");
+  box.innerHTML = "";
+
+  if(!snap.exists()){
+    box.textContent = "通知はありません";
+    return;
+  }
+
+  const list = [];
+
+  snap.forEach(child=>{
+    list.push({
+      id: child.key,
+      ...child.val()
+    });
+  });
+
+  list.sort((a,b)=>b.time-a.time);
+
+  list.forEach(async(n)=>{
+
+    const div = document.createElement("div");
+
+    div.className = "card";
+
+    div.innerHTML = `
+      <b>${n.text}</b><br>
+      +${n.point}pt
+      <br>
+      <small>${new Date(n.time).toLocaleString()}</small>
+    `;
+
+    box.appendChild(div);
+
+    if(!n.read){
+      await update(
+        ref(db,"notifications/"+uid+"/"+n.id),
+        {read:true}
+      );
+    }
+
+  });
+
+});
 const snap=await get(ref(db,"members/"+uid));
 
 if(!snap.exists()){
