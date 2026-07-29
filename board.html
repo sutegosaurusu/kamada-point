@@ -162,7 +162,8 @@ ref(db,"board/threads");
 
 onValue(threadsRef,(snapshot)=>{
 
-
+console.log("Firebase取得成功");
+console.log(snapshot.val());
 threadsDiv.innerHTML="";
 
 
