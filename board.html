@@ -171,7 +171,13 @@ const now = Date.now();
 
 let count = 0;
 
+snapshot.forEach((child)=>{
 
+const data = child.val();
+
+console.log(data);
+
+});
 
 snapshot.forEach((child)=>{
 
@@ -278,14 +284,7 @@ threadsDiv.innerHTML=
 
 
 });
-    snapshot.forEach((child)=>{
-
-const data = child.val();
-
-console.log(data);
-
-});
-
+    
 
 
 </script>
