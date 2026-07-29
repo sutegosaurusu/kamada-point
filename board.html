@@ -105,7 +105,8 @@ from
 import { 
 getDatabase,
 ref,
-onValue
+onValue,
+get
 }
 from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -229,6 +230,8 @@ ${data.category || "未設定"}
 投稿者：
 ${data.name || "名無し"}
 
+<span id="rank-${id}"></span>
+
 <br>
 
 日時：
@@ -266,6 +269,34 @@ location.href =
 
 
 };
+    const rankRef =
+ref(db,"members/"+data.uid);
+
+
+get(rankRef)
+.then((snap)=>{
+
+
+if(snap.exists()){
+
+
+const member =
+snap.val();
+
+
+document.getElementById(
+"rank-"+id
+).innerHTML =
+
+" ["+
+(member.rank || "新人")
++"] "+
+(member.badge || "");
+
+
+}
+
+});
 
 
 
