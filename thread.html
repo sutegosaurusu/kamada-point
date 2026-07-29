@@ -129,7 +129,8 @@ ref,
 onValue,
 push,
 set,
-get
+get,
+update
 
 }
 from
@@ -318,8 +319,103 @@ ${new Date(post.time)
 .toLocaleString()}
 
 </div>
+<p>
+
+👍 ${post.likes || 0}
+
+</p>
+
+
+<button class="likeBtn">
+
+いいね
+
+</button>
 
 `;
+
+  const likeBtn =
+div.querySelector(".likeBtn");
+
+
+likeBtn.onclick=async()=>{
+
+
+if(!currentUser){
+
+alert("ログインしてください");
+
+return;
+
+}
+
+
+
+// 自分の投稿は禁止
+
+if(post.uid === currentUser.uid){
+
+alert("自分の投稿にはいいねできません");
+
+return;
+
+}
+
+
+
+const likeRef =
+ref(
+db,
+"board/threads/"
++threadId+
+"/posts/"
++child.key+
+"/likedUsers/"
++currentUser.uid
+);
+
+
+
+const likeSnap =
+await get(likeRef);
+
+
+
+if(likeSnap.exists()){
+
+alert("すでにいいねしています");
+
+return;
+
+}
+
+
+
+// いいね記録
+
+await set(likeRef,true);
+
+
+
+await update(
+ref(
+db,
+"board/threads/"
++threadId+
+"/posts/"
++child.key
+),
+{
+
+likes:
+(post.likes || 0)+1
+
+}
+
+);
+
+
+};
 
 
 
