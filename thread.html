@@ -203,7 +203,7 @@ snap.val();
 
 
 
-let rank="新人";
+let rank = member.rank || "新人";
 
 
 
@@ -217,7 +217,51 @@ Date.now()-member.lastPostDate
 rank="常連";
 
 }
+async function checkMaster(uid,likes){
 
+
+if(likes < 20) return;
+
+
+
+const memberRef =
+ref(db,"members/"+uid);
+
+
+
+const snap =
+await get(memberRef);
+
+
+
+if(!snap.exists()) return;
+
+
+
+const member =
+snap.val();
+
+
+
+if(member.rank !== "名人"){
+
+
+await update(memberRef,{
+
+rank:"名人",
+
+badge:"🏆 名人"
+
+});
+
+
+alert("名人ランクになりました！");
+
+
+}
+
+
+}
 
 
 await update(memberRef,{
