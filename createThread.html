@@ -127,7 +127,9 @@ import {
 getDatabase,
 ref,
 push,
-set
+set,
+get,
+update
 
 }
 
@@ -228,6 +230,35 @@ likes:0
 
 
 });
+  // スレ作成報酬
+
+const memberRef =
+ref(db,"members/"+uid);
+
+
+const memberSnap =
+await get(memberRef);
+
+
+if(memberSnap.exists()){
+
+
+const member =
+memberSnap.val();
+
+
+await update(memberRef,{
+
+point:
+(member.point || 0)+10
+
+});
+
+
+alert("スレ作成報酬 +10pt");
+
+
+}
 
 
 
