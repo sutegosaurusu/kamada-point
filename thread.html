@@ -217,8 +217,21 @@ Date.now()-member.lastPostDate
 rank="常連";
 
 }
-async function checkMaster(uid,likes){
 
+
+await update(memberRef,{
+
+rank:rank
+
+});
+
+
+}
+
+
+// 名人チェック
+
+async function checkMaster(uid,likes){
 
 if(likes < 20) return;
 
@@ -264,11 +277,7 @@ alert("名人ランクになりました！");
 }
 
 
-await update(memberRef,{
 
-rank:rank
-
-});
 
 
 }
@@ -603,6 +612,10 @@ point:
 (author.point || 0)+addPoint
 
 });
+  await checkMaster(
+post.uid,
+newLikes
+);
 
 
 }
