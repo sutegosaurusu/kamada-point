@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>スレ作成</title>
+
+
+<style>
+
+body{
+
+font-family:"Arial","Noto Sans JP",sans-serif;
+padding:20px;
+background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
+
+}
+
+
+.card{
+
+background:white;
+padding:20px;
+border-radius:15px;
+
+}
+
+
+input,select,textarea{
+
+width:90%;
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+border:1px solid #ccc;
+
+}
+
+
+button{
+
+padding:12px 25px;
+border:none;
+border-radius:25px;
+background:#ff8fcf;
+color:white;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<h1>スレを作成</h1>
+
+
+<div class="card">
+
+
+<input id="title" placeholder="スレタイトル">
+
+
+<br>
+
+
+<select id="category">
+
+<option value="雑談">
+雑談
+</option>
+
+<option value="実況">
+実況
+</option>
+
+<option value="趣味">
+趣味
+</option>
+
+</select>
+
+
+<br>
+
+
+<button id="create">
+
+作成する
+
+</button>
+
+
+</div>
+
+
+
+<button onclick="location.href='board.html'">
+
+戻る
+
+</button>
+
+
+
+
+<script type="module">
+
+
+import { initializeApp }
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
+import {
+
+getDatabase,
+ref,
+push,
+set
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+
+
+// Firebase設定
+
+const firebaseConfig = {
+
+apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+
+authDomain:"kamadapoint.firebaseapp.com",
+
+databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+projectId:"kamadapoint",
+
+storageBucket:"kamadapoint.firebasestorage.app",
+
+messagingSenderId:"601769416524",
+
+appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
+
+};
+
+
+
+const app =
+initializeApp(firebaseConfig);
+
+
+const db =
+getDatabase(app);
+
+
+
+
+document
+.getElementById("create")
+.onclick=async()=>{
+
+
+const title =
+document.getElementById("title").value;
+
+
+const category =
+document.getElementById("category").value;
+
+
+
+if(title===""){
+
+alert("タイトルを入力してください");
+
+return;
+
+}
+
+
+
+// 仮ユーザー
+
+const uid="test";
+
+const name="鎌田";
+
+
+
+
+// スレID作成
+
+const threadRef =
+push(ref(db,"board/threads"));
+
+
+
+await set(threadRef,{
+
+
+title:title,
+
+category:category,
+
+uid:uid,
+
+name:name,
+
+createdAt:Date.now(),
+
+likes:0
+
+
+
+});
+
+
+
+alert("スレを作成しました");
+
+
+location.href="board.html";
+
+
+};
+
+
+
+</script>
+
+
+</body>
+
+</html>
