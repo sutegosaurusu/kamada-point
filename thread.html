@@ -286,9 +286,8 @@ posts.innerHTML="";
 
 if(data.posts){
 
-Object.values(data.posts)
-.forEach((post)=>{
-
+Object.entries(data.posts)
+.forEach(([postId,post])=>{
 
 const div =
 document.createElement("div");
@@ -369,7 +368,7 @@ db,
 "board/threads/"
 +threadId+
 "/posts/"
-+child.key+
++postId+
 "/likedUsers/"
 +currentUser.uid
 );
@@ -403,7 +402,7 @@ db,
 "board/threads/"
 +threadId+
 "/posts/"
-+child.key
++postId
 ),
 {
 
