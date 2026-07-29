@@ -10,40 +10,155 @@
 <style>
 
 body{
-    font-family:sans-serif;
-    background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
+    font-family:"Arial","Noto Sans JP",sans-serif;
+    margin:0;
     padding:20px;
+    background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
 }
 
-.card{
-    background:white;
-    padding:15px;
-    margin:10px 0;
-    border-radius:15px;
+h1{
+    text-align:center;
 }
 
 button{
-    padding:10px 20px;
-    border-radius:20px;
+    padding:12px 20px;
+    border:none;
+    border-radius:25px;
+    background:#ff8fcf;
+    color:white;
+    cursor:pointer;
+    margin:5px;
 }
+
+button:hover{
+    opacity:0.8;
+}
+
+.card{
+
+    background:white;
+    padding:15px;
+    margin:15px 0;
+    border-radius:15px;
+    box-shadow:0 3px 10px #ccc;
+
+}
+
+.title{
+
+    font-size:20px;
+    font-weight:bold;
+
+}
+
+.info{
+
+    color:#666;
+    font-size:14px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<h1>鎌田P掲示板</h1>
+
+
+<button onclick="location.href='createThread.html'">
+スレを作成
+</button>
+
+
+<button onclick="location.href='user.html'">
+戻る
+</button>
+
+
+<hr>
+
+
+<div id="threads">
+
+読み込み中...
+
+</div>
+
+
+
+<script type="module">
+
+
+// Firebase SDK
+
+import { initializeApp }
+from 
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+
 import { 
 getDatabase,
 ref,
 onValue
 }
-from 
+from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
-const db=getDatabase();
 
 
-const threadsDiv=
+// ★ここを自分のFirebase設定に変更
+
+const firebaseConfig = {
+
+  apiKey: "ここに入力",
+
+  authDomain: "ここに入力",
+
+  databaseURL: "ここに入力",
+
+  projectId: "ここに入力",
+
+  storageBucket: "ここに入力",
+
+  messagingSenderId: "ここに入力",
+
+  appId: "ここに入力"
+
+};
+
+
+
+
+// Firebase開始
+
+const app =
+initializeApp(firebaseConfig);
+
+
+const db =
+getDatabase(app);
+
+
+
+
+// 表示場所
+
+const threadsDiv =
 document.getElementById("threads");
 
 
-const threadsRef=
+
+
+// スレ取得
+
+const threadsRef =
 ref(db,"board/threads");
+
 
 
 onValue(threadsRef,(snapshot)=>{
@@ -52,95 +167,134 @@ onValue(threadsRef,(snapshot)=>{
 threadsDiv.innerHTML="";
 
 
-const now=Date.now();
+const now = Date.now();
+
+
+let count = 0;
+
 
 
 snapshot.forEach((child)=>{
 
 
-const data=child.val();
+const data = child.val();
+
+const id = child.key;
 
 
-const id=child.key;
 
+// 3日以上前は表示しない
 
-//3日以内か確認
+if(
+now - data.createdAt > 259200000
+){
 
-if(now-data.createdAt > 259200000){
-    return;
+return;
+
 }
 
 
 
-const div=document.createElement("div");
+count++;
+
+
+
+const div =
+document.createElement("div");
+
 
 div.className="card";
 
 
-div.innerHTML=`
 
-<h2>${data.title}</h2>
+div.innerHTML = `
 
-<p>
-${data.category}
-</p>
+<div class="title">
 
-<p>
-投稿者：${data.name}
-</p>
+${data.title || "タイトルなし"}
+
+</div>
+
 
 <p>
-👍${data.likes || 0}
+カテゴリー：
+${data.category || "未設定"}
 </p>
+
+
+<p class="info">
+
+投稿者：
+${data.name || "名無し"}
+
+<br>
+
+日時：
+${new Date(data.createdAt)
+.toLocaleString()}
+
+</p>
+
+
+<p>
+
+👍 ${data.likes || 0}
+
+</p>
+
+
 
 <button>
-開く
+
+スレを見る
+
 </button>
 
+
 `;
+
 
 
 div.querySelector("button")
 .onclick=()=>{
 
-location.href=
+
+location.href =
 "thread.html?id="+id;
 
+
 };
+
 
 
 threadsDiv.appendChild(div);
 
 
-});
-
 
 });
-</style>
-
-</head>
-
-<body>
-
-<h1>鎌田掲示板</h1>
-
-<button onclick="location.href='createThread.html'">
-スレを作成
-</button>
-
-<hr>
-
-<div id="threads">
-読み込み中...
-</div>
 
 
-<script type="module">
 
-// ここにFirebase設定を書く
+if(count===0){
+
+threadsDiv.innerHTML=
+
+"表示できるスレはありません";
+
+}
+
+
+
+});
+
 
 
 </script>
+
+
+</body>
+
+</html>
 
 </body>
 </html>
