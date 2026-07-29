@@ -184,13 +184,6 @@ const id = child.key;
 
 // 3日以上前は表示しない
 
-if(
-now - data.createdAt > 259200000
-){
-
-return;
-
-}
 
 
 
@@ -283,6 +276,13 @@ threadsDiv.innerHTML=
 }
 
 
+
+});
+    snapshot.forEach((child)=>{
+
+const data = child.val();
+
+console.log(data);
 
 });
 
