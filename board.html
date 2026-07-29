@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>鎌田P掲示板</title>
+
+<style>
+
+body{
+    font-family:sans-serif;
+    background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:15px;
+    margin:10px 0;
+    border-radius:15px;
+}
+
+button{
+    padding:10px 20px;
+    border-radius:20px;
+}
+import { 
+getDatabase,
+ref,
+onValue
+}
+from 
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+const db=getDatabase();
+
+
+const threadsDiv=
+document.getElementById("threads");
+
+
+const threadsRef=
+ref(db,"board/threads");
+
+
+onValue(threadsRef,(snapshot)=>{
+
+
+threadsDiv.innerHTML="";
+
+
+const now=Date.now();
+
+
+snapshot.forEach((child)=>{
+
+
+const data=child.val();
+
+
+const id=child.key;
+
+
+//3日以内か確認
+
+if(now-data.createdAt > 259200000){
+    return;
+}
+
+
+
+const div=document.createElement("div");
+
+div.className="card";
+
+
+div.innerHTML=`
+
+<h2>${data.title}</h2>
+
+<p>
+${data.category}
+</p>
+
+<p>
+投稿者：${data.name}
+</p>
+
+<p>
+👍${data.likes || 0}
+</p>
+
+<button>
+開く
+</button>
+
+`;
+
+
+div.querySelector("button")
+.onclick=()=>{
+
+location.href=
+"thread.html?id="+id;
+
+};
+
+
+threadsDiv.appendChild(div);
+
+
+});
+
+
+});
+</style>
+
+</head>
+
+<body>
+
+<h1>鎌田掲示板</h1>
+
+<button onclick="location.href='createThread.html'">
+スレを作成
+</button>
+
+<hr>
+
+<div id="threads">
+読み込み中...
+</div>
+
+
+<script type="module">
+
+// ここにFirebase設定を書く
+
+
+</script>
+
+</body>
+</html>
