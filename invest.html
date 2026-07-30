@@ -190,7 +190,8 @@ leverage = trade.leverage;
 
     document.getElementById("longButton").disabled = true;
     document.getElementById("shortButton").disabled = true;
-
+　　document.getElementById("leverage").disabled = true;
+　　document.getElementById("bet").disabled = true;
    profitTimer = setInterval(updateProfit,1000);
 
 let elapsed = Math.floor(
@@ -731,6 +732,7 @@ positionRef = null;
 document.getElementById("longButton").disabled = false;
 document.getElementById("shortButton").disabled = false;
 document.getElementById("leverage").disabled = false;
+document.getElementById("bet").disabled = false;
     }
 
     catch(e){
