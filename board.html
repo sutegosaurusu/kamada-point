@@ -95,7 +95,17 @@ margin-top:0;
 
 
 <hr>
+<div>
 
+<button id="categoryBtn">
+📂 カテゴリ別
+</button>
+
+<button id="timeBtn">
+🕒 時間順
+</button>
+
+</div>
 
 <div id="threads">
 
@@ -185,7 +195,7 @@ initializeApp(firebaseConfig);
 const db =
 getDatabase(app);
 
-
+let mode = "category";
 
 
 // 表示場所
@@ -194,7 +204,20 @@ const threadsDiv =
 document.getElementById("threads");
 
 
+document.getElementById("categoryBtn").onclick=()=>{
 
+mode="category";
+loadThreads();
+
+};
+
+
+document.getElementById("timeBtn").onclick=()=>{
+
+mode="time";
+loadThreads();
+
+};
 
 // スレ取得
 
@@ -203,7 +226,7 @@ ref(db,"board/threads");
     console.log("読み込み開始");
 
 
-
+function loadThreads(){
 onValue(threadsRef,(snapshot)=>{
 
 console.log("Firebase取得成功");
@@ -215,8 +238,20 @@ const now = Date.now();
 
 
 let count = 0;
+let threadList = [];
 
 snapshot.forEach((child)=>{
+
+threadList.push({
+id: child.key,
+data: child.val()
+});
+
+});
+threadList.forEach((item)=>{
+
+const id = item.id;
+const data = item.data;
 
 const data = child.val();
 
@@ -402,7 +437,7 @@ threadsDiv.innerHTML=
 
 }
 
-
+loadThreads();
 
 });
     
