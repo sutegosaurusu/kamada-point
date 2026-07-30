@@ -685,23 +685,14 @@ encodeURIComponent(id);
 
 if(data.uid){
 
-const rankRef=
+const rankRef =
 ref(db,"members/"+data.uid);
 
 
 get(rankRef)
 .then((snap)=>{
 
-if(!snap.exists()){
-return;
-}
 
-})
-.catch((error)=>{
-
-console.log("ランク取得できません");
-
-});
 if(!snap.exists()){
 
 return;
@@ -709,21 +700,23 @@ return;
 }
 
 
-const member=snap.val();
+const member =
+snap.val();
 
-const rankSpan=
+
+const rankSpan =
 div.querySelector(".rank");
 
 
-rankSpan.textContent=
+rankSpan.textContent =
 
 " ["+
 (member.rank || "新人")
 +"] "+
 (member.badge || "");
 
+
 })
-    
 .catch((error)=>{
 
 console.error(
