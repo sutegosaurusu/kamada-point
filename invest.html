@@ -193,10 +193,16 @@ let remaining = 10 - elapsed;
 
 if(remaining <= 0){
 
-    closePosition();
+    // 既に決済時間を過ぎていたら
+    // 一度だけ決済する
+    if(!closing){
+        tradeActive = true;
+        closePosition();
+    }
 
 }else{
 
+    tradeActive = true;
     startCountdown(remaining);
 
 }
@@ -254,6 +260,7 @@ let positionRef = null;
 let profitTimer = null;
     let closing = false;
     let countdownTimer = null;
+    let tradeActive = false;
 async function updatePrice(){
 
     try{
@@ -463,10 +470,11 @@ await set(tradeRef,{
     entryPrice: entryPrice,
     startTime: Date.now()
 });
+tradeActive = true;
+
 console.log("取引開始保存");
 
 return true;
-
 }
 
    function startCountdown(seconds = 10){
@@ -570,6 +578,15 @@ if(profit >= 0){
 /* ---------------- 自動決済 ---------------- */
 
 async function closePosition(){
+    if(!positionRef){
+    return;
+}
+
+const snap = await get(positionRef);
+
+if(!snap.exists()){
+    return;
+}
 
     if(closing){
         return;
@@ -702,6 +719,7 @@ alert(
 position = null;
 entryPrice = 0;
 betPoint = 0;
+tradeActive = false;
 closing = false;
 
 document.getElementById("longButton").disabled = false;
