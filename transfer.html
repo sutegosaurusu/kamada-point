@@ -234,6 +234,9 @@ let uid = null;
 let myPoint = 0;
 let sending = false;
 let specialSending = false;
+      function changePoint(user, diff){
+    user.point = Number(user.point || 0) + diff;
+}
       // ログイン確認
 onAuthStateChanged(auth, async(user)=>{
 
@@ -475,15 +478,8 @@ const result = await runTransaction(ref(db, "members"), (members)=>{
     return;
   }
 
-  // 自分から減らす
-  me.point = Number(me.point || 0) - point;
-
-  // 相手へ加算
-  targetUser.point = Number(targetUser.point || 0) + point;
-
-  return members;
-
-});
+ changePoint(me, -point);
+changePoint(targetUser, point);
 
 if(!result.committed){
 
@@ -603,9 +599,8 @@ document.getElementById("specialGiveButton").onclick = async()=>{
       return;
     }
 
-    me.point = Number(me.point || 0) - point;
-    targetUser.point = Number(targetUser.point || 0) + receivePoint;
-
+  changePoint(me, -point);
+changePoint(targetUser, receivePoint);
     return members;
 
   });
