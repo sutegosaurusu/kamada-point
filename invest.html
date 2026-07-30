@@ -597,15 +597,6 @@ async function closePosition(){
     }
 
     closing = true;
-if(!snap.exists()){
-    return;
-}
-
-    if(closing){
-        return;
-    }
-
-    closing = true;
 
     try{
 
@@ -734,6 +725,8 @@ entryPrice = 0;
 betPoint = 0;
 tradeActive = false;
 closing = false;
+leverage = 0;
+positionRef = null;
 
 document.getElementById("longButton").disabled = false;
 document.getElementById("shortButton").disabled = false;
