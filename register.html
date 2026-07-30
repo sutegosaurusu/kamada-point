@@ -314,9 +314,9 @@ setTimeout(()=>{
 
 }catch(e){
 
-    msg.textContent="登録失敗";
+    msg.textContent = e.code + "\n" + e.message;
 
-    console.log(e);
+    console.error(e);
 
 }
 
