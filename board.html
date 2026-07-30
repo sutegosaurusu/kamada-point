@@ -57,6 +57,21 @@ button:hover{
     font-size:14px;
 
 }
+    .categoryBox{
+
+background:white;
+padding:15px;
+margin:20px 0;
+border-radius:15px;
+box-shadow:0 3px 10px #ccc;
+
+}
+
+.categoryBox h2{
+
+margin-top:0;
+
+}
 
 </style>
 
@@ -84,10 +99,35 @@ button:hover{
 
 <div id="threads">
 
-読み込み中...
-
+<div class="categoryBox" id="notice">
+<h2>📢 お知らせ</h2>
 </div>
 
+<div class="categoryBox" id="chat">
+<h2>💬 雑談</h2>
+</div>
+
+<div class="categoryBox" id="point">
+<h2>💰 鎌田ポイント</h2>
+</div>
+
+<div class="categoryBox" id="game">
+<h2>🎮 ゲーム</h2>
+</div>
+
+<div class="categoryBox" id="improve">
+<h2>💡 改善</h2>
+</div>
+
+<div class="categoryBox" id="question">
+<h2>❓ 質問</h2>
+</div>
+
+<div class="categoryBox" id="bug">
+<h2>🐛 不具合報告</h2>
+</div>
+
+</div>
 
 
 <script type="module">
@@ -168,7 +208,7 @@ onValue(threadsRef,(snapshot)=>{
 
 console.log("Firebase取得成功");
 console.log(snapshot.val());
-threadsDiv.innerHTML="";
+
 
 
 const now = Date.now();
@@ -300,7 +340,53 @@ document.getElementById(
 
 
 
-threadsDiv.appendChild(div);
+let box;
+
+
+switch(data.category){
+
+case "お知らせ":
+box=document.getElementById("notice");
+break;
+
+
+case "雑談":
+box=document.getElementById("chat");
+break;
+
+
+case "鎌田ポイント":
+box=document.getElementById("point");
+break;
+
+
+case "ゲーム":
+box=document.getElementById("game");
+break;
+
+
+case "改善":
+box=document.getElementById("improve");
+break;
+
+
+case "質問":
+box=document.getElementById("question");
+break;
+
+
+case "不具合報告":
+box=document.getElementById("bug");
+break;
+
+
+default:
+box=threadsDiv;
+
+}
+
+
+box.appendChild(div);
 
 
 
