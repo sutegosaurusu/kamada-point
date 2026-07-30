@@ -148,15 +148,23 @@ let myPoint = 0;
         return;
     }
 
- uid = user.uid;
+uid = user.uid;
+
+const snap = await get(ref(db, "members/" + uid));
+
+if (!snap.exists()) {
+    alert("ユーザー情報がありません");
+    return;
+}
+
+myPoint = Number(snap.val().point);
+
+document.getElementById("myPoint").textContent =
+myPoint + " pt";
 
 await checkPosition();
-    const snap = await get(ref(db, "members/" + uid));
 
-    if (!snap.exists()) {
-        alert("ユーザー情報がありません");
-        return;
-    }
+loadHistory();
 async function checkPosition(){
 
     const snap = await get(ref(db,"positions/"+uid));
@@ -208,15 +216,7 @@ if(remaining <= 0){
 }
 
 }
-   myPoint = Number(snap.val().point || 0);
-
-console.log("現在のポイント:", myPoint);
-
-document.getElementById("myPoint").textContent =
-myPoint + " pt";
-
-loadHistory();
-
+  
 });
     
 new TradingView.widget({
@@ -576,14 +576,27 @@ if(profit >= 0){
 }
 
 /* ---------------- 自動決済 ---------------- */
-
 async function closePosition(){
+
+    if(!tradeActive){
+        return;
+    }
+
+    if(closing){
+        return;
+    }
+
     if(!positionRef){
-    return;
-}
+        return;
+    }
 
-const snap = await get(positionRef);
+    const snap = await get(positionRef);
 
+    if(!snap.exists()){
+        return;
+    }
+
+    closing = true;
 if(!snap.exists()){
     return;
 }
