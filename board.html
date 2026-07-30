@@ -72,6 +72,25 @@ box-shadow:0 3px 10px #ccc;
 margin-top:0;
 
 }
+    #categoryBtn.active,
+#timeBtn.active{
+    background:#e754a6;
+    box-shadow:0 3px 8px rgba(0,0,0,0.2);
+}
+
+#threads{
+    max-width:900px;
+    margin:0 auto;
+}
+
+.categoryBox{
+    background:rgba(255,255,255,0.8);
+}
+
+.categoryBox .card{
+    border:1px solid #f1d7e6;
+    box-shadow:0 2px 6px #ddd;
+}
 
 </style>
 
@@ -196,225 +215,519 @@ const db =
 getDatabase(app);
 
 let mode = "category";
-
-
-// 表示場所
+let threadList = [];
 
 const threadsDiv =
 document.getElementById("threads");
 
+const categoryBtn =
+document.getElementById("categoryBtn");
 
-document.getElementById("categoryBtn").onclick=()=>{
-
-mode="category";
-loadThreads();
-
-};
-
-
-document.getElementById("timeBtn").onclick=()=>{
-
-mode="time";
-loadThreads();
-
-};
-
-// スレ取得
+const timeBtn =
+document.getElementById("timeBtn");
 
 const threadsRef =
 ref(db,"board/threads");
-    console.log("読み込み開始");
 
 
-function loadThreads(){
+// カテゴリ別ボタン
+categoryBtn.onclick=()=>{
+
+mode="category";
+renderThreads();
+
+};
+
+
+// 時間順ボタン
+timeBtn.onclick=()=>{
+
+mode="time";
+renderThreads();
+
+};
+
+
+// Firebaseからスレを取得
 onValue(threadsRef,(snapshot)=>{
 
 console.log("Firebase取得成功");
 console.log(snapshot.val());
 
-
-
-const now = Date.now();
-
-
-let count = 0;
-let threadList = [];
+threadList=[];
 
 snapshot.forEach((child)=>{
 
 threadList.push({
-id: child.key,
-data: child.val()
+
+id:child.key,
+data:child.val()
+
 });
 
 });
+
+
+// 新しい順に並べる
+threadList.sort((a,b)=>{
+
+return (b.data.createdAt || 0)
+-
+(a.data.createdAt || 0);
+
+});
+
+renderThreads();
+
+},(error)=>{
+
+console.error("スレ取得エラー",error);
+
+threadsDiv.innerHTML=
+"<p>スレの読み込みに失敗しました。</p>";
+
+});
+
+
+// 全体を表示
+function renderThreads(){
+
+threadsDiv.innerHTML="";
+
+categoryBtn.classList.toggle(
+"active",
+mode==="category"
+);
+
+timeBtn.classList.toggle(
+"active",
+mode==="time"
+);
+
+
+if(threadList.length===0){
+
+threadsDiv.innerHTML=
+"<p>表示できるスレはありません。</p>";
+
+return;
+
+}
+
+
+if(mode==="category"){
+
+renderCategoryMode();
+
+}else{
+
+renderTimeMode();
+
+}
+
+}
+
+
+// カテゴリ別表示
+function renderCategoryMode(){
+
+const categories=[
+
+{
+name:"お知らせ",
+icon:"📢",
+id:"notice"
+},
+
+{
+name:"雑談",
+icon:"💬",
+id:"chat"
+},
+
+{
+name:"鎌田ポイント",
+icon:"💰",
+id:"point"
+},
+
+{
+name:"ゲーム",
+icon:"🎮",
+id:"game"
+},
+
+{
+name:"実況",
+icon:"📣",
+id:"live"
+},
+
+{
+name:"趣味",
+icon:"🎨",
+id:"hobby"
+},
+
+{
+name:"改善",
+icon:"💡",
+id:"improve"
+},
+
+{
+name:"質問",
+icon:"❓",
+id:"question"
+},
+
+{
+name:"不具合報告",
+icon:"🐛",
+id:"bug"
+},
+
+{
+name:"未設定",
+icon:"📁",
+id:"other"
+}
+
+];
+
+
+categories.forEach((category)=>{
+
+const items=
+threadList.filter((item)=>{
+
+const itemCategory=
+item.data.category || "未設定";
+
+if(category.name==="未設定"){
+
+return !categories.some((known)=>{
+
+return known.name!=="未設定"
+&&
+known.name===itemCategory;
+
+});
+
+}
+
+return itemCategory===category.name;
+
+});
+
+
+if(items.length===0){
+
+return;
+
+}
+
+
+const section=
+createSection(
+
+category.icon+" "+category.name,
+items.length
+
+);
+
+
+items.forEach((item)=>{
+
+section.appendChild(
+createThreadCard(item)
+);
+
+});
+
+
+threadsDiv.appendChild(section);
+
+});
+
+}
+
+
+// 時間順表示
+function renderTimeMode(){
+
+const groups={
+
+"今日":[],
+"1日前":[],
+"2日前":[],
+"3日前":[],
+"4日以上前":[]
+
+};
+
+
 threadList.forEach((item)=>{
 
-const id = item.id;
-const data = item.data;
+const days=
+getDaysAgo(item.data.createdAt);
 
-count++;
 
-const div =
+if(days===0){
+
+groups["今日"].push(item);
+
+}else if(days===1){
+
+groups["1日前"].push(item);
+
+}else if(days===2){
+
+groups["2日前"].push(item);
+
+}else if(days===3){
+
+groups["3日前"].push(item);
+
+}else{
+
+groups["4日以上前"].push(item);
+
+}
+
+});
+
+
+Object.entries(groups)
+.forEach(([title,items])=>{
+
+if(items.length===0){
+
+return;
+
+}
+
+
+const section=
+createSection(
+"🕒 "+title,
+items.length
+);
+
+
+items.forEach((item)=>{
+
+section.appendChild(
+createThreadCard(item)
+);
+
+});
+
+
+threadsDiv.appendChild(section);
+
+});
+
+}
+
+
+// 今日から何日前かを計算
+function getDaysAgo(createdAt){
+
+const timestamp=
+Number(createdAt);
+
+
+if(!timestamp){
+
+return 9999;
+
+}
+
+
+const today=
+new Date();
+
+today.setHours(0,0,0,0);
+
+
+const createdDate=
+new Date(timestamp);
+
+createdDate.setHours(0,0,0,0);
+
+
+return Math.floor(
+
+(today.getTime()
+-
+createdDate.getTime())
+
+/
+(1000*60*60*24)
+
+);
+
+}
+
+
+// 分類の箱を作る
+function createSection(title,count){
+
+const section=
+document.createElement("section");
+
+section.className="categoryBox";
+
+
+const heading=
+document.createElement("h2");
+
+heading.textContent=
+title+"（"+count+"件）";
+
+
+section.appendChild(heading);
+
+return section;
+
+}
+
+
+// スレカードを作る
+function createThreadCard(item){
+
+const id=item.id;
+const data=item.data;
+
+const div=
 document.createElement("div");
-
 
 div.className="card";
 
-div.innerHTML = `
 
-<div class="title">
+const createdAt=
+Number(data.createdAt);
 
-${data.title || "タイトルなし"}
+const dateText=
+createdAt
 
-</div>
+? new Date(createdAt)
+.toLocaleString("ja-JP")
+
+: "日時不明";
 
 
-<p>
-カテゴリー：
-${data.category || "未設定"}
-</p>
+div.innerHTML=`
 
+<div class="title"></div>
+
+<p class="category"></p>
 
 <p class="info">
 
 投稿者：
-${data.name || "名無し"}
+<span class="author"></span>
 
-<span id="rank-${id}"></span>
+<span class="rank"></span>
 
 <br>
 
 日時：
-${new Date(data.createdAt)
-.toLocaleString()}
+<span class="date"></span>
 
 </p>
 
+<p class="likes"></p>
 
-<p>
-
-👍 ${data.likes || 0}
-
-</p>
-
-
-
-<button>
-
+<button class="openThread">
 スレを見る
-
 </button>
-
 
 `;
 
 
+div.querySelector(".title")
+.textContent=
+data.title || "タイトルなし";
 
-div.querySelector("button")
+
+div.querySelector(".category")
+.textContent=
+"カテゴリー："+
+(data.category || "未設定");
+
+
+div.querySelector(".author")
+.textContent=
+data.name || "名無し";
+
+
+div.querySelector(".date")
+.textContent=
+dateText;
+
+
+div.querySelector(".likes")
+.textContent=
+"👍 "+(data.likes || 0);
+
+
+div.querySelector(".openThread")
 .onclick=()=>{
 
-
-location.href =
-"thread.html?id="+id;
-
+location.href=
+"thread.html?id="+
+encodeURIComponent(id);
 
 };
-    const rankRef =
+
+
+if(data.uid){
+
+const rankRef=
 ref(db,"members/"+data.uid);
 
 
 get(rankRef)
 .then((snap)=>{
 
+if(!snap.exists()){
 
-if(snap.exists()){
+return;
+
+}
 
 
-const member =
-snap.val();
+const member=snap.val();
+
+const rankSpan=
+div.querySelector(".rank");
 
 
-document.getElementById(
-"rank-"+id
-).innerHTML =
+rankSpan.textContent=
 
 " ["+
 (member.rank || "新人")
 +"] "+
 (member.badge || "");
 
+})
+.catch((error)=>{
 
-}
+console.error(
+"ランク取得エラー",
+error
+);
 
 });
-
-
-
-let box;
-
-
-switch(data.category){
-
-case "お知らせ":
-box=document.getElementById("notice");
-break;
-
-
-case "雑談":
-box=document.getElementById("chat");
-break;
-
-
-case "鎌田ポイント":
-box=document.getElementById("point");
-break;
-
-
-case "ゲーム":
-box=document.getElementById("game");
-break;
-
-
-case "改善":
-box=document.getElementById("improve");
-break;
-
-
-case "質問":
-box=document.getElementById("question");
-break;
-
-
-case "不具合報告":
-box=document.getElementById("bug");
-break;
-
-
-default:
-box=threadsDiv;
 
 }
 
 
-box.appendChild(div);
-});
-
-
-
-if(count===0){
-
-threadsDiv.innerHTML=
-
-"表示できるスレはありません";
+return div;
 
 }
-
-
-});
- }   
-loadThreads();
-
 </script>
 
 
