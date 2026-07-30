@@ -369,7 +369,8 @@ document.getElementById("status").textContent =
 "LONG保有中（10秒後に自動決済）";
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
-document.getElementById("leverage").disabled = true; // ←追加
+document.getElementById("leverage").disabled = true;
+document.getElementById("bet").disabled = true;
 
 startCountdown();
 };
@@ -423,8 +424,8 @@ document.getElementById("status").textContent =
 "SHORT保有中（10秒後に自動決済）";
 document.getElementById("longButton").disabled = true;
 document.getElementById("shortButton").disabled = true;
-document.getElementById("leverage").disabled = true; // ←追加
-
+document.getElementById("leverage").disabled = true;
+document.getElementById("bet").disabled = true;
 startCountdown();
 
 };
