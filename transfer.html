@@ -478,16 +478,12 @@ const result = await runTransaction(ref(db, "members"), (members)=>{
     return;
   }
 
- changePoint(me, -point);
-changePoint(targetUser, point);
+  changePoint(me, -point);
+  changePoint(targetUser, point);
 
-if(!result.committed){
+  return members;
 
-  alert("譲渡に失敗しました");
-  sending = false;
-  return;
-
-}
+});   
 
 // ログ保存
 await push(ref(db,"logs/"+uid),{
