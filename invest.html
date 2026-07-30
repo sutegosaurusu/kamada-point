@@ -253,6 +253,7 @@ let positionRef = null;
 
 let profitTimer = null;
     let closing = false;
+    let countdownTimer = null;
 async function updatePrice(){
 
     try{
@@ -325,17 +326,22 @@ document.getElementById("longButton").onclick = async () => {
 
     }
 
-   betPoint = Number(document.getElementById("bet").value);
-leverage = Number(document.getElementById("leverage").value); 
+  betPoint = Number(document.getElementById("bet").value);
+leverage = Number(document.getElementById("leverage").value);
 
-if(betPoint <= 0){
+if(isNaN(betPoint) || betPoint <= 0){
 
-        alert("投資ポイントを入力してください");
+    alert("投資ポイントを入力してください");
+    return;
 
-        return;
+}
 
-    }
+if(isNaN(leverage) || leverage <= 0){
 
+    alert("レバレッジを選択してください");
+    return;
+
+}
     entryPrice = Number(
         document.getElementById("price").textContent
         .replace(/,/g,"")
@@ -374,15 +380,21 @@ document.getElementById("shortButton").onclick = async () => {
     }
 
    betPoint = Number(document.getElementById("bet").value);
-leverage = Number(document.getElementById("leverage").value); 
+leverage = Number(document.getElementById("leverage").value);
 
-if(betPoint <= 0){
+if(isNaN(betPoint) || betPoint <= 0){
 
-        alert("投資ポイントを入力してください");
+    alert("投資ポイントを入力してください");
+    return;
 
-        return;
+}
 
-    }
+if(isNaN(leverage) || leverage <= 0){
+
+    alert("レバレッジを選択してください");
+    return;
+
+}
 
     entryPrice = Number(
         document.getElementById("price").textContent
@@ -415,7 +427,12 @@ startCountdown();
 
     const snap = await get(userRef);
 
-    let currentPoint = Number(snap.val().point || 0);
+   let currentPoint = Number(snap.val().point);
+
+if (!Number.isFinite(currentPoint)) {
+    alert("ポイントデータが壊れています");
+    return false;
+}
 
     if(currentPoint < betPoint){
 
@@ -453,11 +470,14 @@ return true;
 }
 
    function startCountdown(seconds = 10){
+       if(countdownTimer){
+        clearInterval(countdownTimer);
+    }
 
     document.getElementById("countdown").textContent =
     "残り " + seconds + "秒";
 
-    const timer = setInterval(()=>{
+   countdownTimer = setInterval(()=>{
 
         seconds--;
 
@@ -466,7 +486,8 @@ return true;
 
         if(seconds <= 0){
 
-            clearInterval(timer);
+            clearInterval(countdownTimer);
+countdownTimer = null;
 
             document.getElementById("countdown").textContent =
             "";
@@ -510,10 +531,13 @@ return true;
 
        const gameMultiplier = 1000;
 
-const profit =
-Math.round(
+const profit = Math.round(
     betPoint * rate * leverage * gameMultiplier
 );
+
+if (!Number.isFinite(profit)) {
+    return;
+}
 
 
         const profitElement = document.getElementById("profit");
@@ -574,10 +598,19 @@ async function closePosition(){
         }
 
 const gameMultiplier = 1000;
-
-const profit = Math.round(
+        const profit = Math.round(
     betPoint * rate * leverage * gameMultiplier
 );
+
+if (!Number.isFinite(profit)) {
+
+    alert("利益計算エラー");
+
+    closing = false;
+
+    return;
+
+}
  // FX税計算
 let fxTax = 0;
 
@@ -610,7 +643,13 @@ const userRef = ref(db, "members/" + uid);
 
 const snap = await get(userRef);
 
-let currentPoint = Number(snap.val().point || 0);
+let currentPoint = Number(snap.val().point);
+
+if (!Number.isFinite(currentPoint)) {
+    alert("ポイントデータが壊れています");
+    closing = false;
+    return;
+}
 
 await update(userRef,{
     point: currentPoint + betPoint + afterTaxProfit
