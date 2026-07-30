@@ -1,30 +1,1025 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
+
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>ダンゴムシダンジョン</title>
+
+
+<style>
+
+body{
+
+font-family:"Arial","Noto Sans JP",sans-serif;
+
+margin:0;
+
+padding:20px;
+
+background:linear-gradient(135deg,#e8ffe6,#dff7ff);
+
+color:#333;
+
+}
+
+
+h1{
+
+text-align:center;
+
+color:#4b9b4b;
+
+font-size:32px;
+
+}
+
+
+h2{
+
+color:#555;
+
+border-left:6px solid #65c96b;
+
+padding-left:10px;
+
+}
+
+
+
+.card{
+
+background:white;
+
+border-radius:25px;
+
+padding:20px;
+
+margin:15px 0;
+
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+}
+
+
+
+#bug{
+
+font-size:70px;
+
+text-align:center;
+
+}
+
+
+
+#status{
+
+text-align:center;
+
+font-size:20px;
+
+font-weight:bold;
+
+}
+
+
+
+button{
+
+padding:12px 25px;
+
+margin:5px;
+
+border:none;
+
+border-radius:25px;
+
+background:linear-gradient(135deg,#65c96b,#3ca94a);
+
+color:white;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+
+
+button:hover{
+
+transform:translateY(-2px);
+
+}
+
+
+
+select{
+
+padding:12px;
+
+border-radius:15px;
+
+border:2px solid #b9e8bc;
+
+font-size:16px;
+
+}
+
+
+
+#result{
+
+background:white;
+
+padding:15px;
+
+border-radius:20px;
+
+margin-top:15px;
+
+}
+
+
+
+</style>
+
+
 </head>
+
 
 <body>
 
+
+
 <h1>🐛 ダンゴムシポリス</h1>
 
-<p id="status">
-待機中
+
+
+<div class="card">
+
+
+<div id="bug">
+
+🪲
+
+</div>
+
+
+<h2>主人公ダンゴムシ</h2>
+
+
+<p>
+
+レベル：
+<span id="level">
+
+1
+
+</span>
+
 </p>
 
+
+<p>
+
+HP：
+
+<span id="hp">
+
+100
+
+</span>
+
+</p>
+
+
+<p>
+
+探索力：
+
+<span id="explore">
+
+50
+
+</span>
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>食料</h2>
+
+
+<p>
+
+🍂 落ち葉：
+
+<span id="food">
+
+0
+
+</span>
+
+個
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>探索準備</h2>
+
+
+
+<select id="place">
+
+
+<option value="forest">
+
+落ち葉の森
+
+(食料1個 / 10分)
+
+</option>
+
+
+<option value="stone">
+
+石の隙間
+
+(食料2個 / 30分)
+
+</option>
+
+
+<option value="cave">
+
+湿った洞窟
+
+(食料3個 / 1時間)
+
+</option>
+
+
+</select>
+
+
+
+<br><br>
+
+
+
 <button id="start">
+
 探索開始
+
 </button>
+
+
+
+<button onclick="location.href='user.html'">
+
+戻る
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="card">
+
+
+<h2>状態</h2>
+
+
+<div id="status">
+
+待機中
+
+</div>
+
+
+
+<div id="result">
+
+まだ探索していません
+
+</div>
+
+
+</div>
+
+
+
 
 
 <script type="module">
 
-// ここにFirebase接続を書く
+
+
+import {
+
+initializeApp
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+
+
+import {
+
+getAuth,
+
+onAuthStateChanged
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+
+
+import {
+
+getDatabase,
+
+ref,
+
+get,
+
+set,
+
+update
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+
+
+
+
+const firebaseConfig = {
+
+
+
+apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+
+
+authDomain:"kamadapoint.firebaseapp.com",
+
+
+databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+
+projectId:"kamadapoint",
+
+
+storageBucket:"kamadapoint.firebasestorage.app",
+
+
+messagingSenderId:"601769416524",
+
+
+appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
+
+
+};
+
+
+
+
+const app = initializeApp(firebaseConfig);
+
+
+
+const auth = getAuth(app);
+
+
+
+const db = getDatabase(app);
+
+
+
+
+
+let uid = null;
+
+
+
+let memberData = null;
+
+
+
+
+
+// ログイン確認
+
+
+
+onAuthStateChanged(auth,async(user)=>{
+
+
+
+if(!user){
+
+
+location.href="login.html";
+
+
+return;
+
+
+}
+
+
+
+uid=user.uid;
+
+
+
+const snap = await get(
+
+ref(db,"members/"+uid)
+
+);
+
+
+
+if(!snap.exists()){
+
+
+alert("ユーザーデータがありません");
+
+
+return;
+
+
+}
+
+
+
+memberData=snap.val();
+
+
+
+loadDango();
+
+
+
+});
+
+
+
+
+
+
+// ダンゴムシデータ読み込み
+
+
+
+async function loadDango(){
+
+
+
+const snap = await get(
+
+ref(db,"dango/"+uid)
+
+);
+
+
+
+if(!snap.exists()){
+
+
+
+await set(
+
+ref(db,"dango/"+uid),
+
+{
+
+
+level:1,
+
+hp:100,
+
+explore:50,
+
+food:5
+
+
+}
+
+);
+
+
+
+document.getElementById("food").textContent=5;
+
+
+
+}else{
+
+
+
+const d=snap.val();
+
+
+
+document.getElementById("level").textContent=d.level;
+
+
+document.getElementById("hp").textContent=d.hp;
+
+
+document.getElementById("explore").textContent=d.explore;
+
+
+document.getElementById("food").textContent=d.food;
+
+
+
+}
+
+
+
+}
+
+
+
+
+// 探索開始
+
+
+
+document.getElementById("start").onclick=async()=>{
+
+
+
+const place=document.getElementById("place").value;
+
+
+
+const dangoSnap=await get(
+
+ref(db,"dango/"+uid)
+
+);
+
+
+
+const dango=dangoSnap.val();
+
+
+
+let needFood=1;
+
+let minutes=10;
+
+
+
+if(place==="stone"){
+
+
+needFood=2;
+
+
+minutes=30;
+
+
+}
+
+
+
+if(place==="cave"){
+
+
+needFood=3;
+
+
+minutes=60;
+
+
+}
+
+
+
+
+if(dango.food < needFood){
+
+
+
+alert("食料が足りません");
+
+
+return;
+
+
+}
+
+
+
+
+const now=Date.now();
+
+
+
+const endTime=
+
+now + minutes*60*1000;
+
+
+
+await update(
+
+ref(db,"dango/"+uid),
+
+{
+
+
+food:dango.food-needFood
+
+
+}
+
+);
+
+
+
+await set(
+
+ref(db,"explores/"+uid),
+
+{
+
+
+place:place,
+
+
+startTime:now,
+
+
+endTime:endTime,
+
+
+status:"running"
+
+
+}
+
+);
+
+
+
+document.getElementById("status").textContent=
+
+"探索中…";
+
+
+
+document.getElementById("result").textContent=
+
+"ダンゴムシが旅に出ました";
+
+
+
+document.getElementById("food").textContent=
+
+dango.food-needFood;
+
+
+
+};
+  // -------------------------------
+// 探索状態チェック
+// -------------------------------
+
+
+async function checkExplore(){
+
+
+const snap = await get(
+
+ref(db,"explores/"+uid)
+
+);
+
+
+
+if(!snap.exists()){
+
+
+document.getElementById("status").textContent=
+
+"待機中";
+
+
+return;
+
+
+}
+
+
+
+const data=snap.val();
+
+
+
+const now=Date.now();
+
+
+
+// まだ探索中
+
+if(now < data.endTime){
+
+
+
+let remain = data.endTime-now;
+
+
+
+let min=Math.floor(remain/60000);
+
+
+
+document.getElementById("status").textContent=
+
+"探索中… 残り "+min+"分";
+
+
+
+return;
+
+
+}
+
+
+
+
+// 探索終了
+
+
+finishExplore(data);
+
+
+
+}
+
+
+
+
+
+// -------------------------------
+// 探索結果
+// -------------------------------
+
+
+async function finishExplore(data){
+
+
+
+let reward={};
+
+
+
+let text="";
+
+
+
+// 場所ごとの報酬
+
+
+if(data.place==="forest"){
+
+
+
+reward={
+
+leaf:5,
+
+mushroom:2
+
+};
+
+
+
+text=
+
+"🍂 落ち葉×5\n🍄 キノコ×2";
+
+
+}
+
+
+
+if(data.place==="stone"){
+
+
+
+reward={
+
+stone:5,
+
+ore:1
+
+};
+
+
+
+text=
+
+"🪨 石×5\n💎 鉱石×1";
+
+
+}
+
+
+
+if(data.place==="cave"){
+
+
+
+reward={
+
+mushroom:5,
+
+ore:3
+
+};
+
+
+
+text=
+
+"🍄 珍しいキノコ×5\n💎 鉱石×3";
+
+
+}
+
+
+
+
+
+// 倉庫追加
+
+
+const invSnap=await get(
+
+ref(db,"inventory/"+uid)
+
+);
+
+
+
+let inv={};
+
+
+
+if(invSnap.exists()){
+
+
+inv=invSnap.val();
+
+
+}
+
+
+
+
+
+for(const key in reward){
+
+
+inv[key]=Number(inv[key]||0)+reward[key];
+
+
+}
+
+
+
+
+
+await set(
+
+ref(db,"inventory/"+uid),
+
+inv
+
+);
+
+
+
+
+// 探索終了
+
+await update(
+
+ref(db,"explores/"+uid),
+
+{
+
+status:"finished"
+
+}
+
+);
+
+
+
+// 表示
+
+
+document.getElementById("status").textContent=
+
+"探索終了！";
+
+
+
+document.getElementById("result").textContent=
+
+text;
+
+
+
+// 探索データ削除
+
+
+setTimeout(async()=>{
+
+
+await remove(
+
+ref(db,"explores/"+uid)
+
+);
+
+
+},3000);
+
+
+
+}
+
+
+
+
+
+
+
+// -------------------------------
+// 1分ごとに確認
+// -------------------------------
+
+
+setInterval(()=>{
+
+
+if(uid){
+
+checkExplore();
+
+}
+
+
+},10000);
+
 
 
 </script>
 
 
 </body>
+
 </html>
