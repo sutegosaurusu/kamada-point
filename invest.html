@@ -205,7 +205,7 @@ if(remaining <= 0){
     // 一度だけ決済する
     if(!closing){
         tradeActive = true;
-        closePosition();
+      await closePosition();
     }
 
 }else{
@@ -462,7 +462,7 @@ if (!Number.isFinite(currentPoint)) {
   const tradeRef = push(ref(db,"positions/"+uid));
 
 positionRef = tradeRef;
-
+tradeActive = true;
 await set(tradeRef,{
     type: type,
     bet: betPoint,
@@ -470,7 +470,7 @@ await set(tradeRef,{
     entryPrice: entryPrice,
     startTime: Date.now()
 });
-tradeActive = true;
+
 
 console.log("取引開始保存");
 
