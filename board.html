@@ -693,6 +693,16 @@ get(rankRef)
 .then((snap)=>{
 
 if(!snap.exists()){
+return;
+}
+
+})
+.catch((error)=>{
+
+console.log("ランク取得できません");
+
+});
+if(!snap.exists()){
 
 return;
 
