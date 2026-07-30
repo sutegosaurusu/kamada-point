@@ -253,19 +253,9 @@ threadList.forEach((item)=>{
 const id = item.id;
 const data = item.data;
 
-const data = child.val();
-
 console.log(data);
 
 });
-
-snapshot.forEach((child)=>{
-
-
-const data = child.val();
-
-const id = child.key;
-
 
 
 // 3日以上前は表示しない
@@ -437,12 +427,11 @@ threadsDiv.innerHTML=
 
 }
 
-loadThreads();
 
 });
     
 
-
+loadThreads();
 </script>
 
 
