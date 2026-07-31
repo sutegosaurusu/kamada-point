@@ -800,6 +800,48 @@ time:Date.now(),
 
 replyTo:replyTo
 });
+    // 返信通知
+if(replyTo && replyTo !== ""){
+
+const parentPost =
+(await get(
+ref(
+db,
+"board/threads/"+threadId+"/posts/"+replyTo
+)
+)).val();
+
+
+if(
+parentPost &&
+parentPost.uid !== uid
+){
+
+const notificationRef =
+push(
+ref(db,"notifications/"+parentPost.uid)
+);
+
+
+await set(notificationRef,{
+
+text:
+userName+"さんがあなたの投稿に返信しました",
+
+read:false,
+
+time:Date.now(),
+
+threadId:threadId,
+
+postId:postRef.key
+
+});
+
+
+}
+
+}
 replyTo=null;
 document.getElementById("replyBox").style.display="none";
   // 投稿活動記録
