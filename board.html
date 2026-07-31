@@ -280,7 +280,13 @@ renderThreads();
 
 };
 
+// Firebaseからスレを取得
+onValue(threadsRef,(snapshot)=>{
 
+console.log("Firebase取得成功");
+console.log(snapshot.val());
+
+threadList=[];
 snapshot.forEach((child)=>{
 
 const thread = child.val();
