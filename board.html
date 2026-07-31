@@ -203,11 +203,12 @@ from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 
-import { 
+import {
 getDatabase,
 ref,
 onValue,
-get
+get,
+remove
 }
 from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -280,25 +281,28 @@ renderThreads();
 };
 
 
-// Firebaseからスレを取得
-onValue(threadsRef,(snapshot)=>{
-
-console.log("Firebase取得成功");
-console.log(snapshot.val());
-
-threadList=[];
-
 snapshot.forEach((child)=>{
+
+const thread = child.val();
+
+const twoDays = 2 * 24 * 60 * 60 * 1000;
+
+if(Date.now() - (thread.createdAt || 0) > twoDays){
+
+    remove(ref(db,"board/threads/"+child.key));
+
+    return;
+
+}
 
 threadList.push({
 
-id:child.key,
-data:child.val()
+    id:child.key,
+    data:thread
 
 });
 
 });
-
 
 // 新しい順に並べる
 threadList.sort((a,b)=>{
