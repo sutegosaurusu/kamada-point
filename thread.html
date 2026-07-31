@@ -723,7 +723,7 @@ nameDiv.onclick=()=>{
 
     document.getElementById("replyName").textContent =
     post.name;
-
+document.getElementById("text").focus();
 };
 posts.appendChild(div);
 
@@ -746,7 +746,13 @@ document
 .getElementById("send")
 .onclick=async()=>{
 
+if(!currentUser){
 
+    alert("ログイン情報を読み込み中です");
+
+    return;
+
+}
 const text =
 document.getElementById("text").value;
 
