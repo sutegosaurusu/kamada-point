@@ -314,7 +314,161 @@ alert("🍎野生果実を購入しました！");
 
 };
 
+// --------------------
+// 落ち葉売却
+// --------------------
 
+document.getElementById("sellLeaf").onclick=async()=>{
+
+
+const invSnap=await get(
+ref(db,"dangoInventory/"+uid)
+);
+
+
+let inv=invSnap.val()||{};
+
+
+let amount=Number(inv.leaf||0);
+
+
+if(amount<=0){
+
+alert("落ち葉がありません");
+
+return;
+
+}
+
+
+
+const memberSnap=await get(
+ref(db,"members/"+uid)
+);
+
+
+let member=memberSnap.val();
+
+
+let money=Number(member.point||0);
+
+
+
+let gain=amount*1;
+
+
+
+await update(
+ref(db,"members/"+uid),
+{
+
+point:money+gain
+
+}
+
+);
+
+
+
+await update(
+ref(db,"dangoInventory/"+uid),
+{
+
+leaf:0
+
+}
+
+);
+
+
+
+alert(
+"🍂落ち葉を"+amount+"個売却\n+"+gain+"pt"
+);
+
+
+};
+
+
+
+
+
+
+// --------------------
+// キノコ売却
+// --------------------
+
+document.getElementById("sellMushroom").onclick=async()=>{
+
+
+const invSnap=await get(
+ref(db,"dangoInventory/"+uid)
+);
+
+
+let inv=invSnap.val()||{};
+
+
+let amount=Number(inv.mushroom||0);
+
+
+
+if(amount<=0){
+
+alert("キノコがありません");
+
+return;
+
+}
+
+
+
+const memberSnap=await get(
+ref(db,"members/"+uid)
+);
+
+
+let member=memberSnap.val();
+
+
+let money=Number(member.point||0);
+
+
+
+let gain=amount*10;
+
+
+
+await update(
+ref(db,"members/"+uid),
+{
+
+point:money+gain
+
+}
+
+);
+
+
+
+await update(
+ref(db,"dangoInventory/"+uid),
+{
+
+mushroom:0
+
+}
+
+);
+
+
+
+alert(
+"🍄キノコを"+amount+"個売却\n+"+gain+"pt"
+);
+
+
+};
 
 </script>
 
