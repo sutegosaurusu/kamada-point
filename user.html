@@ -296,7 +296,9 @@ onValue(ref(db,"notifications/"+uid),snap=>{
   list.sort((a,b)=>b.time-a.time);
 
   list.forEach(async(n)=>{
-
+if(n.read){
+    return;
+}
     const div = document.createElement("div");
 
     div.className = "card";
@@ -317,7 +319,9 @@ onValue(ref(db,"notifications/"+uid),snap=>{
       );
     }
 
-  });
+  });if(box.innerHTML===""){
+    box.textContent="通知はありません";
+}
 
 });
 const snap=await get(ref(db,"members/"+uid));
