@@ -179,8 +179,7 @@ onclick="location.href='transfer.html'">
 表示
 </button>
 
-<div id="rankList"></div>
-
+<div id="rankList" style="display:none;"></div>
 <hr>
 
 <h2>履歴</h2>
@@ -189,7 +188,7 @@ onclick="location.href='transfer.html'">
 表示
 </button>
 
-<div id="logList"></div>
+<div id="logList" style="display:none;"></div>
     <hr>
     <h2>ルール</h2>
 
@@ -382,6 +381,18 @@ location.href="login.html";
 document.getElementById("rankButton").onclick = () => {
 
   const box = document.getElementById("rankList");
+  const btn = document.getElementById("rankButton");
+
+  if(box.style.display==="block"){
+
+    box.style.display="none";
+    btn.textContent="表示";
+    return;
+
+  }
+
+  box.style.display="block";
+  btn.textContent="非表示";
 
   onValue(ref(db, "members"), snap => {
 
@@ -419,6 +430,18 @@ document.getElementById("rankButton").onclick = () => {
 document.getElementById("logButton").onclick=()=>{
 
   const box=document.getElementById("logList");
+  const btn=document.getElementById("logButton");
+
+  if(box.style.display==="block"){
+
+    box.style.display="none";
+    btn.textContent="表示";
+    return;
+
+  }
+
+  box.style.display="block";
+  btn.textContent="非表示";
 
   onValue(ref(db,"logs/"+uid),snap=>{
 
