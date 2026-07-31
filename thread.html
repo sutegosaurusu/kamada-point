@@ -109,7 +109,10 @@ opacity:.7;
 
 
 <h2>書き込み</h2>
-
+<div id="replyBox" style="display:none;margin-bottom:10px;background:#fff3f8;padding:8px 12px;border-radius:10px;">
+↩ <span id="replyName"></span> に返信中
+<button id="cancelReply" style="float:right;">×</button>
+</div>
 
 <input id="text" placeholder="コメントを書く">
 
@@ -301,7 +304,7 @@ getAuth(app);
 let currentUser = null;
 
 let userName = "名無し";
-
+let replyTo = null;
 
 onAuthStateChanged(auth,async(user)=>{
 
@@ -340,7 +343,13 @@ snap.val().name;
 
 
 });
+document.getElementById("cancelReply").onclick=()=>{
 
+replyTo=null;
+
+document.getElementById("replyBox").style.display="none";
+
+};
 
 
 // URLからスレID取得
@@ -413,6 +422,8 @@ div.className="card";
 
 
 div.innerHTML=`
+<div class="reply"></div>
+
 
 <div class="name">
 
@@ -443,6 +454,12 @@ ${new Date(post.time)
 </p>
 
 `;
+  if(post.replyTo && data.posts[post.replyTo]){
+
+    div.querySelector(".reply").textContent =
+    "↩ " + data.posts[post.replyTo].name + " に返信";
+
+}
 
   const likeBtn =
 div.querySelector(".likeBtn");
@@ -684,7 +701,54 @@ document.getElementById(
 });
 
 
+let pressTimer;
 
+div.addEventListener("mousedown",()=>{
+
+pressTimer=setTimeout(()=>{
+
+replyTo=postId;
+
+document.getElementById("replyBox").style.display="block";
+
+document.getElementById("replyName").textContent=post.name;
+
+},500);
+
+});
+
+div.addEventListener("mouseup",()=>{
+
+clearTimeout(pressTimer);
+
+});
+
+div.addEventListener("mouseleave",()=>{
+
+clearTimeout(pressTimer);
+
+});
+
+// スマホ用
+div.addEventListener("touchstart",()=>{
+
+pressTimer=setTimeout(()=>{
+
+replyTo=postId;
+
+document.getElementById("replyBox").style.display="block";
+
+document.getElementById("replyName").textContent=post.name;
+
+},500);
+
+});
+
+div.addEventListener("touchend",()=>{
+
+clearTimeout(pressTimer);
+
+});
 posts.appendChild(div);
 
 
@@ -752,7 +816,10 @@ name:name,
 
 time:Date.now()
 
+replyTo:replyTo
 });
+replyTo=null;
+document.getElementById("replyBox").style.display="none";
   // 投稿活動記録
 
 await update(
