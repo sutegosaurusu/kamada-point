@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>アゴラ商店</title>
+
+
+<style>
+
+body{
+
+font-family:sans-serif;
+
+padding:20px;
+
+background:linear-gradient(135deg,#f5e6c8,#e8f5ff);
+
+}
+
+
+.card{
+
+background:white;
+
+padding:20px;
+
+border-radius:20px;
+
+margin:15px 0;
+
+}
+
+
+button{
+
+padding:12px 25px;
+
+border:none;
+
+border-radius:25px;
+
+background:#b8863b;
+
+color:white;
+
+font-weight:bold;
+
+}
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<h1>🏛 アゴラ商店</h1>
+
+
+<div class="card">
+
+
+<h2>🍎 野生果実</h2>
+
+
+<p>
+価格：100鎌田ポイント
+</p>
+
+
+<p>
+探索者の水分補給に使われる基本食料
+</p>
+
+
+
+<button id="buy">
+
+購入する
+
+</button>
+
+
+</div>
+
+
+
+<button onclick="location.href='dango.html'">
+
+戻る
+
+</button>
+
+
+
+
+
+<script type="module">
+
+
+import {
+
+initializeApp
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+
+import {
+
+getAuth,
+
+onAuthStateChanged
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+
+import {
+
+getDatabase,
+
+ref,
+
+get,
+
+update
+
+}
+
+from
+
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+
+
+const firebaseConfig={
+
+
+apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+
+authDomain:"kamadapoint.firebaseapp.com",
+
+databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+projectId:"kamadapoint",
+
+storageBucket:"kamadapoint.firebasestorage.app",
+
+messagingSenderId:"601769416524",
+
+appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
+
+};
+
+
+const app=initializeApp(firebaseConfig);
+
+
+const auth=getAuth(app);
+
+
+const db=getDatabase(app);
+
+
+
+let uid=null;
+
+
+
+onAuthStateChanged(auth,(user)=>{
+
+
+if(!user){
+
+location.href="login.html";
+
+return;
+
+}
+
+
+uid=user.uid;
+
+
+});
+
+
+
+
+
+document.getElementById("buy").onclick=async()=>{
+
+
+
+const memberSnap=await get(
+
+ref(db,"members/"+uid)
+
+);
+
+
+
+const member=memberSnap.val();
+
+
+
+let point=Number(member.point||0);
+
+
+
+if(point<100){
+
+alert("鎌田ポイントが足りません");
+
+return;
+
+}
+
+
+
+
+// ポイント減少
+
+await update(
+
+ref(db,"members/"+uid),
+
+{
+
+
+point:point-100
+
+
+}
+
+);
+
+
+
+
+// 果実追加
+
+const invSnap=await get(
+
+ref(db,"dangoInventory/"+uid)
+
+);
+
+
+let inv=invSnap.val()||{};
+
+
+inv.fruit=
+
+Number(inv.fruit||0)+1;
+
+
+
+await update(
+
+ref(db,"dangoInventory/"+uid),
+
+{
+
+
+fruit:inv.fruit
+
+
+}
+
+);
+
+
+
+alert("🍎野生果実を購入しました！");
+
+
+
+};
+
+
+
+</script>
+
+
+</body>
+
+</html>
