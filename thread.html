@@ -739,7 +739,9 @@ clearTimeout(pressTimer);
 });
 
 // スマホ用
-div.addEventListener("touchstart",()=>{
+div.addEventListener("touchstart",(e)=>{
+
+e.preventDefault();
 
 pressTimer=setTimeout(()=>{
 
@@ -749,9 +751,10 @@ document.getElementById("replyBox").style.display="block";
 
 document.getElementById("replyName").textContent=post.name;
 
-},500);
+},600);
 
-});
+},{passive:false});
+
 
 div.addEventListener("touchend",()=>{
 
