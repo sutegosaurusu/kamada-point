@@ -607,7 +607,13 @@ const div=
 document.createElement("div");
 
 div.className="card";
+div.style.cursor = "pointer";
 
+div.onclick = () => {
+    location.href =
+    "thread.html?id=" +
+    encodeURIComponent(id);
+};
 
 const createdAt=
 Number(data.createdAt);
@@ -643,9 +649,7 @@ div.innerHTML=`
 
 <p class="likes"></p>
 
-<button class="openThread">
-スレを見る
-</button>
+
 
 `;
 
@@ -676,14 +680,7 @@ div.querySelector(".likes")
 "👍 "+(data.likes || 0);
 
 
-div.querySelector(".openThread")
-.onclick=()=>{
 
-location.href=
-"thread.html?id="+
-encodeURIComponent(id);
-
-};
 
 
 if(data.uid){
