@@ -39,13 +39,39 @@ input{
     font-size:22px;
     font-weight:bold;
 }
+#loadingScreen{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:white;
+    z-index:9999;
 
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.loadingBox{
+    text-align:center;
+    padding:30px;
+}
+
+.loadingBox h2{
+    margin-bottom:10px;
+}
 </style>
 
 </head>
 
 <body>
-
+<div id="loadingScreen">
+    <div class="loadingBox">
+        <h2>準備中...</h2>
+        <p>ポイントとポジションを確認しています</p>
+    </div>
+</div>
 <h1>投資</h1>
     <button onclick="location.href='user.html'">
 ユーザーページへ戻る
@@ -74,12 +100,12 @@ input{
 <input
 type="number"
 id="bet"
-placeholder="投資ポイント">
-
+placeholder="投資ポイント"
+disabled>
 <br><br>
     <h3>レバレッジ</h3>
 
-<select id="leverage">
+<select id="leverage" disabled>
     <option value="5">5倍</option>
     <option value="10">10倍</option>
     <option value="25">25倍</option>
@@ -89,11 +115,11 @@ placeholder="投資ポイント">
 
 <br><br>
 
-<button id="longButton">
+<button id="longButton" disabled>
 LONG
 </button>
 
-<button id="shortButton">
+<button id="shortButton" disabled>
 SHORT
 </button>
 
@@ -143,28 +169,48 @@ let uid = "";
 let myPoint = 0;
     onAuthStateChanged(auth, async (user) => {
 
-    if (!user) {
-        location.href = "login.html";
-        return;
-    }
+    try{
 
-uid = user.uid;
+        if (!user) {
+            location.href = "login.html";
+            return;
+        }
 
-const snap = await get(ref(db, "members/" + uid));
+        uid = user.uid;
 
-if (!snap.exists()) {
-    alert("ユーザー情報がありません");
-    return;
-}
+        const snap = await get(ref(db, "members/" + uid));
+
+        if (!snap.exists()) {
+
+            document.getElementById("loadingScreen").innerHTML =
+            "<div class='loadingBox'><h2>エラー</h2><p>ユーザー情報がありません</p></div>";
+
+            return;
+        }
 
 myPoint = Number(snap.val().point);
 
 document.getElementById("myPoint").textContent =
 myPoint + " pt";
 
+// ポジションを確認
 await checkPosition();
 
-loadHistory();
+// 履歴を読み込む
+await loadHistory();
+
+// Firebaseの読み込み完了
+document.getElementById("loadingScreen").style.display = "none";
+
+// ポジションがない場合だけ操作可能にする
+if(!position){
+
+    document.getElementById("longButton").disabled = false;
+    document.getElementById("shortButton").disabled = false;
+    document.getElementById("leverage").disabled = false;
+    document.getElementById("bet").disabled = false;
+
+}
 async function checkPosition(){
 
     const snap = await get(ref(db,"positions/"+uid));
@@ -217,7 +263,19 @@ if(remaining <= 0){
 }
 
 }
-  
+
+    }catch(error){
+
+        console.error("初期読み込みエラー", error);
+
+        document.getElementById("loadingScreen").innerHTML =
+        "<div class='loadingBox'>" +
+        "<h2>読み込みエラー</h2>" +
+        "<p>ページを再読み込みしてください</p>" +
+        "</div>";
+
+    }
+
 });
     
 new TradingView.widget({
