@@ -647,10 +647,6 @@ div.innerHTML=`
 
 </p>
 
-<p class="likes"></p>
-
-
-
 `;
 
 
@@ -673,14 +669,6 @@ data.name || "名無し";
 div.querySelector(".date")
 .textContent=
 dateText;
-
-
-div.querySelector(".likes")
-.textContent=
-"👍 "+(data.likes || 0);
-
-
-
 
 
 if(data.uid){
