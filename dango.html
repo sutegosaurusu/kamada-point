@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>ダンゴムシダンジョン</title>
+<title>ダンゴムシポリス</title>
 
 
 <style>
@@ -19,7 +19,7 @@ margin:0;
 
 padding:20px;
 
-background:linear-gradient(135deg,#e8ffe6,#dff7ff);
+background:linear-gradient(135deg,#f5e6c8,#dff3ff);
 
 color:#333;
 
@@ -30,20 +30,18 @@ h1{
 
 text-align:center;
 
-color:#4b9b4b;
-
-font-size:32px;
+color:#9b6b2f;
 
 }
 
 
 h2{
 
-color:#555;
-
-border-left:6px solid #65c96b;
+border-left:6px solid #c99a4a;
 
 padding-left:10px;
+
+color:#76502a;
 
 }
 
@@ -53,13 +51,13 @@ padding-left:10px;
 
 background:white;
 
-border-radius:25px;
+border-radius:20px;
 
 padding:20px;
 
 margin:15px 0;
 
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
+box-shadow:0 5px 15px rgba(0,0,0,0.15);
 
 }
 
@@ -75,35 +73,23 @@ text-align:center;
 
 
 
-#status{
-
-text-align:center;
-
-font-size:20px;
-
-font-weight:bold;
-
-}
-
-
-
 button{
 
 padding:12px 25px;
-
-margin:5px;
 
 border:none;
 
 border-radius:25px;
 
-background:linear-gradient(135deg,#65c96b,#3ca94a);
+background:#b8863b;
 
 color:white;
 
 font-weight:bold;
 
 cursor:pointer;
+
+margin:5px;
 
 }
 
@@ -119,27 +105,29 @@ transform:translateY(-2px);
 
 select{
 
-padding:12px;
+padding:10px;
 
 border-radius:15px;
-
-border:2px solid #b9e8bc;
-
-font-size:16px;
 
 }
 
 
 
-#result{
+#status{
 
-background:white;
+text-align:center;
 
-padding:15px;
+font-weight:bold;
 
-border-radius:20px;
+font-size:20px;
 
-margin-top:15px;
+}
+
+
+
+.item{
+
+padding:5px;
 
 }
 
@@ -151,11 +139,13 @@ margin-top:15px;
 </head>
 
 
+
 <body>
 
 
-
-<h1>🐛 ダンゴムシポリス</h1>
+<h1>
+🏛 ダンゴムシポリス
+</h1>
 
 
 
@@ -169,44 +159,20 @@ margin-top:15px;
 </div>
 
 
-<h2>主人公ダンゴムシ</h2>
+<h2>
+探索者
+</h2>
 
 
 <p>
-
-レベル：
-<span id="level">
-
-1
-
-</span>
-
+名前：
+市民探索隊
 </p>
 
 
 <p>
-
-HP：
-
-<span id="hp">
-
-100
-
-</span>
-
-</p>
-
-
-<p>
-
-探索力：
-
-<span id="explore">
-
-50
-
-</span>
-
+階級：
+新人探索者
 </p>
 
 
@@ -219,22 +185,39 @@ HP：
 <div class="card">
 
 
-<h2>食料</h2>
+<h2>
+🎒 倉庫
+</h2>
 
 
-<p>
+<div class="item">
 
 🍂 落ち葉：
-
-<span id="food">
-
+<span id="leaf">
 0
-
 </span>
 
-個
+</div>
 
-</p>
+
+<div class="item">
+
+🍎 野生果実：
+<span id="fruit">
+0
+</span>
+
+</div>
+
+
+<div class="item">
+
+🍄 キノコ：
+<span id="mushroom">
+0
+</span>
+
+</div>
 
 
 </div>
@@ -243,39 +226,23 @@ HP：
 
 
 
+
 <div class="card">
 
 
-<h2>探索準備</h2>
-
+<h2>
+🌳 探索地
+</h2>
 
 
 <select id="place">
 
 
-<option value="forest">
+<option value="olive">
 
-落ち葉の森
+オリーブ森
 
-(食料1個 / 10分)
-
-</option>
-
-
-<option value="stone">
-
-石の隙間
-
-(食料2個 / 30分)
-
-</option>
-
-
-<option value="cave">
-
-湿った洞窟
-
-(食料3個 / 1時間)
+（果実1個必要）
 
 </option>
 
@@ -287,13 +254,11 @@ HP：
 <br><br>
 
 
-
 <button id="start">
 
 探索開始
 
 </button>
-
 
 
 <button onclick="location.href='user.html'">
@@ -309,10 +274,13 @@ HP：
 
 
 
+
 <div class="card">
 
 
-<h2>状態</h2>
+<h2>
+状態
+</h2>
 
 
 <div id="status">
@@ -322,22 +290,22 @@ HP：
 </div>
 
 
-
-<div id="result">
+<p id="result">
 
 まだ探索していません
 
-</div>
+</p>
 
 
 </div>
+
+
 
 
 
 
 
 <script type="module">
-
 
 
 import {
@@ -376,9 +344,7 @@ get,
 
 set,
 
-update,
-
-remove
+update
 
 }
 
@@ -390,27 +356,20 @@ from
 
 
 
-const firebaseConfig = {
-
+const firebaseConfig={
 
 
 apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
 
-
 authDomain:"kamadapoint.firebaseapp.com",
-
 
 databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
 
-
 projectId:"kamadapoint",
-
 
 storageBucket:"kamadapoint.firebasestorage.app",
 
-
 messagingSenderId:"601769416524",
-
 
 appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
 
@@ -419,37 +378,23 @@ appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
 
 
 
-
-const app = initializeApp(firebaseConfig);
-
+const app=initializeApp(firebaseConfig);
 
 
-const auth = getAuth(app);
+const auth=getAuth(app);
 
 
-
-const db = getDatabase(app);
+const db=getDatabase(app);
 
 
 
 
+let uid=null;
 
-let uid = null;
-
-
-
-let memberData = null;
-
-
-
-
-
-// ログイン確認
 
 
 
 onAuthStateChanged(auth,async(user)=>{
-
 
 
 if(!user){
@@ -469,33 +414,7 @@ uid=user.uid;
 
 
 
-const snap = await get(
-
-ref(db,"members/"+uid)
-
-);
-
-
-
-if(!snap.exists()){
-
-
-alert("ユーザーデータがありません");
-
-
-return;
-
-
-}
-
-
-
-memberData=snap.val();
-
-
-
-loadDango();
-
+await loadInventory();
 
 
 });
@@ -505,17 +424,19 @@ loadDango();
 
 
 
-// ダンゴムシデータ読み込み
+
+// --------------------
+// 所持品読み込み
+// --------------------
+
+
+async function loadInventory(){
 
 
 
-async function loadDango(){
+const snap=await get(
 
-
-
-const snap = await get(
-
-ref(db,"dango/"+uid)
+ref(db,"dangoInventory/"+uid)
 
 );
 
@@ -527,19 +448,15 @@ if(!snap.exists()){
 
 await set(
 
-ref(db,"dango/"+uid),
+ref(db,"dangoInventory/"+uid),
 
 {
 
+leaf:0,
 
-level:1,
+fruit:5,
 
-hp:100,
-
-explore:50,
-
-food:5
-
+mushroom:0
 
 }
 
@@ -547,102 +464,8 @@ food:5
 
 
 
-document.getElementById("food").textContent=5;
+document.getElementById("fruit").textContent=5;
 
-
-
-}else{
-
-
-
-const d=snap.val();
-
-
-
-document.getElementById("level").textContent=d.level;
-
-
-document.getElementById("hp").textContent=d.hp;
-
-
-document.getElementById("explore").textContent=d.explore;
-
-
-document.getElementById("food").textContent=d.food;
-
-
-
-}
-
-
-
-}
-
-
-
-
-// 探索開始
-
-
-
-document.getElementById("start").onclick=async()=>{
-
-
-
-const place=document.getElementById("place").value;
-
-
-
-const dangoSnap=await get(
-
-ref(db,"dango/"+uid)
-
-);
-
-
-
-const dango=dangoSnap.val();
-
-
-
-let needFood=1;
-
-let minutes=1/6;
-
-
-
-if(place==="stone"){
-
-
-needFood=2;
-
-
-minutes=30;
-
-
-}
-
-
-
-if(place==="cave"){
-
-
-needFood=3;
-
-
-minutes=60;
-
-
-}
-
-
-
-
-if(dango.food < needFood){
-
-
-
-alert("食料が足りません");
 
 
 return;
@@ -653,25 +476,88 @@ return;
 
 
 
-const now=Date.now();
+const data=snap.val();
 
 
 
-const endTime=
+document.getElementById("leaf").textContent=
 
-now + minutes*60*1000;
+data.leaf||0;
+
+
+
+document.getElementById("fruit").textContent=
+
+data.fruit||0;
+
+
+
+document.getElementById("mushroom").textContent=
+
+data.mushroom||0;
+
+
+
+}
+
+
+
+
+
+
+// --------------------
+// 探索開始
+// --------------------
+
+
+document.getElementById("start").onclick=async()=>{
+
+
+
+const invSnap=await get(
+
+ref(db,"dangoInventory/"+uid)
+
+);
+
+
+
+const inv=invSnap.val();
+
+
+
+if(inv.fruit < 1){
+
+
+alert("果実が足りません");
+
+
+return;
+
+
+}
+
+
+
+let now=Date.now();
+
+
+
+// テスト用10秒
+
+let endTime=
+
+now+10000;
 
 
 
 await update(
 
-ref(db,"dango/"+uid),
+ref(db,"dangoInventory/"+uid),
 
 {
 
-
-food:dango.food-needFood
-
+fruit:inv.fruit-1
 
 }
 
@@ -681,19 +567,16 @@ food:dango.food-needFood
 
 await set(
 
-ref(db,"explores/"+uid),
+ref(db,"dangoExplore/"+uid),
 
 {
 
 
-place:place,
-
+place:"olive",
 
 startTime:now,
 
-
 endTime:endTime,
-
 
 status:"running"
 
@@ -701,6 +584,12 @@ status:"running"
 }
 
 );
+
+
+
+document.getElementById("fruit").textContent=
+
+inv.fruit-1;
 
 
 
@@ -712,28 +601,23 @@ document.getElementById("status").textContent=
 
 document.getElementById("result").textContent=
 
-"ダンゴムシが旅に出ました";
-
-
-
-document.getElementById("food").textContent=
-
-dango.food-needFood;
+"オリーブ森へ向かいました";
 
 
 
 };
-  // -------------------------------
-// 探索状態チェック
-// -------------------------------
 
+
+// --------------------
+// 探索結果確認
+// --------------------
 
 async function checkExplore(){
 
 
 const snap = await get(
 
-ref(db,"explores/"+uid)
+ref(db,"dangoExplore/"+uid)
 
 );
 
@@ -741,14 +625,7 @@ ref(db,"explores/"+uid)
 
 if(!snap.exists()){
 
-
-document.getElementById("status").textContent=
-
-"待機中";
-
-
 return;
-
 
 }
 
@@ -767,19 +644,16 @@ const now=Date.now();
 if(now < data.endTime){
 
 
+let remain=Math.ceil(
 
-let remain = data.endTime-now;
+(data.endTime-now)/1000
 
-
-
-let min=Math.floor(remain/60000);
-
+);
 
 
 document.getElementById("status").textContent=
 
-"探索中… 残り "+min+"分";
-
+"探索中… 残り "+remain+"秒";
 
 
 return;
@@ -790,10 +664,17 @@ return;
 
 
 
-// 探索終了
+// 帰還処理
+
+if(data.status==="finished"){
+
+return;
+
+}
 
 
-finishExplore(data);
+
+await finishExplore(data);
 
 
 
@@ -803,131 +684,52 @@ finishExplore(data);
 
 
 
-// -------------------------------
-// 探索結果
-// -------------------------------
+// --------------------
+// 探索成功
+// --------------------
 
 
 async function finishExplore(data){
 
 
 
-let reward={};
+let reward={
 
 
 
-let text="";
-
-
-
-// 場所ごとの報酬
-
-
-if(data.place==="forest"){
-
-
-
-reward={
-
-leaf:5,
+leaf:10,
 
 mushroom:2
 
-};
 
-
-
-text=
-
-"🍂 落ち葉×5\n🍄 キノコ×2";
-
-
-}
-
-
-
-if(data.place==="stone"){
-
-
-
-reward={
-
-stone:5,
-
-ore:1
 
 };
 
-
-
-text=
-
-"🪨 石×5\n💎 鉱石×1";
-
-
-}
-
-
-
-if(data.place==="cave"){
-
-
-
-reward={
-
-mushroom:5,
-
-ore:3
-
-};
-
-
-
-text=
-
-"🍄 珍しいキノコ×5\n💎 鉱石×3";
-
-
-}
-
-
-
-
-
-// 倉庫追加
 
 
 const invSnap=await get(
 
-ref(db,"inventory/"+uid)
+ref(db,"dangoInventory/"+uid)
 
 );
 
 
 
-let inv={};
-
-
-
-if(invSnap.exists()){
-
-
-inv=invSnap.val();
-
-
-}
+let inv=invSnap.val();
 
 
 
 
 
-for(const key in reward){
+inv.leaf=
+
+Number(inv.leaf||0)+reward.leaf;
 
 
-inv[key]=Number(inv[key]||0)+reward[key];
 
+inv.mushroom=
 
-}
+Number(inv.mushroom||0)+reward.mushroom;
 
 
 
@@ -935,7 +737,7 @@ inv[key]=Number(inv[key]||0)+reward[key];
 
 await set(
 
-ref(db,"inventory/"+uid),
+ref(db,"dangoInventory/"+uid),
 
 inv
 
@@ -944,15 +746,16 @@ inv
 
 
 
-// 探索終了
 
 await update(
 
-ref(db,"explores/"+uid),
+ref(db,"dangoExplore/"+uid),
 
 {
 
+
 status:"finished"
+
 
 }
 
@@ -960,7 +763,20 @@ status:"finished"
 
 
 
-// 表示
+
+
+document.getElementById("leaf").textContent=
+
+inv.leaf;
+
+
+
+document.getElementById("mushroom").textContent=
+
+inv.mushroom;
+
+
+
 
 
 document.getElementById("status").textContent=
@@ -971,24 +787,7 @@ document.getElementById("status").textContent=
 
 document.getElementById("result").textContent=
 
-text;
-
-
-
-// 探索データ削除
-
-
-setTimeout(async()=>{
-
-
-await remove(
-
-ref(db,"explores/"+uid)
-
-);
-
-
-},3000);
+"🌳オリーブ森から帰還しました！\n\n🍂落ち葉 ×10\n🍄キノコ ×2";
 
 
 
@@ -1000,9 +799,9 @@ ref(db,"explores/"+uid)
 
 
 
-// -------------------------------
-// 1分ごとに確認
-// -------------------------------
+// --------------------
+// 3秒ごと確認
+// --------------------
 
 
 setInterval(()=>{
@@ -1015,13 +814,4 @@ checkExplore();
 }
 
 
-},10000);
-
-
-
-</script>
-
-
-</body>
-
-</html>
+},3000);
