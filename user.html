@@ -368,35 +368,6 @@ myPoint+" pt";
 
 });
 
-/* ---------- 譲渡先一覧 ---------- */
-
-onValue(ref(db,"members"),snap=>{
-
-const data=snap.val()||{};
-
-const select=document.getElementById("giveUser");
-
-select.innerHTML="<option value=''>譲渡先を選択</option>";
-
-for(const id in data){
-
-if(id===uid) continue;
-
-if(data[id].banned===true) continue;
-
-const option=document.createElement("option");
-
-option.value=id;
-
-option.textContent=data[id].name;
-
-select.appendChild(option);
-
-}
-
-});
-
-});
 
 /* ---------------- ログアウト ---------------- */
 
