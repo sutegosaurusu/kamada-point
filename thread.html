@@ -52,11 +52,15 @@ color:white;
 
 
 .name{
+    font-weight:bold;
+    cursor:pointer;
 
-font-weight:bold;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
 
+    touch-action:manipulation;
 }
-
 
 .time{
 
@@ -710,33 +714,17 @@ document.getElementById(
 });
 
 
-let pressTimer;
+nameDiv.onclick=()=>{
 
-nameDiv.addEventListener("touchstart",()=>{
+    replyTo = postId;
 
-    pressTimer = setTimeout(()=>{
+    document.getElementById("replyBox").style.display =
+    "block";
 
-        replyTo = postId;
+    document.getElementById("replyName").textContent =
+    post.name;
 
-        document.getElementById("replyBox").style.display = "block";
-
-        document.getElementById("replyName").textContent = post.name;
-
-    },600);
-
-});
-
-nameDiv.addEventListener("touchend",()=>{
-
-    clearTimeout(pressTimer);
-
-});
-
-nameDiv.addEventListener("touchcancel",()=>{
-
-    clearTimeout(pressTimer);
-
-});
+};
 posts.appendChild(div);
 
 
