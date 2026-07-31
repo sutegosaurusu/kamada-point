@@ -476,7 +476,7 @@ div.querySelector(".likeBtn");
 
 likeBtn.onclick=async()=>{
 
-
+ e.stopPropagation();
 if(!currentUser){
 
 alert("ログインしてください");
@@ -676,7 +676,7 @@ newLikes
   const rankRef =
 ref(db,"members/"+post.uid);
 
-
+const nameDiv = div.querySelector(".name");
 get(rankRef)
 .then((snap)=>{
 
@@ -712,53 +712,29 @@ document.getElementById(
 
 let pressTimer;
 
-div.addEventListener("mousedown",()=>{
+nameDiv.addEventListener("touchstart",()=>{
 
-pressTimer=setTimeout(()=>{
+    pressTimer = setTimeout(()=>{
 
-replyTo=postId;
+        replyTo = postId;
 
-document.getElementById("replyBox").style.display="block";
+        document.getElementById("replyBox").style.display = "block";
 
-document.getElementById("replyName").textContent=post.name;
+        document.getElementById("replyName").textContent = post.name;
 
-},500);
-
-});
-
-div.addEventListener("mouseup",()=>{
-
-clearTimeout(pressTimer);
+    },600);
 
 });
 
-div.addEventListener("mouseleave",()=>{
+nameDiv.addEventListener("touchend",()=>{
 
-clearTimeout(pressTimer);
+    clearTimeout(pressTimer);
 
 });
 
-// スマホ用
-div.addEventListener("touchstart",(e)=>{
+nameDiv.addEventListener("touchcancel",()=>{
 
-e.preventDefault();
-
-pressTimer=setTimeout(()=>{
-
-replyTo=postId;
-
-document.getElementById("replyBox").style.display="block";
-
-document.getElementById("replyName").textContent=post.name;
-
-},600);
-
-},{passive:false});
-
-
-div.addEventListener("touchend",()=>{
-
-clearTimeout(pressTimer);
+    clearTimeout(pressTimer);
 
 });
 posts.appendChild(div);
