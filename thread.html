@@ -22,10 +22,10 @@ background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
 .card{
 
 background:white;
-padding:15px;
-margin:10px 0;
-border-radius:15px;
-box-shadow:0 3px 10px #ccc;
+padding:8px 12px;
+margin:6px 0;
+border-radius:10px;
+box-shadow:0 1px 4px #ddd;
 
 }
 
@@ -64,7 +64,22 @@ font-size:12px;
 color:#777;
 
 }
+.likeBtn{
 
+display:inline-block;
+cursor:pointer;
+color:#ff5ca8;
+font-size:14px;
+margin-top:4px;
+user-select:none;
+
+}
+
+.likeBtn:hover{
+
+opacity:.7;
+
+}
 </style>
 
 
@@ -421,18 +436,11 @@ ${new Date(post.time)
 .toLocaleString()}
 
 </div>
-<p>
+<p class="likeBtn">
 
 👍 ${post.likes || 0}
 
 </p>
-
-
-<button class="likeBtn">
-
-いいね
-
-</button>
 
 `;
 
