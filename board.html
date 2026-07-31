@@ -116,6 +116,14 @@ margin-top:0;
 .card:hover{
     background:#fff8fc;
 }
+    .replyCount{
+
+    font-size:12px;
+    color:#888;
+    font-weight:normal;
+    margin-left:6px;
+
+}
 </style>
 
 </head>
@@ -671,10 +679,13 @@ div.innerHTML=`
 `;
 
 
-div.querySelector(".title")
-.textContent=
-data.title || "タイトルなし";
+const replyCount = data.posts ? Object.keys(data.posts).length : 0;
 
+div.querySelector(".title").innerHTML =
+(data.title || "タイトルなし") +
+' <span class="replyCount">' +
+replyCount +
+'レス</span>';
 
 div.querySelector(".category")
 .textContent=
