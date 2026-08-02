@@ -517,22 +517,8 @@ function watchInventory(){
         });
 }
 
-/* =====================================================
-   市場の出品を監視
-===================================================== */
 
-function watchListings(){
 
-    database
-        .ref("marketListings")
-        .on("value", snapshot => {
-
-            listingData = snapshot.val() || {};
-
-            renderMarket();
-            renderMyListings();
-        });
-}
 
 /* =====================================================
    カテゴリ切り替え
