@@ -336,6 +336,11 @@ header p{
     }
 }
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script src="common.js"></script>
 </head>
 
 <body>
@@ -423,27 +428,6 @@ header p{
    自分のFirebase設定に書き換えてください
 ===================================================== */
 
-const firebaseConfig = {
-
-apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
-
-authDomain:"kamadapoint.firebaseapp.com",
-
-databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-projectId:"kamadapoint",
-
-storageBucket:"kamadapoint.firebasestorage.app",
-
-messagingSenderId:"601769416524",
-
-appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
-
-};
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const database = firebase.database();
 
 /* =====================================================
    基本データ
