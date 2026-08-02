@@ -56,3 +56,15 @@ const merchantItems = [
         price:700
     }
 ];
+function watchListings(){
+
+    database
+        .ref("marketListings")
+        .on("value", snapshot => {
+
+            listingData = snapshot.val() || {};
+
+            renderMarket();
+            renderMyListings();
+        });
+}
