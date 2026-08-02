@@ -244,7 +244,12 @@ const auth = getAuth(app);
 
 const db = getDatabase(app);
 
+let deviceId = localStorage.getItem("deviceId");
 
+if (!deviceId) {
+    deviceId = crypto.randomUUID();
+    localStorage.setItem("deviceId", deviceId);
+}
 
 const msg = document.getElementById("msg");
 
@@ -282,6 +287,21 @@ const nameQuery = query(
 try{
 const snapshot = await get(nameQuery);
 
+const members = await get(ref(db, "members"));
+
+let used = false;
+
+members.forEach(child => {
+    if (child.val().deviceId === deviceId) {
+        used = true;
+    }
+});
+
+if (used) {
+    msg.textContent = "この端末では既にアカウントが作成されています";
+    return;
+}
+    
 if(snapshot.exists()){
     msg.textContent="その名前は既に登録されています";
     return;
@@ -302,7 +322,8 @@ ref(db,"members/"+user.uid),
     email:email,
     point:0,
     admin:false,
-    banned:false
+    banned:false,
+    deviceId:deviceId
 }
 );
 
