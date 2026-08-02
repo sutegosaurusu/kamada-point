@@ -199,11 +199,11 @@ import { initializeApp } from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 
-import { getAuth, signInWithEmailAndPassword } from 
+import { getAuth, signInWithEmailAndPassword } from
 "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-
-
+import { getDatabase, ref, get, update } from
+"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 const firebaseConfig = {
 
   apiKey: "AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
@@ -228,7 +228,7 @@ const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 
-
+const db = getDatabase(app);
 
 const msg = document.getElementById("msg");
 
@@ -261,18 +261,39 @@ if(!email || !password){
 try{
 
 
-await signInWithEmailAndPassword(
-auth,
-email,
-password
+const userCredential = await signInWithEmailAndPassword(
+    auth,
+    email,
+    password
 );
 
+const uid = userCredential.user.uid;
 
-msg.textContent="ログイン成功";
+// 端末ID取得（なければ作成）
+let deviceId = localStorage.getItem("deviceId");
 
+if (!deviceId) {
+    deviceId = crypto.randomUUID();
+    localStorage.setItem("deviceId", deviceId);
+}
 
-location.href="index.html";
+// Firebaseのユーザー情報取得
+const userRef = ref(db, "members/" + uid);
+const snap = await get(userRef);
 
+// deviceIdが未登録なら登録
+if (snap.exists()) {
+    const user = snap.val();
+
+    if (!user.deviceId) {
+        await update(userRef, {
+            deviceId: deviceId
+        });
+    }
+}
+
+msg.textContent = "ログイン成功";
+location.href = "index.html";
 
 
 }catch(e){
