@@ -68,3 +68,28 @@ function watchListings(){
             renderMyListings();
         });
 }
+document.querySelectorAll(".categoryTabs button")
+.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        document
+            .querySelectorAll(".categoryTabs button")
+            .forEach(btn => btn.classList.remove("active"));
+
+        button.classList.add("active");
+
+        currentCategory = button.dataset.category;
+
+        renderMarket();
+        renderSellItems();
+    });
+});
+
+document
+    .getElementById("searchInput")
+    .addEventListener("input", renderMarket);
+
+document
+    .getElementById("sortSelect")
+    .addEventListener("change", renderMarket);
