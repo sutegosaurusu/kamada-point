@@ -1,824 +1,178 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>ダンゴムシポリス</title>
-
+<title>ダンゴムシダンジョン</title>
 
 <style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
 body{
-
-font-family:"Arial","Noto Sans JP",sans-serif;
-
-margin:0;
-
-padding:20px;
-
-background:linear-gradient(135deg,#f5e6c8,#dff3ff);
-
-color:#333;
-
+    font-family:"Yu Mincho","Noto Serif JP",serif;
+    background:#b79d74;
+    background-image:
+        radial-gradient(circle at 20% 20%,rgba(255,255,255,.08),transparent 40%),
+        radial-gradient(circle at 80% 60%,rgba(0,0,0,.08),transparent 50%);
+    color:#2d2116;
+    min-height:100vh;
 }
 
+/* タイトル */
 
-h1{
-
-text-align:center;
-
-color:#9b6b2f;
-
+header{
+    background:#cbb38a;
+    border-bottom:6px solid #5b442b;
+    padding:22px;
+    text-align:center;
+    box-shadow:0 4px 8px rgba(0,0,0,.25);
 }
 
-
-h2{
-
-border-left:6px solid #c99a4a;
-
-padding-left:10px;
-
-color:#76502a;
-
+header h1{
+    font-size:36px;
+    letter-spacing:2px;
+    color:#3b2b1b;
 }
 
+header p{
+    margin-top:8px;
+    color:#6b5538;
+    font-style:italic;
+}
 
+/* 共通カード */
 
 .card{
-
-background:white;
-
-border-radius:20px;
-
-padding:20px;
-
-margin:15px 0;
-
-box-shadow:0 5px 15px rgba(0,0,0,0.15);
-
+    width:90%;
+    max-width:650px;
+    margin:24px auto;
+    background:#d9ccb2;
+    border:3px solid #5b442b;
+    border-radius:6px;
+    padding:18px;
+    box-shadow:4px 4px 0 #7d6443;
 }
 
+/* ポイント */
 
-
-#bug{
-
-font-size:70px;
-
-text-align:center;
-
+.pointTitle{
+    text-align:center;
+    font-size:20px;
 }
 
-
-
-button{
-
-padding:12px 25px;
-
-border:none;
-
-border-radius:25px;
-
-background:#b8863b;
-
-color:white;
-
-font-weight:bold;
-
-cursor:pointer;
-
-margin:5px;
-
+.point{
+    margin-top:12px;
+    text-align:center;
+    font-size:42px;
+    font-weight:bold;
+    color:#715317;
 }
 
+/* ボタン */
 
-
-button:hover{
-
-transform:translateY(-2px);
-
+.menu{
+    width:90%;
+    max-width:650px;
+    margin:30px auto;
 }
 
+.menu button{
+    width:100%;
+    padding:18px;
+    margin-bottom:16px;
 
+    background:#8a6842;
+    color:#f5ebd5;
 
-select{
+    border:3px solid #4d351f;
+    border-radius:6px;
 
-padding:10px;
+    font-size:22px;
+    font-family:inherit;
 
-border-radius:15px;
+    cursor:pointer;
+    transition:.15s;
 
+    box-shadow:3px 3px 0 #3d2917;
 }
 
-
-
-#status{
-
-text-align:center;
-
-font-weight:bold;
-
-font-size:20px;
-
+.menu button:hover{
+    background:#7a5937;
 }
 
-
-
-.item{
-
-padding:5px;
-
+.menu button:active{
+    transform:translateY(3px);
+    box-shadow:none;
 }
 
+/* 現在地 */
 
+.location{
+    width:90%;
+    max-width:650px;
+    margin:25px auto;
 
+    background:#cab58d;
+
+    border:3px solid #5b442b;
+
+    padding:15px;
+
+    text-align:center;
+
+    font-size:18px;
+}
+
+/* フッター */
+
+footer{
+    margin:40px 0 20px;
+    text-align:center;
+    color:#5e4932;
+    font-size:14px;
+}
 </style>
 
-
 </head>
-
-
-
 <body>
 
+<header>
+    <h1>🏛 ダンゴムシダンジョン</h1>
+    <p>Ancient Expedition</p>
+</header>
 
-<h1>
-🏛 ダンゴムシ探検
-</h1>
-
-
-
-<div class="card">
-
-
-<div id="bug">
-
-🪲
-
+<div class="pointBox">
+    <h2>鎌田ポイント</h2>
+    <div class="point" id="point">0 Pt</div>
 </div>
 
+<div class="menu">
 
-<h2>
-探検者
-</h2>
+<button onclick="location.href='adventure.html'">
+⚔ 探検へ
+</button>
 
-
-<p>
-名前：
-探索隊
-</p>
-
-
-
-</div>
-
-
-
-
-
-<div class="card">
-
-
-<h2>
-🎒 倉庫
-</h2>
-<div class="card">
-
-<h2>🏛 アゴラ商店</h2>
-
-<p>
-商人から物資を購入できます
-</p>
+<button onclick="location.href='inventory.html'">
+🎒 持ち物
+</button>
 
 <button onclick="location.href='shop.html'">
-商店へ行く
+🏺 店
+</button>
+
+<button onclick="location.href='map.html'">
+🗺 マップ
 </button>
 
 </div>
 
-<div class="item">
-
-🍂 落ち葉：
-<span id="leaf">
-0
-</span>
-
-</div>
-
-
-<div class="item">
-
-🍎 野生果実：
-<span id="fruit">
-0
-</span>
-
-</div>
-
-
-<div class="item">
-
-🍄 キノコ：
-<span id="mushroom">
-0
-</span>
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-<div class="card">
-
-
-<h2>
-🌳 探索地
-</h2>
-
-
-<select id="place">
-
-
-<option value="olive">
-
-オリーブ森
-
-（果実1個必要）
-
-</option>
-
-
-</select>
-
-
-
-<br><br>
-
-
-<button id="start">
-
-探索開始
-
-</button>
-
-
-<button onclick="location.href='user.html'">
-
-戻る
-
-</button>
-
-
-</div>
-
-
-
-
-
-
-<div class="card">
-
-
-<h2>
-状態
-</h2>
-
-
-<div id="status">
-
-待機中
-
-</div>
-
-
-<p id="result">
-
-まだ探索していません
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-
-<script type="module">
-
-
-import {
-
-initializeApp
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-
-
-import {
-
-getAuth,
-
-onAuthStateChanged
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-
-
-import {
-
-getDatabase,
-
-ref,
-
-get,
-
-set,
-
-update
-
-}
-
-from
-
-"https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-
-
-
-
-const firebaseConfig={
-
-
-apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
-
-authDomain:"kamadapoint.firebaseapp.com",
-
-databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-projectId:"kamadapoint",
-
-storageBucket:"kamadapoint.firebasestorage.app",
-
-messagingSenderId:"601769416524",
-
-appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
-
-
-};
-
-
-
-const app=initializeApp(firebaseConfig);
-
-
-const auth=getAuth(app);
-
-
-const db=getDatabase(app);
-
-
-
-
-let uid=null;
-
-
-
-
-onAuthStateChanged(auth,async(user)=>{
-
-
-if(!user){
-
-
-location.href="login.html";
-
-
-return;
-
-
-}
-
-
-
-uid=user.uid;
-
-
-
-await loadInventory();
-
-
-});
-
-
-
-
-
-
-
-// --------------------
-// 所持品読み込み
-// --------------------
-
-
-async function loadInventory(){
-
-
-
-const snap=await get(
-
-ref(db,"dangoInventory/"+uid)
-
-);
-
-
-
-if(!snap.exists()){
-
-
-
-await set(
-
-ref(db,"dangoInventory/"+uid),
-
-{
-
-leaf:0,
-
-fruit:5,
-
-mushroom:0
-
-}
-
-);
-
-
-
-document.getElementById("fruit").textContent=5;
-
-
-
-return;
-
-
-}
-
-
-
-
-const data=snap.val();
-
-
-
-document.getElementById("leaf").textContent=
-
-data.leaf||0;
-
-
-
-document.getElementById("fruit").textContent=
-
-data.fruit||0;
-
-
-
-document.getElementById("mushroom").textContent=
-
-data.mushroom||0;
-
-
-
-}
-
-
-
-
-
-
-// --------------------
-// 探索開始
-// --------------------
-
-
-document.getElementById("start").onclick=async()=>{
-
-
-
-const invSnap=await get(
-
-ref(db,"dangoInventory/"+uid)
-
-);
-
-
-
-const inv=invSnap.val();
-
-
-
-if(inv.fruit < 1){
-
-
-alert("果実が足りません");
-
-
-return;
-
-
-}
-
-
-
-let now=Date.now();
-
-
-
-// テスト用10秒
-
-let endTime=
-
-now+10000;
-
-
-
-await update(
-
-ref(db,"dangoInventory/"+uid),
-
-{
-
-fruit:inv.fruit-1
-
-}
-
-);
-
-
-
-await set(
-
-ref(db,"dangoExplore/"+uid),
-
-{
-
-
-place:"olive",
-
-startTime:now,
-
-endTime:endTime,
-
-status:"running"
-
-
-}
-
-);
-
-
-
-document.getElementById("fruit").textContent=
-
-inv.fruit-1;
-
-
-
-document.getElementById("status").textContent=
-
-"探索中…";
-
-
-
-document.getElementById("result").textContent=
-
-"オリーブ森へ向かいました";
-
-
-
-};
-
-
-// --------------------
-// 探索結果確認
-// --------------------
-
-async function checkExplore(){
-
-
-const snap = await get(
-
-ref(db,"dangoExplore/"+uid)
-
-);
-
-
-
-if(!snap.exists()){
-
-return;
-
-}
-
-
-
-const data=snap.val();
-
-
-
-const now=Date.now();
-
-
-
-// まだ探索中
-
-if(now < data.endTime){
-
-
-let remain=Math.ceil(
-
-(data.endTime-now)/1000
-
-);
-
-
-document.getElementById("status").textContent=
-
-"探索中… 残り "+remain+"秒";
-
-
-return;
-
-
-}
-
-
-
-
-// 帰還処理
-
-if(data.status==="finished"){
-
-return;
-
-}
-
-
-
-await finishExplore(data);
-
-
-
-}
-
-
-
-
-
-// --------------------
-// 探索成功
-// --------------------
-
-
-async function finishExplore(data){
-
-
-
-let reward={
-
-
-
-leaf:10,
-
-mushroom:2
-
-
-
-};
-
-
-
-const invSnap=await get(
-
-ref(db,"dangoInventory/"+uid)
-
-);
-
-
-
-let inv=invSnap.val();
-
-
-
-
-
-inv.leaf=
-
-Number(inv.leaf||0)+reward.leaf;
-
-
-
-inv.mushroom=
-
-Number(inv.mushroom||0)+reward.mushroom;
-
-
-
-
-
-await set(
-
-ref(db,"dangoInventory/"+uid),
-
-inv
-
-);
-
-
-
-
-
-await update(
-
-ref(db,"dangoExplore/"+uid),
-
-{
-
-
-status:"finished"
-
-
-}
-
-);
-
-
-
-
-
-document.getElementById("leaf").textContent=
-
-inv.leaf;
-
-
-
-document.getElementById("mushroom").textContent=
-
-inv.mushroom;
-
-
-
-
-
-document.getElementById("status").textContent=
-
-"探索終了！";
-
-
-
-document.getElementById("result").textContent=
-
-"🌳オリーブ森から帰還しました！\n\n🍂落ち葉 ×10\n🍄キノコ ×2";
-
-
-
-}
-
-
-
-
-
-
-
-// --------------------
-// 3秒ごと確認
-// --------------------
-
-
-setInterval(()=>{
-
-
-if(uid){
-
-checkExplore();
-
-}
-
-
-},3000);
+<footer>
+ダンゴムシ遠征隊
+</footer>
+
+</body>
+</html>
