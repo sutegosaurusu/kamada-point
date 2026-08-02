@@ -181,49 +181,6 @@ footer{
 <footer>
     ダンゴムシ遠征隊
 </footer>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-<script>
-const firebaseConfig = {
-
-apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
-
-authDomain:"kamadapoint.firebaseapp.com",
-
-databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-projectId:"kamadapoint",
-
-storageBucket:"kamadapoint.firebasestorage.app",
-
-messagingSenderId:"601769416524",
-
-appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
-
-};
-
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.database();
-
-auth.onAuthStateChanged(user => {
-
-    if (!user) {
-        location.href = "../index.html";
-        return;
-    }
-
-    db.ref("members/" + user.uid + "/point").on("value", snapshot => {
-
-        document.getElementById("point").textContent =
-            (snapshot.val() || 0) + " Pt";
-
-    });
-
-});
-</script>
 </body>
 </html>
