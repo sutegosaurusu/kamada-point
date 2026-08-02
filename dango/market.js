@@ -304,5 +304,214 @@ function renderMarket(){
         market.appendChild(card);
     });
 }
+async function buyMerchantItem(item){
+
+    const confirmed = confirm(
+        item.itemName +
+        "を" +
+        Number(item.price).toLocaleString() +
+        "Ptで購入しますか？"
+    );
+
+    if(!confirmed){
+        return;
+    }
+
+    try{
+
+        const pointRef =
+            database.ref(
+                "members/" +
+                currentUser.uid +
+                "/point"
+            );
+
+        const pointResult =
+            await pointRef.transaction(currentPoint => {
+
+                const point = Number(currentPoint || 0);
+
+                if(point < item.price){
+                    return;
+                }
+
+                return point - item.price;
+            });
+
+        if(!pointResult.committed){
+
+            showMessage("ポイントが足りません");
+            return;
+        }
+
+        await addItemToInventory(
+            currentUser.uid,
+            item.itemId,
+            item.itemName,
+            item.category,
+            1
+        );
+
+        showMessage(item.itemName + "を購入しました");
+
+    }catch(error){
+
+        console.error(error);
+        showMessage("購入に失敗しました");
+    }
+}
+
+/* =====================================================
+   会員の出品を購入
+===================================================== */
+
+async function buyMemberListing(listing){
+
+    if(listing.sellerId === currentUser.uid){
+
+        showMessage("自分の出品は購入できません");
+        return;
+    }
+
+    const confirmed = confirm(
+        listing.itemName +
+        "を" +
+        Number(listing.price).toLocaleString() +
+        "Ptで購入しますか？"
+    );
+
+    if(!confirmed){
+        return;
+    }
+
+    const buyerPointRef =
+        database.ref(
+            "members/" +
+            currentUser.uid +
+            "/point"
+        );
+
+    let pointDeducted = false;
+
+    try{
+
+        /*
+        購入者からポイントを引く
+        */
+
+        const pointResult =
+            await buyerPointRef.transaction(currentPoint => {
+
+                const point = Number(currentPoint || 0);
+
+                if(point < listing.price){
+                    return;
+                }
+
+                return point - Number(listing.price);
+            });
+
+        if(!pointResult.committed){
+
+            showMessage("ポイントが足りません");
+            return;
+        }
+
+        pointDeducted = true;
+
+        /*
+        在庫を1個減らす
+        */
+
+        const listingRef =
+            database.ref(
+                "marketListings/" + listing.id
+            );
+
+        const listingResult =
+            await listingRef.transaction(currentListing => {
+
+                if(!currentListing){
+                    return;
+                }
+
+                const quantity =
+                    Number(currentListing.quantity || 0);
+
+                if(quantity <= 0){
+                    return;
+                }
+
+                if(quantity === 1){
+                    return null;
+                }
+
+                currentListing.quantity = quantity - 1;
+
+                return currentListing;
+            });
+
+        if(!listingResult.committed){
+
+            await refundPoints(listing.price);
+
+            showMessage("この商品は売り切れました");
+            return;
+        }
+
+        /*
+        出品者にポイントを渡す
+        */
+
+        await database
+            .ref(
+                "members/" +
+                listing.sellerId +
+                "/point"
+            )
+            .transaction(currentPoint =>
+                Number(currentPoint || 0) +
+                Number(listing.price)
+            );
+
+        /*
+        購入者の持ち物へ追加
+        */
+
+        await addItemToInventory(
+            currentUser.uid,
+            listing.itemId,
+            listing.itemName,
+            listing.category,
+            1
+        );
+
+        showMessage(listing.itemName + "を購入しました");
+
+    }catch(error){
+
+        console.error(error);
+
+        if(pointDeducted){
+            await refundPoints(listing.price);
+        }
+
+        showMessage("購入処理に失敗しました");
+    }
+}
+
+async function refundPoints(amount){
+
+    await database
+        .ref(
+            "members/" +
+            currentUser.uid +
+            "/point"
+        )
+        .transaction(currentPoint =>
+            Number(currentPoint || 0) +
+            Number(amount)
+        );
+}
 
 
