@@ -26,7 +26,7 @@ if (!firebase.apps.length) {
 }
 
 const auth = firebase.auth();
-const db = firebase.database();
+const database = firebase.database();
 
 let currentUser = null;
 
