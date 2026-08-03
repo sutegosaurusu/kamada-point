@@ -426,12 +426,7 @@ Number(listing.price * quantity).toLocaleString() +
                     return;
                 }
 
-                const stock =
-    Number(currentListing.quantity || 0);
-
-                if(quantity <= 0){
-                    return;
-                }
+                
 
               const stock =
     Number(currentListing.quantity || 0);
