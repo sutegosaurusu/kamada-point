@@ -332,10 +332,6 @@ header p{
     }
 }
 </style>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
 
 </head>
 
@@ -417,31 +413,25 @@ header p{
 </section>
 
 <div class="message" id="message"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+
+<script src="firebase.js"></script>
+
 <script src="common.js"></script>
 <script src="items.js"></script>
 <script src="merchant.js"></script>
 <script src="market.js"></script>
-
 <script>
-/* =====================================================
-   Firebase設定
-   自分のFirebase設定に書き換えてください
-===================================================== */
 
 
-/* =====================================================
-   基本データ
-===================================================== */
+
 
 
 let currentMember = null;
 
-/*
-商人の商品です。
-
-stockは無限なので設定不要です。
-商人の商品を増やす場合は、この中に追加してください。
-*/
 
 
 
