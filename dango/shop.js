@@ -78,8 +78,9 @@ function watchInventory(){
 
             renderSellItems();
 
-            renderMarket();
+           renderSellMarket();
 
+            renderMarket();
         });
 
 }
@@ -120,7 +121,7 @@ function renderSellMarket(){
         </div>
 
         <div>
-        買取価格 ${item.price || 50} Pt
+       買取価格 ${price} Pt
         </div>
 
      <input
@@ -156,9 +157,11 @@ function renderSellMarket(){
 }
 async function sellToMerchant(id,item,quantity){
 
-    const price =
-    Number(item.price || 50);
+   const basePrice =
+Number(getItemById(id).price || 0);
 
+const price =
+Math.floor(basePrice * 0.3);
 
     const uid =
     currentUser.uid;
