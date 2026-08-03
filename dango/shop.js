@@ -83,32 +83,10 @@ function watchInventory(){
         });
 
 }
-let shopMode = "buy";
 
 
 
 
-    shopMode="buy";
-
-    document.getElementById("market").style.display="block";
-    document.getElementById("sellMarket").style.display="none";
-
-    renderMarket();
-
-});
-
-
-document.getElementById("sellModeButton")
-.addEventListener("click",()=>{
-
-    shopMode="sell";
-
-    document.getElementById("market").style.display="none";
-    document.getElementById("sellMarket").style.display="block";
-
-    renderSellMarket();
-
-});
 function renderSellMarket(){
 
     const area =
