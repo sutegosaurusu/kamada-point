@@ -209,15 +209,14 @@ if(ownedQuantity < quantity){
     await database.ref(
     "members/"+uid+"/point"
     )
-    .transaction(p=>
-        Number(p||0)+price
-    );
+   .transaction(p=>
+    Number(p||0)+price * quantity
+);
 
-
-    showMessage(
-    item.name+"を"+price+"Ptで売りました"
-    );
-
+   showMessage(
+    item.name+"を"+quantity+"個、"+
+    (price * quantity)+"Ptで売りました"
+);
 
     renderSellMarket();
 
