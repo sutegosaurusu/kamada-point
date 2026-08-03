@@ -88,7 +88,7 @@ function renderMarket(){
         sellerId:"merchant",
         sellerName:"商人",
         price:Number(item.price),
-        quantity:Infinity,
+        quantity:null,
         createdAt:0
     });
 
