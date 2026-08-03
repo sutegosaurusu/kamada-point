@@ -108,4 +108,8 @@ const items = [
    
 ];
 
+const itemInformation = {};
 
+items.forEach(item=>{
+    itemInformation[item.id] = item;
+});
