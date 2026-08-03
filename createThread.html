@@ -307,7 +307,7 @@ likes:0
 
 
 });
-// 初回スレ作成報酬
+// 1日1回スレ作成報酬
 
 const memberRef =
 ref(db,"members/"+uid);
@@ -319,32 +319,40 @@ await get(memberRef);
 
 if(memberSnap.exists()){
 
-
 const member =
 memberSnap.val();
 
 
+const today =
+new Date().toLocaleDateString();
 
-if(!member.threadCreatedReward){
+
+const rewardDate =
+member.threadRewardDate || "";
+
+
+// 日付が変わったら受取可能
+if(rewardDate !== today){
 
 
 await update(memberRef,{
 
 point:
-(member.point || 0)+10,
+(member.point || 0)+50,
 
-threadCreatedReward:true
+threadRewardDate:
+today
 
 });
 
 
-alert("初回スレ作成報酬 +10pt");
+alert("スレ作成報酬 +50pt");
 
 
 }else{
 
 
-alert("スレ作成済みのため報酬はありません");
+alert("今日はスレ作成報酬を受け取り済みです");
 
 
 }
