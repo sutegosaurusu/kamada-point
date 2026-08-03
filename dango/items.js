@@ -120,4 +120,22 @@ const categoryInformation = {
     }
 
 };
+function getDefaultIcon(category){
+
+    switch(category){
+
+        case "food":
+            return "🍎";
+
+        case "water":
+            return "💧";
+
+        case "equipment":
+            return "⚔️";
+
+        default:
+            return "📦";
+    }
+
+}
 console.log("items.js読み込み完了");
