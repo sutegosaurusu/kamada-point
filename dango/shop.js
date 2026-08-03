@@ -115,18 +115,16 @@ ${escapeHtml(item.name)}
 買取価格 ${Math.floor(Number(getItemById(id).price || 0) * 0.3)} Pt
 </div>
 
-<div class="buyArea">
+<div class="sellArea">
 
     <input
-        class="buyQuantity"
+        class="sellQuantity"
         type="number"
         min="1"
         value="1"
     >
 
-    <br>
-
-    <button class="buyButton sellButton">
+    <button class="sellButton">
         売る
     </button>
 
@@ -140,7 +138,7 @@ ${escapeHtml(item.name)}
    
         const quantity =
     Number(
-        div.querySelector(".buyQuantity").value
+      div.querySelector(".sellQuantity").value
     );
     sellToMerchant(id,item,quantity);
 
