@@ -1,16 +1,3 @@
-
-
-
-// 二重初期化防止
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-
-
-const auth = firebase.auth();
-const database = firebase.database();
-
-
 let currentUser = null;
 
 
