@@ -326,7 +326,9 @@ document
         closeItemDetail();
 
     }
-    function getItemInformation(item){
+    
+});
+function getItemInformation(item){
 
     const savedInformation =
         itemInformation[item.name] || {};
@@ -344,6 +346,4 @@ document
             "このアイテムの効果は設定されていません。"
     };
 }
-
-});
 
