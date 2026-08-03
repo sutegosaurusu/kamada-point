@@ -101,3 +101,22 @@ const itemInformation = {};
 items.forEach(item=>{
     itemInformation[item.id] = item;
 });
+
+function getDefaultIcon(category){
+
+    switch(category){
+
+        case "food":
+            return "🍎";
+
+        case "water":
+            return "💧";
+
+        case "equipment":
+            return "⚔️";
+
+        default:
+            return "📦";
+    }
+
+}
