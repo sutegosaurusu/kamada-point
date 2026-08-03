@@ -185,7 +185,8 @@ header p{
 }
 
 .buyButton{
-    padding:8px 6px;
+    width:74px;
+    height:36px;
 
     border:2px solid #49311d;
     background:#795536;
@@ -194,7 +195,6 @@ header p{
     font-family:inherit;
     cursor:pointer;
 }
-
 .buyButton:disabled{
     opacity:.5;
     cursor:not-allowed;
@@ -347,15 +347,7 @@ header p{
         所持ポイント：
         <span class="point" id="pointDisplay">---</span>
     </div>
-    <div>
-        <button id="buyModeButton" class="backButton">
-            🛒 買う
-        </button>
-
-        <button id="sellModeButton" class="backButton">
-            💰 売る
-        </button>
-    </div>
+   
 
     <button class="backButton" onclick="location.href='dango.html'">
         村へ戻る
