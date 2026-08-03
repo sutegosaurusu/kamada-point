@@ -1,9 +1,6 @@
 let currentCategory = "food";
 let listingData = {};
-const merchantItems = [
-   "merchant_leaf",
-    "merchant_water"
-];
+
 function watchListings(){
 
     database
