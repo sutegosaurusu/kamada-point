@@ -74,7 +74,7 @@ const merchantItems = [
         name:"OS-1",
         category:"water",
         price:250
-    },
+    }
     ];
 
 
