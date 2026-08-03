@@ -523,144 +523,16 @@ header p{
 </div>
 
 <script>
-/* =====================================================
-   Firebase設定
-   shop.htmlと同じ設定を貼ってください
-===================================================== */
 
-const firebaseConfig = {
 
-apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
 
-authDomain:"kamadapoint.firebaseapp.com",
 
-databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
 
-projectId:"kamadapoint",
 
-storageBucket:"kamadapoint.firebasestorage.app",
 
-messagingSenderId:"601769416524",
 
-appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
 
-};
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const database = firebase.database();
-
-/* =====================================================
-   基本変数
-===================================================== */
-
-let currentUser = null;
-let currentCategory = "food";
-let inventoryData = {};
-
-/* =====================================================
-   アイテムの絵文字と効果
-===================================================== */
-
-/*
-商品名と同じ名前を書くことで、
-絵文字と効果を設定できます。
-
-後で画像を使う場合も、この部分を変更できます。
-*/
-
-const itemInformation = {
-
-    "大麦パン":{
-        icon:"🍞",
-        effect:"探検中の空腹を少し満たす。食料値を10回復する。"
-    },
-
-    "干しいちじく":{
-        icon:"🫐",
-        effect:"軽くて持ち運びやすい保存食。食料値を15回復する。"
-    },
-
-    "オリーブ":{
-        icon:"🫒",
-        effect:"少量でも力がつく食料。食料値を8回復する。"
-    },
-
-    "山羊のチーズ":{
-        icon:"🧀",
-        effect:"栄養の多い保存食。食料値を25回復する。"
-    },
-
-    "水袋":{
-        icon:"💧",
-        effect:"探検中の喉の渇きを癒やす。水分値を20回復する。"
-    },
-
-    "大きな水袋":{
-        icon:"🏺",
-        effect:"多くの水を持ち運べる。水分値を50回復する。"
-    },
-
-    "麻の縄":{
-        icon:"🪢",
-        effect:"崖や穴のある場所で役立つ。特別な探検先へ進めることがある。"
-    },
-
-    "松明":{
-        icon:"🔥",
-        effect:"暗い洞窟を照らす。洞窟での失敗率を下げる。"
-    },
-
-    "青銅の小刀":{
-        icon:"🗡️",
-        effect:"危険な生き物から身を守る。探検時の戦闘を少し有利にする。"
-    }
-
-};
-
-/* =====================================================
-   カテゴリ情報
-===================================================== */
-
-const categoryInformation = {
-
-    food:{
-        name:"食べ物",
-        icon:"🍖"
-    },
-
-    water:{
-        name:"水",
-        icon:"💧"
-    },
-
-    equipment:{
-        name:"装備",
-        icon:"🛡️"
-    }
-
-};
-
-/* =====================================================
-   ログイン確認
-===================================================== */
-
-auth.onAuthStateChanged(user => {
-
-    if(!user){
-
-        alert("先にログインしてください");
-
-        location.href = "../index.html";
-
-        return;
-    }
-
-    currentUser = user;
-
-    watchInventory();
-});
 
 /* =====================================================
    持ち物を監視
@@ -945,20 +817,11 @@ function getDefaultIcon(category){
     return "📦";
 }
 
-/* =====================================================
-   文字を安全に表示
-===================================================== */
 
-function escapeHtml(value){
-
-    return String(value || "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-}
 </script>
+<script src="js/firebase.js"></script>
+<script src="js/common.js"></script>
+<script src="js/items.js"></script>
 
 </body>
 </html>
