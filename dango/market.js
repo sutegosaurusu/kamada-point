@@ -206,33 +206,55 @@ function renderMarket(){
                 ? "seller merchant"
                 : "seller";
 
-            row.innerHTML = `
-                <div class="${sellerClass}">
-                    ${escapeHtml(offer.sellerName || "名無し")}
-                </div>
+         row.innerHTML = `
+    <div class="${sellerClass}">
+        ${escapeHtml(offer.sellerName || "名無し")}
+    </div>
 
-                <div class="price">
-                    ${Number(offer.price).toLocaleString()} Pt
-                </div>
+    <div class="price">
+        ${Number(offer.price).toLocaleString()} Pt
+    </div>
 
-                <div class="stock">
-                    ${
-                        offer.type === "merchant"
-                        ? "在庫 ∞"
-                        : "残り " + offer.quantity
-                    }
-                </div>
+    <div class="stock">
+        ${
+            offer.type === "merchant"
+            ? "在庫 ∞"
+            : "残り " + offer.quantity
+        }
+    </div>
 
-                <button
-                    class="buyButton"
-                    ${isOwnListing ? "disabled" : ""}
-                >
-                    ${isOwnListing ? "自分" : "買う"}
-                </button>
-            `;
+    <button
+        class="buyButton"
+        ${isOwnListing ? "disabled" : ""}
+    >
+        ${isOwnListing ? "自分" : "買う"}
+    </button>
 
+    ${
+        offer.type === "merchant"
+        ? `
+        <button class="sellButton">
+            売る
+        </button>
+        `
+        : ""
+    }
+`;
             const buyButton =
                 row.querySelector(".buyButton");
+            const sellButton =
+    row.querySelector(".sellButton");
+
+
+if(sellButton){
+
+    sellButton.addEventListener("click",()=>{
+
+        sellMerchantItem(offer);
+
+    });
+
+}
 
             if(!isOwnListing){
 
@@ -822,4 +844,84 @@ async function cancelListing(listingId, listing){
         showMessage("取り下げに失敗しました");
     }
 }
+async function sellMerchantItem(item){
 
+    const quantity = Number(
+        prompt(
+            item.itemName +
+            "を何個売りますか？"
+        )
+    );
+
+    if(!quantity || quantity <= 0){
+        return;
+    }
+
+
+    const inventoryRef =
+        database.ref(
+            "inventories/" +
+            currentUser.uid +
+            "/" +
+            item.itemId
+        );
+
+
+    const result =
+        await inventoryRef.transaction(currentItem=>{
+
+            if(!currentItem){
+                return;
+            }
+
+            const have =
+                Number(currentItem.quantity || 0);
+
+
+            if(have < quantity){
+                return;
+            }
+
+
+            if(have === quantity){
+                return null;
+            }
+
+
+            currentItem.quantity =
+                have - quantity;
+
+
+            return currentItem;
+
+        });
+
+
+    if(!result.committed){
+
+        showMessage("持っていません");
+
+        return;
+    }
+
+
+    await database.ref(
+        "members/" +
+        currentUser.uid +
+        "/point"
+    )
+    .transaction(point=>
+        Number(point || 0)
+        +
+        Number(item.price) * quantity
+    );
+
+
+    showMessage(
+        item.itemName +
+        "を" +
+        quantity +
+        "個売りました"
+    );
+
+}
