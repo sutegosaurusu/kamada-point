@@ -89,6 +89,20 @@ function watchInventory(){
 
 
 function renderSellMarket(){
+    const area = document.getElementById("sellMarket");
+
+    area.innerHTML = "";
+
+    Object.entries(inventoryData)
+    .forEach(([id,item])=>{
+
+        if(!item || item.quantity <= 0){
+            return;
+        }
+
+        const div = document.createElement("div");
+
+        div.className = "itemCard";
 
    div.innerHTML=`
 
@@ -118,7 +132,7 @@ ${escapeHtml(item.name)}
       div.querySelector(".sellButton")
 .onclick=()=>{
 
-    const quantity =
+   
         const quantity =
     Number(
         div.querySelector(".buyQuantity").value
