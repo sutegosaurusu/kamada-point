@@ -1,4 +1,3 @@
-console.log("merchant.js読み込み");
 const merchantItems = [
     "merchant_leaf",
     "merchant_water"
