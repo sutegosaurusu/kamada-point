@@ -241,9 +241,16 @@ function renderMarket(){
     </button>
 
 </div>
-        `
-        : ""
-    }
+      ${
+    offer.type === "merchant"
+    ? `
+    <button class="sellButton">
+        売る
+    </button>
+    `
+    : ""
+}
+
 `;
             const buyButton =
                 row.querySelector(".buyButton");
