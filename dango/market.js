@@ -34,10 +34,11 @@ document.querySelectorAll(".categoryTabs button")
     });
 });
 
-document
-    .getElementById("searchInput")
-    .addEventListener("input", renderMarket);
+const searchInput = document.getElementById("searchInput");
 
+if(searchInput){
+    searchInput.addEventListener("input", renderMarket);
+}
 document
     .getElementById("sortSelect")
     .addEventListener("change", renderMarket);
