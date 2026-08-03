@@ -293,12 +293,14 @@ if(sellButton){
 }
 async function buyMerchantItem(item, quantity){
 
-    const confirmed = confirm(
-        item.itemName +
-        "を" +
-        Number(item.price).toLocaleString() +
-        "Ptで購入しますか？"
-    );
+   const confirmed = confirm(
+    item.itemName +
+    "を" +
+    quantity +
+    "個、" +
+    Number(item.price * quantity).toLocaleString() +
+    "Ptで購入しますか？"
+);
 
     if(!confirmed){
         return;
