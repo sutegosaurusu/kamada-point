@@ -76,11 +76,7 @@ function watchInventory(){
                 snapshot.val() || {};
 
 
-            renderSellItems();
-
-           renderSellMarket();
-
-            renderMarket();
+          
         });
 
 }
@@ -88,114 +84,8 @@ function watchInventory(){
 
 
 
-function renderSellMarket(){
-    const area = document.getElementById("sellMarket");
-
-    area.innerHTML = "";
-
-    Object.entries(inventoryData)
-    .forEach(([id,item])=>{
-
-        if(!item || item.quantity <= 0){
-            return;
-        }
-
-        const div = document.createElement("div");
-
-        div.className = "itemCard";
-
-  div.innerHTML=`
-
-<div>
-${escapeHtml(item.name)}
-×${item.quantity}
-</div>
-
-<div>
-買取価格 ${Math.floor(Number(getItemById(id).price || 0) * 0.3)} Pt
-</div>
-
-<div class="sellArea">
-
-    <input
-        class="sellQuantity"
-        type="number"
-        min="1"
-        value="1"
-    >
-
-    <button class="sellButton">
-        売る
-    </button>
-
-</div>
-`;
 
 
-      div.querySelector(".sellButton")
-.onclick=()=>{
-
-   
-        const quantity =
-    Number(
-      div.querySelector(".sellQuantity").value
-    );
-    sellToMerchant(id,item,quantity);
-
-};
-
-
-        area.appendChild(div);
-
-    });
-
-}
-async function sellToMerchant(id,item,quantity){
-
-   const basePrice =
-Number(getItemById(id).price || 0);
-
-const price =
-Math.floor(basePrice * 0.3);
-
-    const uid =
-    currentUser.uid;
-
-
-    const ref =
-    database.ref(
-    "inventories/"+uid+"/"+id+"/quantity"
-    );
-
-
-    const snapshot =
-    await ref.once("value");
-
-
-   const ownedQuantity =
-    Number(snapshot.val()||0);
-if(ownedQuantity < quantity){
-    return;
-}
-
-   
-  await ref.set(ownedQuantity - quantity);
-
-    await database.ref(
-    "members/"+uid+"/point"
-    )
-   .transaction(p=>
-    Number(p||0)+price * quantity
-);
-
-   showMessage(
-    item.name+"を"+quantity+"個、"+
-    (price * quantity)+"Ptで売りました"
-);
-
-    renderSellMarket();
-　　renderMarket();
-}
 function renderSellItems(){
 
     const select =
