@@ -326,5 +326,24 @@ document
         closeItemDetail();
 
     }
+    function getItemInformation(item){
+
+    const savedInformation =
+        itemInformation[item.name] || {};
+
+    return {
+
+        icon:
+            item.icon ||
+            savedInformation.icon ||
+            getDefaultIcon(item.category),
+
+        effect:
+            item.effect ||
+            savedInformation.effect ||
+            "このアイテムの効果は設定されていません。"
+    };
+}
 
 });
+
