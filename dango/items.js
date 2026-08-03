@@ -152,5 +152,8 @@ function getItemById(id){
 
 }
 
+function getMerchantItems(){
 
+    return items;
+}
 console.log("items.js読み込み完了");
