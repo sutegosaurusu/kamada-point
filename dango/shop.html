@@ -347,6 +347,15 @@ header p{
         所持ポイント：
         <span class="point" id="pointDisplay">---</span>
     </div>
+    <div>
+        <button id="buyModeButton" class="backButton">
+            🛒 買う
+        </button>
+
+        <button id="sellModeButton" class="backButton">
+            💰 売る
+        </button>
+    </div>
 
     <button class="backButton" onclick="location.href='dango.html'">
         村へ戻る
@@ -374,6 +383,11 @@ header p{
 
 <div class="market" id="market">
     <div class="empty">市場を読み込んでいます</div>
+</div>
+    <div class="market" id="sellMarket" style="display:none;">
+    <div class="empty">
+        売れる商品を読み込んでいます
+    </div>
 </div>
 
 <section class="sellArea">
