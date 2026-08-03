@@ -1,4 +1,4 @@
-const merchantItems = [
+const items = [
 
     // ======================
     // 食べ物
@@ -103,7 +103,7 @@ const equipmentItems = [
 
 
 const items = [
-    ...merchantItems,
+    ...items,
     ...equipmentItems
    
 ];
