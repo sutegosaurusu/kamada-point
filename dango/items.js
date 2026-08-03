@@ -102,22 +102,22 @@ items.forEach(item=>{
     itemInformation[item.id] = item;
 });
 
-function getDefaultIcon(category){
+const categoryInformation = {
 
-    switch(category){
+    food:{
+        name:"食べ物",
+        icon:"🍎"
+    },
 
-        case "food":
-            return "🍎";
+    water:{
+        name:"水",
+        icon:"💧"
+    },
 
-        case "water":
-            return "💧";
-
-        case "equipment":
-            return "⚔️";
-
-        default:
-            return "📦";
+    equipment:{
+        name:"装備",
+        icon:"⚔️"
     }
 
-}
+};
 console.log("items.js読み込み完了");
