@@ -5,49 +5,49 @@ const items = [
     // ======================
 
     {
-        id:"merchant_apple",
+        id:"apple",
         name:"リンゴ",
         category:"food",
         price:120
     },
     {
-        id:"merchant_cucumber",
+        id:"cucumber",
         name:"キュウリ",
         category:"food",
         price:80
     },
     {
-        id:"merchant_watermelon",
+        id:"watermelon",
         name:"スイカ",
         category:"food",
         price:450
     },
     {
-        id:"merchant_leaf",
+        id:"leaf",
         name:"落ち葉",
         category:"food",
         price:15
     },
     {
-        id:"merchant_jelly",
+        id:"jelly",
         name:"ゼリー",
         category:"food",
         price:100
     },
     {
-        id:"merchant_chinese_cabbage",
+        id:"chinese_cabbage",
         name:"白菜",
         category:"food",
         price:180
     },
     {
-        id:"merchant_azuki_bar",
+        id:"azuki_bar",
         name:"小豆バー",
         category:"food",
         price:160
     },
     {
-        id:"merchant_honey",
+        id:"honey",
         name:"蜜",
         category:"food",
         price:300
@@ -59,19 +59,19 @@ const items = [
     // ======================
 
     {
-        id:"merchant_water",
+        id:"water",
         name:"水",
         category:"water",
         price:40
     },
     {
-        id:"merchant_slime",
+        id:"slime",
         name:"粘液",
         category:"water",
         price:90
     },
     {
-        id:"merchant_os1",
+        id:"os1",
         name:"OS-1",
         category:"water",
         price:250
@@ -83,7 +83,7 @@ const items = [
     // ======================
 
     {
-        id:"items-bou",
+        id:"bou",
         name:"茎",
         category:"equipment",
         price:300
@@ -93,7 +93,7 @@ const items = [
 
 
 // ======================
-// ID検索用データ作成
+// ID検索
 // ======================
 
 const itemInformation = {};
@@ -101,6 +101,7 @@ const itemInformation = {};
 items.forEach(item=>{
     itemInformation[item.id] = item;
 });
+
 
 const categoryInformation = {
 
@@ -120,6 +121,8 @@ const categoryInformation = {
     }
 
 };
+
+
 function getDefaultIcon(category){
 
     switch(category){
@@ -138,13 +141,16 @@ function getDefaultIcon(category){
     }
 
 }
+
+
 function getItemById(id){
 
-    return items.find(item =>
-        item.id === id
-    ) || {
-        price:0
+    return itemInformation[id] || {
+        price:0,
+        name:"不明"
     };
 
 }
+
+
 console.log("items.js読み込み完了");
