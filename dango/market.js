@@ -223,13 +223,20 @@ function renderMarket(){
         }
     </div>
 
-    <button
-        class="buyButton"
-        ${isOwnListing ? "disabled" : ""}
-    >
-        ${isOwnListing ? "自分" : "買う"}
-    </button>
+  <input
+    class="buyQuantity"
+    type="number"
+    min="1"
+    value="1"
+    ${isOwnListing ? "disabled" : ""}
+>
 
+<button
+    class="buyButton"
+    ${isOwnListing ? "disabled" : ""}
+>
+    ${isOwnListing ? "自分" : "買う"}
+</button>
     ${
         offer.type === "merchant"
         ? `
@@ -258,14 +265,24 @@ if(sellButton){
 
             if(!isOwnListing){
 
-                buyButton.addEventListener("click", () => {
+               buyButton.addEventListener("click", () => {
 
-                    if(offer.type === "merchant"){
-                        buyMerchantItem(offer);
-                    }else{
-                        buyMemberListing(offer);
-                    }
-                });
+    const quantity =
+        Number(
+            row.querySelector(".buyQuantity").value
+        );
+
+    if(quantity <= 0){
+        showMessage("個数を入力してください");
+        return;
+    }
+
+    if(offer.type === "merchant"){
+        buyMerchantItem(offer, quantity);
+    }else{
+        buyMemberListing(offer, quantity);
+    }
+});
             }
 
             card.appendChild(row);
@@ -274,7 +291,7 @@ if(sellButton){
         market.appendChild(card);
     });
 }
-async function buyMerchantItem(item){
+async function buyMerchantItem(item, quantity){
 
     const confirmed = confirm(
         item.itemName +
@@ -305,7 +322,7 @@ async function buyMerchantItem(item){
                     return;
                 }
 
-                return point - item.price;
+              return point - (item.price * quantity);
             });
 
         if(!pointResult.committed){
@@ -315,12 +332,12 @@ async function buyMerchantItem(item){
         }
 
         await addItemToInventory(
-            currentUser.uid,
-            item.itemId,
-            item.itemName,
-            item.category,
-            1
-        );
+    currentUser.uid,
+    item.itemId,
+    item.itemName,
+    item.category,
+    quantity
+);
 
         showMessage(item.itemName + "を購入しました");
 
