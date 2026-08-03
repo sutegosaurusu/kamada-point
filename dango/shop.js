@@ -146,19 +146,30 @@ function renderSellMarket(){
         買取価格 ${item.price || 50} Pt
         </div>
 
-        <button class="buyButton">
-        売る
-        </button>
+     <input
+    class="sellQuantity"
+    type="number"
+    min="1"
+    value="1"
+>
 
+<button class="sellButton">
+    売る
+</button>
         `;
 
 
-        div.querySelector("button")
-        .onclick=()=>{
+      div.querySelector(".sellButton")
+.onclick=()=>{
 
-            sellToMerchant(id,item);
+    const quantity =
+        Number(
+            div.querySelector(".sellQuantity").value
+        );
 
-        };
+    sellToMerchant(id,item,quantity);
+
+};
 
 
         area.appendChild(div);
@@ -166,8 +177,7 @@ function renderSellMarket(){
     });
 
 }
-async function sellToMerchant(id,item){
-
+async function sellToMerchant(id,item,quantity){
 
     const price =
     Number(item.price || 50);
@@ -187,17 +197,14 @@ async function sellToMerchant(id,item){
     await ref.once("value");
 
 
-    const quantity =
+   const ownedQuantity =
     Number(snapshot.val()||0);
+if(ownedQuantity < quantity){
+    return;
+}
 
-
-    if(quantity<=0){
-        return;
-    }
-
-
-    await ref.set(quantity-1);
-
+   
+  await ref.set(ownedQuantity - quantity);
 
     await database.ref(
     "members/"+uid+"/point"
