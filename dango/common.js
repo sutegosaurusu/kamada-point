@@ -53,7 +53,7 @@ auth.onAuthStateChanged(user => {
 
 function loadPoint() {
 
-    db.ref("members/" + currentUser.uid + "/point")
+    database.ref("members/" + uid)("members/" + currentUser.uid + "/point")
     .on("value", snapshot => {
 
         const point = snapshot.val() || 0;
