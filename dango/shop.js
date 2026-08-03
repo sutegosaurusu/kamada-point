@@ -86,8 +86,7 @@ function watchInventory(){
 let shopMode = "buy";
 
 
-document.getElementById("buyModeButton")
-.addEventListener("click",()=>{
+
 
     shopMode="buy";
 
