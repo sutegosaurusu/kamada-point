@@ -101,55 +101,11 @@ const equipmentItems = [
 ];
 
 
-// ======================
-// 素材
-// ======================
 
-const materialItems = [
-
-    {
-        id: "",
-        name: "",
-        category: "material",
-        price: 0
-    },
-
-    {
-        id: "",
-        name: "",
-        category: "material",
-        price: 0
-    }
-
-];
-
-
-// ======================
-// 道具
-// ======================
-
-const toolItems = [
-
-    {
-        id: "",
-        name: "",
-        category: "tool",
-        price: 0
-    },
-
-    {
-        id: "",
-        name: "",
-        category: "tool",
-        price: 0
-    }
-
-];
 const items = [
     ...merchantItems,
-    ...equipmentItems,
-    ...materialItems,
-    ...toolItems
+    ...equipmentItems
+   
 ];
 
 
