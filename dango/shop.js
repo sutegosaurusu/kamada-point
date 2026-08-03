@@ -124,12 +124,13 @@ ${escapeHtml(item.name)}
         value="1"
     >
 
+    <br>
+
     <button class="buyButton sellButton">
         売る
     </button>
 
 </div>
-
 `;
 
 
