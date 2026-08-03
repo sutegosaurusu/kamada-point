@@ -364,9 +364,11 @@ async function buyMemberListing(listing, quantity){
 
     const confirmed = confirm(
         listing.itemName +
-        "を" +
-        Number(listing.price).toLocaleString() +
-        "Ptで購入しますか？"
+"を" +
+quantity +
+"個、" +
+Number(listing.price * quantity).toLocaleString() +
+"Ptで購入しますか？"
     );
 
     if(!confirmed){
@@ -393,7 +395,7 @@ async function buyMemberListing(listing, quantity){
 
                 const point = Number(currentPoint || 0);
 
-                if(point < listing.price){
+              if(point < listing.price * quantity){
                     return;
                 }
 
@@ -424,8 +426,8 @@ async function buyMemberListing(listing, quantity){
                     return;
                 }
 
-                const quantity =
-                    Number(currentListing.quantity || 0);
+                const stock =
+    Number(currentListing.quantity || 0);
 
                 if(quantity <= 0){
                     return;
@@ -446,7 +448,7 @@ currentListing.quantity =
     stock - quantity;
 
 return currentListing;
-                return currentListing;
+            
             });
 
         if(!listingResult.committed){
@@ -491,7 +493,7 @@ return currentListing;
         console.error(error);
 
         if(pointDeducted){
-            await refundPoints(listing.price);
+          await refundPoints(listing.price * quantity);
         }
 
         showMessage("購入処理に失敗しました");
