@@ -120,3 +120,4 @@ function getDefaultIcon(category){
     }
 
 }
+console.log("items.js読み込み完了");
