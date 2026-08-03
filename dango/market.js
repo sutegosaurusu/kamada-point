@@ -225,13 +225,20 @@ function renderMarket(){
 
  <div class="buyArea">
 
-    <input
-        class="buyQuantity"
-        type="number"
-        min="1"
-        value="1"
-        ${isOwnListing ? "disabled" : ""}
-    >
+  ${
+offer.type === "merchant"
+?
+`
+<input
+    class="buyQuantity"
+    type="number"
+    min="1"
+    value="1"
+>
+`
+:
+""
+}
 
     <button
         class="buyButton"
@@ -272,21 +279,22 @@ if(sellButton){
 
                buyButton.addEventListener("click", () => {
 
-    const quantity =
-        Number(
-            row.querySelector(".buyQuantity").value
-        );
+   let quantity = 1;
 
-    if(quantity <= 0){
-        showMessage("個数を入力してください");
-        return;
-    }
+if(offer.type === "member"){
+    quantity = Number(offer.quantity);
+}else{
+    quantity = Number(
+        row.querySelector(".buyQuantity").value
+    );
+}
 
-    if(offer.type === "merchant"){
-        buyMerchantItem(offer, quantity);
-    }else{
-        buyMemberListing(offer, quantity);
-    }
+
+if(offer.type === "merchant"){
+    buyMerchantItem(offer, quantity);
+}else{
+    buyMemberListing(offer);
+}
 });
             }
 
@@ -359,7 +367,9 @@ async function buyMerchantItem(item, quantity){
    会員の出品を購入
 ===================================================== */
 
-async function buyMemberListing(listing, quantity){
+async function buyMemberListing(listing){
+    
+    const quantity = Number(listing.quantity || 0);
 
     if(listing.sellerId === currentUser.uid){
 
@@ -436,17 +446,14 @@ Number(listing.price * quantity).toLocaleString() +
               const stock =
     Number(currentListing.quantity || 0);
 
-if(stock < quantity){
-    return;
-}
-
-if(stock === quantity){
+if(stock <= quantity){
     return null;
 }
 
 currentListing.quantity =
     stock - quantity;
 
+return currentListing;
 
             
             });
