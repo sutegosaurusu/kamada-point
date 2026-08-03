@@ -331,7 +331,7 @@ document
 function getItemInformation(item){
 
     const savedInformation =
-        itemInformation[item.name] || {};
+        itemInformation[item.id] || {};
 
     return {
 
