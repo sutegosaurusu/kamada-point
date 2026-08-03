@@ -138,4 +138,13 @@ function getDefaultIcon(category){
     }
 
 }
+function getItemById(id){
+
+    return items.find(item =>
+        item.id === id
+    ) || {
+        price:0
+    };
+
+}
 console.log("items.js読み込み完了");
