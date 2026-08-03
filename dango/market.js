@@ -442,7 +442,7 @@ if(stock === quantity){
 currentListing.quantity =
     stock - quantity;
 
-return currentListing;
+
             
             });
 
