@@ -354,7 +354,7 @@ async function buyMerchantItem(item, quantity){
    会員の出品を購入
 ===================================================== */
 
-async function buyMemberListing(listing){
+async function buyMemberListing(listing, quantity){
 
     if(listing.sellerId === currentUser.uid){
 
@@ -397,7 +397,7 @@ async function buyMemberListing(listing){
                     return;
                 }
 
-                return point - Number(listing.price);
+               return point - Number(listing.price) * quantity;
             });
 
         if(!pointResult.committed){
@@ -431,12 +431,21 @@ async function buyMemberListing(listing){
                     return;
                 }
 
-                if(quantity === 1){
-                    return null;
-                }
+              const stock =
+    Number(currentListing.quantity || 0);
 
-                currentListing.quantity = quantity - 1;
+if(stock < quantity){
+    return;
+}
 
+if(stock === quantity){
+    return null;
+}
+
+currentListing.quantity =
+    stock - quantity;
+
+return currentListing;
                 return currentListing;
             });
 
@@ -460,7 +469,7 @@ async function buyMemberListing(listing){
             )
             .transaction(currentPoint =>
                 Number(currentPoint || 0) +
-                Number(listing.price)
+               Number(listing.price) * quantity
             );
 
         /*
@@ -472,7 +481,7 @@ async function buyMemberListing(listing){
             listing.itemId,
             listing.itemName,
             listing.category,
-            1
+            quantity
         );
 
         showMessage(listing.itemName + "を購入しました");
