@@ -223,26 +223,24 @@ function renderMarket(){
         }
     </div>
 
-  <input
-    class="buyQuantity"
-    type="number"
-    min="1"
-    value="1"
-    ${isOwnListing ? "disabled" : ""}
->
+ <div class="buyArea">
 
-<button
-    class="buyButton"
-    ${isOwnListing ? "disabled" : ""}
->
-    ${isOwnListing ? "自分" : "買う"}
-</button>
-    ${
-        offer.type === "merchant"
-        ? `
-        <button class="sellButton">
-            売る
-        </button>
+    <input
+        class="buyQuantity"
+        type="number"
+        min="1"
+        value="1"
+        ${isOwnListing ? "disabled" : ""}
+    >
+
+    <button
+        class="buyButton"
+        ${isOwnListing ? "disabled" : ""}
+    >
+        ${isOwnListing ? "自分" : "買う"}
+    </button>
+
+</div>
         `
         : ""
     }
