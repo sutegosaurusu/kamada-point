@@ -187,6 +187,16 @@ let myPoint = 0;
 
             return;
         }
+        window.addEventListener("pageshow", (event)=>{
+
+    if(event.persisted){
+
+        // BFCacheから復元された場合
+        location.reload();
+
+    }
+
+});
 
 myPoint = Number(snap.val().point);
 
