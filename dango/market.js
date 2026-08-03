@@ -223,22 +223,20 @@ function renderMarket(){
         }
     </div>
 
- <div class="buyArea">
+<div class="buyArea">
 
-  ${
-offer.type === "merchant"
-?
-`
-<input
-    class="buyQuantity"
-    type="number"
-    min="1"
-    value="1"
->
-`
-:
-""
-}
+    ${
+        offer.type === "merchant"
+        ? `
+            <input
+                class="buyQuantity"
+                type="number"
+                min="1"
+                value="1"
+            >
+        `
+        : ""
+    }
 
     <button
         class="buyButton"
@@ -247,16 +245,17 @@ offer.type === "merchant"
         ${isOwnListing ? "自分" : "買う"}
     </button>
 
+    ${
+        offer.type === "merchant"
+        ? `
+            <button class="sellButton">
+                売る
+            </button>
+        `
+        : ""
+    }
+
 </div>
-      ${
-    offer.type === "merchant"
-    ? `
-    <button class="sellButton">
-        売る
-    </button>
-    `
-    : ""
-}
 
 `;
             const buyButton =
@@ -267,14 +266,20 @@ offer.type === "merchant"
 
 if(sellButton){
 
-    sellButton.addEventListener("click",()=>{
+    sellButton.addEventListener("click", () => {
 
-        sellMerchantItem(offer);
+        const quantity = Number(
+            row.querySelector(".buyQuantity").value
+        );
 
+        if(!Number.isInteger(quantity) || quantity <= 0){
+            showMessage("個数を正しく入力してください");
+            return;
+        }
+
+        sellMerchantItem(offer, quantity);
     });
-
 }
-
             if(!isOwnListing){
 
                buyButton.addEventListener("click", () => {
@@ -881,78 +886,55 @@ async function cancelListing(listingId, listing){
         showMessage("取り下げに失敗しました");
     }
 }
-async function sellMerchantItem(item){
+async function sellMerchantItem(item, quantity){
 
-    const quantity = Number(
-        prompt(
-            item.itemName +
-            "を何個売りますか？"
-        )
+    if(!Number.isInteger(quantity) || quantity <= 0){
+        showMessage("個数を正しく入力してください");
+        return;
+    }
+
+    const inventoryRef = database.ref(
+        "inventories/" +
+        currentUser.uid +
+        "/" +
+        item.itemId
     );
 
-    if(!quantity || quantity <= 0){
-        return;
-    }
+    const result = await inventoryRef.transaction(currentItem => {
 
+        if(!currentItem){
+            return;
+        }
 
-    const inventoryRef =
-        database.ref(
-            "inventories/" +
-            currentUser.uid +
-            "/" +
-            item.itemId
-        );
+        const have = Number(currentItem.quantity || 0);
 
+        if(have < quantity){
+            return;
+        }
 
-    const result =
-        await inventoryRef.transaction(currentItem=>{
+        if(have === quantity){
+            return null;
+        }
 
-            if(!currentItem){
-                return;
-            }
+        currentItem.quantity = have - quantity;
 
-            const have =
-                Number(currentItem.quantity || 0);
-
-
-            if(have < quantity){
-                return;
-            }
-
-
-            if(have === quantity){
-                return null;
-            }
-
-
-            currentItem.quantity =
-                have - quantity;
-
-
-            return currentItem;
-
-        });
-
+        return currentItem;
+    });
 
     if(!result.committed){
-
-        showMessage("持っていません");
-
+        showMessage("持っている個数が足りません");
         return;
     }
-
 
     await database.ref(
         "members/" +
         currentUser.uid +
         "/point"
     )
-    .transaction(point=>
-        Number(point || 0)
-        +
+    .transaction(point =>
+        Number(point || 0) +
         Number(item.price) * quantity
     );
-
 
     showMessage(
         item.itemName +
@@ -960,5 +942,4 @@ async function sellMerchantItem(item){
         quantity +
         "個売りました"
     );
-
 }
