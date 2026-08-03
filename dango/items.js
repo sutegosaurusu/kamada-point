@@ -53,6 +53,7 @@ const items = [
         price:300
     },
 
+
     // ======================
     // 水
     // ======================
@@ -74,39 +75,26 @@ const items = [
         name:"OS-1",
         category:"water",
         price:250
-    }
-    ];
-
-
-// ======================
-// 装備
-// ======================
-
-const equipmentItems = [
-
-    {
-        id: "",
-        name: "",
-        category: "equipment",
-        price: 0
     },
 
+
+    // ======================
+    // 装備
+    // ======================
+
     {
-        id: "",
-        name: "",
-        category: "equipment",
-        price: 0
+        id:"items-bou",
+        name:"茎",
+        category:"equipment",
+        price:300
     }
 
 ];
 
 
-
-const items = [
-    ...items,
-    ...equipmentItems
-   
-];
+// ======================
+// ID検索用データ作成
+// ======================
 
 const itemInformation = {};
 
