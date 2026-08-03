@@ -53,13 +53,13 @@ auth.onAuthStateChanged(user => {
 
 function loadPoint() {
 
-    database.ref("members/" + uid)("members/" + currentUser.uid + "/point")
+    database.ref("members/" + currentUser.uid + "/point")
     .on("value", snapshot => {
 
         const point = snapshot.val() || 0;
 
         const pointElement =
-            document.getElementById("point");
+            document.getElementById("pointDisplay");
 
         if(pointElement){
             pointElement.textContent =
