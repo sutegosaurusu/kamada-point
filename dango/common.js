@@ -69,3 +69,28 @@ function loadPoint() {
     });
 
 }
+function showMessage(text){
+
+    const message =
+        document.getElementById("message");
+
+    message.textContent = text;
+    message.classList.add("show");
+
+    clearTimeout(showMessage.timer);
+
+    showMessage.timer = setTimeout(() => {
+        message.classList.remove("show");
+    },2500);
+}
+
+
+function escapeHtml(value){
+
+    return String(value || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
