@@ -67,10 +67,7 @@ function renderMarket(){
     商人の商品を一覧に追加
     */
 
-    merchantItems.forEach(itemId => {
-
-    const item = items[itemId];
-
+   getMerchantItems().forEach(item => {
     if(!item) return;
 
     if(item.category !== currentCategory){
@@ -79,8 +76,8 @@ function renderMarket(){
 
     offers.push({
         type:"merchant",
-        id:itemId,
-        itemId:itemId,
+       id:item.id,
+　　　　itemId:item.id,
         itemName:item.name,
         category:item.category,
         sellerId:"merchant",
