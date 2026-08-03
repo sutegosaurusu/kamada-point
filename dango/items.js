@@ -145,5 +145,11 @@ const toolItems = [
     }
 
 ];
+const items = [
+    ...merchantItems,
+    ...equipmentItems,
+    ...materialItems,
+    ...toolItems
+];
 
 
