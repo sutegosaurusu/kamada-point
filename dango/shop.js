@@ -90,61 +90,39 @@ function watchInventory(){
 
 function renderSellMarket(){
 
-    const area =
-    document.getElementById("sellMarket");
+   div.innerHTML=`
 
+<div>
+${escapeHtml(item.name)}
+×${item.quantity}
+</div>
 
-    area.innerHTML="";
+<div>
+買取価格 ${Math.floor(Number(getItemById(id).price || 0) * 0.3)} Pt
+</div>
 
-
-    Object.entries(inventoryData)
-    .forEach(([id,item])=>{
-
-
-        if(!item || item.quantity<=0){
-            return;
-        }
-
-
-        const div =
-        document.createElement("div");
-
-
-        div.className="itemCard";
-
-
-        div.innerHTML=`
-
-        <div>
-        ${escapeHtml(item.name)}
-        ×${item.quantity}
-        </div>
-
-        <div>
-       買取価格 ${price} Pt
-        </div>
-
-     <input
-    class="sellQuantity"
+<input
+    class="buyQuantity"
     type="number"
     min="1"
     value="1"
 >
 
-<button class="sellButton">
+<button class="buyButton sellButton">
     売る
 </button>
-        `;
+
+`;
 
 
       div.querySelector(".sellButton")
 .onclick=()=>{
 
     const quantity =
-        Number(
-            div.querySelector(".sellQuantity").value
-        );
-
+        const quantity =
+    Number(
+        div.querySelector(".buyQuantity").value
+    );
     sellToMerchant(id,item,quantity);
 
 };
