@@ -104,7 +104,7 @@ function renderSellMarket(){
 
         div.className = "itemCard";
 
-   div.innerHTML=`
+  div.innerHTML=`
 
 <div>
 ${escapeHtml(item.name)}
@@ -115,16 +115,20 @@ ${escapeHtml(item.name)}
 買取価格 ${Math.floor(Number(getItemById(id).price || 0) * 0.3)} Pt
 </div>
 
-<input
-    class="buyQuantity"
-    type="number"
-    min="1"
-    value="1"
->
+<div class="buyArea">
 
-<button class="buyButton sellButton">
-    売る
-</button>
+    <input
+        class="buyQuantity"
+        type="number"
+        min="1"
+        value="1"
+    >
+
+    <button class="buyButton sellButton">
+        売る
+    </button>
+
+</div>
 
 `;
 
@@ -191,7 +195,7 @@ if(ownedQuantity < quantity){
 );
 
     renderSellMarket();
-
+　　renderMarket();
 }
 function renderSellItems(){
 
