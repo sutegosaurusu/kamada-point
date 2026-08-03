@@ -1,6 +1,6 @@
 window.merchantItems = [
-    "merchant_leaf",
-    "merchant_water"
+    "leaf",
+    "water"
 ];
 
 function getMerchantItems(){
