@@ -1,8 +1,8 @@
 let currentCategory = "food";
 let listingData = {};
 const merchantItems = [
-    "leaf",
-    "water"
+   "merchant_leaf",
+    "merchant_water"
 ];
 function watchListings(){
 
