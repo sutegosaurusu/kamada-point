@@ -215,13 +215,13 @@ function renderMarket(){
         ${Number(offer.price).toLocaleString()} Pt
     </div>
 
-    <div class="stock">
-        ${
-            offer.type === "merchant"
-            ? "在庫 ∞"
-            : "残り " + offer.quantity
-        }
-    </div>
+   <div class="stock">
+    ${
+        offer.type === "merchant"
+        ? "在庫 ∞"
+        : "残り " + offer.quantity + "（まとめ買い）"
+    }
+</div>
 
 <div class="buyArea">
 
@@ -239,11 +239,15 @@ function renderMarket(){
     }
 
     <button
-        class="buyButton"
-        ${isOwnListing ? "disabled" : ""}
-    >
-        ${isOwnListing ? "自分" : "買う"}
-    </button>
+    class="buyButton"
+    ${isOwnListing ? "disabled" : ""}
+>
+    ${
+        isOwnListing
+        ? "自分"
+        : (offer.type === "merchant" ? "買う" : "まとめて買う")
+    }
+</button>
 
     ${
         offer.type === "merchant"
