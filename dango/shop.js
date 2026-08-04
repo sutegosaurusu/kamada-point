@@ -75,8 +75,8 @@ function watchInventory(){
             inventoryData =
                 snapshot.val() || {};
 
-　　　　　　　　renderSellItems();
-          
+　　　　　　renderSellItems();
+           renderMarket();
         });
 
 }
