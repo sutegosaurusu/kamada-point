@@ -443,7 +443,7 @@ Number(listing.price * quantity).toLocaleString() +
                 "marketListings/" + listing.id
             );
 
-        const listingResult =
+       const listingResult =
     await listingRef.transaction(currentListing => {
 
         if(!currentListing){
@@ -454,6 +454,9 @@ Number(listing.price * quantity).toLocaleString() +
             Number(currentListing.quantity || 0);
 
         if(stock <= quantity){
+
+            currentListing.earnedPoints =
+                Number(currentListing.price) * stock;
 
             currentListing.quantity = 0;
             currentListing.status = "sold";
@@ -824,13 +827,15 @@ function renderMyListings(){
         row.className =
             "myListing" + (isSold ? " sold" : "");
 
-        row.innerHTML = `
+       row.innerHTML = `
             <div>
                 <strong>${escapeHtml(listing.itemName)}</strong>
                 <br>
                 ${
                     isSold
-                    ? "売れました"
+                    ? "売れました（+" +
+                      Number(listing.earnedPoints || 0).toLocaleString() +
+                      "Pt）"
                     : Number(listing.price).toLocaleString() +
                       "Pt × " +
                       Number(listing.quantity || 0) +
