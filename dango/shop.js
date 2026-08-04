@@ -75,7 +75,7 @@ function watchInventory(){
             inventoryData =
                 snapshot.val() || {};
 
-
+　　　　　　　　renderSellItems();
           
         });
 
@@ -86,44 +86,3 @@ function watchInventory(){
 
 
 
-function renderSellItems(){
-
-    const select =
-        document.getElementById("sellItem");
-
-    if(!select){
-        return;
-    }
-
-    select.innerHTML =
-        '<option value="">出品する品物を選ぶ</option>';
-
-    Object.entries(inventoryData)
-    .forEach(([itemId,item])=>{
-
-        if(!item){
-            return;
-        }
-
-        const quantity =
-            Number(item.quantity || 0);
-
-        if(quantity <= 0){
-            return;
-        }
-
-        const option =
-            document.createElement("option");
-
-        option.value = itemId;
-
-        option.textContent =
-            item.name +
-            "　所持数：" +
-            quantity;
-
-        select.appendChild(option);
-
-    });
-
-}
