@@ -357,7 +357,7 @@ async function updatePrice(){
 
 updatePrice();
 
-setInterval(updatePrice,5000);
+setInterval(updatePrice,1000);
     async function loadHistory(){
 
     const snap = await get(ref(db,"tradeHistory/"+uid));
