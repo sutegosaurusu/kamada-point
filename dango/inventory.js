@@ -4,7 +4,7 @@
 
 let currentCategory = "food";
 let inventoryData = {};
-
+let listingData = {};
 
 // ===============================
 // ログイン後開始
@@ -20,7 +20,7 @@ auth.onAuthStateChanged(user => {
     currentUser = user;
 
     watchInventory();
-
+　　watchListings();
 });
 
 
@@ -42,7 +42,20 @@ function watchInventory(){
     });
 
 }
+function watchListings(){
 
+    database
+    .ref("marketListings")
+    .on("value", snapshot => {
+
+        listingData = snapshot.val() || {};
+
+        renderInventory();
+        updateTotalItemCount();
+
+    });
+
+}
 
 // ===============================
 // カテゴリ切り替え
