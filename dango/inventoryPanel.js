@@ -40,11 +40,12 @@ function renderInventoryPanel(){
 
     }
 
-    list.innerHTML =
-        items
-        .map(item => `<li>${escapeHtml(item.name)}</li>`)
-        .join("");
-
+   list.innerHTML =
+    items
+    .map(item =>
+        `<li>${escapeHtml(item.name)} <span class="itemQty">×${Number(item.quantity)}</span></li>`
+    )
+    .join("");
 }
 
 document
