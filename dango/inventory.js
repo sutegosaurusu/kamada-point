@@ -85,64 +85,35 @@ function renderInventory(){
     const inventory =
         document.getElementById("inventory");
 
+    const items =
+        Object.entries(inventoryData)
+        .filter(([id, item]) => {
 
-  const items =
-    Object.entries(inventoryData)
-    .filter(([id, item]) => {
-
-        if(!item){
-            return false;
-        }
-
-        return (
-            Number(item.quantity || 0) > 0 &&
-            item.category === currentCategory
-        );
-    });
-
-        const displayQuantity =
-            Number(item.quantity || 0) - listedQuantity;
-
-        if(
-            displayQuantity <= 0 ||
-            item.category !== currentCategory
-        ){
-            return null;
-        }
-
-        return [
-            id,
-            {
-                ...item,
-                quantity: displayQuantity
+            if(!item){
+                return false;
             }
-        ];
 
-    })
-    .filter(item => item !== null);
-
+            return (
+                Number(item.quantity || 0) > 0 &&
+                item.category === currentCategory
+            );
+        });
 
     if(items.length === 0){
 
         const category =
             categoryInformation[currentCategory];
 
-
         inventory.innerHTML = `
-
         <div class="empty">
-
         ${category.icon}
         ${category.name}は持っていません
-
         </div>
-
         `;
 
         return;
 
     }
-
 
 
     inventory.innerHTML="";
