@@ -357,7 +357,7 @@ async function updatePrice(){
 
 updatePrice();
 
-setInterval(updatePrice,1000);
+setInterval(updatePrice,5000);
     async function loadHistory(){
 
     const snap = await get(ref(db,"tradeHistory/"+uid));
@@ -420,11 +420,17 @@ if(isNaN(leverage) || leverage <= 0){
     return;
 
 }
-    entryPrice = Number(
-        document.getElementById("price").textContent
-        .replace(/,/g,"")
-        .replace(" USDT","")
-    );
+    let freshPriceLong;
+    try {
+        const resLong = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+        const dataLong = await resLong.json();
+        freshPriceLong = Number(dataLong.price);
+        if (!Number.isFinite(freshPriceLong)) throw new Error("invalid price");
+    } catch (e) {
+        alert("価格の取得に失敗しました。もう一度お試しください");
+        return;
+    }
+    entryPrice = freshPriceLong;
 console.log("LONGクリック");
  const success = await startTrade("LONG");
 
@@ -475,11 +481,17 @@ if(isNaN(leverage) || leverage <= 0){
 
 }
 
-    entryPrice = Number(
-        document.getElementById("price").textContent
-        .replace(/,/g,"")
-        .replace(" USDT","")
-    );
+    let freshPriceShort;
+    try {
+        const resShort = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+        const dataShort = await resShort.json();
+        freshPriceShort = Number(dataShort.price);
+        if (!Number.isFinite(freshPriceShort)) throw new Error("invalid price");
+    } catch (e) {
+        alert("価格の取得に失敗しました。もう一度お試しください");
+        return;
+    }
+    entryPrice = freshPriceShort;
 
   const success = await startTrade("SHORT");
 
