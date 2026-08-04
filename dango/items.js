@@ -90,7 +90,24 @@ const items = [
     }
 
 ];
+// ======================
+// 素材
+// ======================
 
+{
+    id:"stone",
+    name:"小石",
+    category:"material",
+    price:20
+},
+{
+    id:"twig",
+    name:"小枝",
+    category:"material",
+    price:15
+}
+
+];
 
 // ======================
 // ID検索
@@ -116,9 +133,14 @@ const categoryInformation = {
     },
 
     equipment:{
-        name:"装備",
-        icon:"⚔️"
-    }
+    name:"装備",
+    icon:"⚔️"
+},
+
+material:{
+    name:"素材",
+    icon:"🪨"
+}
 
 };
 
@@ -135,6 +157,9 @@ function getDefaultIcon(category){
 
         case "equipment":
             return "⚔️";
+
+    　case "material":
+    return "🪨";
 
         default:
             return "📦";
