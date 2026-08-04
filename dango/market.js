@@ -338,9 +338,9 @@ async function buyMerchantItem(item, quantity){
 
                 const point = Number(currentPoint || 0);
 
-                if(point < item.price){
-                    return;
-                }
+              if(point < item.price * quantity){
+    return;
+}
 
               return point - (item.price * quantity);
             });
