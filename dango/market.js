@@ -444,28 +444,30 @@ Number(listing.price * quantity).toLocaleString() +
             );
 
         const listingResult =
-            await listingRef.transaction(currentListing => {
+    await listingRef.transaction(currentListing => {
 
-                if(!currentListing){
-                    return;
-                }
+        if(!currentListing){
+            return;
+        }
 
-                
+        const stock =
+            Number(currentListing.quantity || 0);
 
-              const stock =
-    Number(currentListing.quantity || 0);
+        if(stock <= quantity){
 
-if(stock <= quantity){
-    return null;
-}
+            currentListing.quantity = 0;
+            currentListing.status = "sold";
+            currentListing.soldAt =
+                firebase.database.ServerValue.TIMESTAMP;
 
-currentListing.quantity =
-    stock - quantity;
+            return currentListing;
+        }
 
-return currentListing;
+        currentListing.quantity =
+            stock - quantity;
 
-            
-            });
+        return currentListing;
+    });
 
         if(!listingResult.committed){
 
@@ -770,12 +772,36 @@ function renderMyListings(){
         return;
     }
 
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+
     const ownListings =
         Object.entries(listingData)
-        .filter(([id, listing]) =>
-            listing &&
-            listing.sellerId === currentUser.uid
-        );
+        .filter(([id, listing]) => {
+
+            if(!listing || listing.sellerId !== currentUser.uid){
+                return false;
+            }
+
+            if(listing.status === "sold"){
+
+                const soldAt = Number(listing.soldAt || 0);
+
+                if(now - soldAt > oneDay){
+
+                    /*
+                    1日経った売却済み出品は
+                    表示のついでに削除する
+                    */
+
+                    database.ref("marketListings/" + id).remove();
+
+                    return false;
+                }
+            }
+
+            return true;
+        });
 
     if(ownListings.length === 0){
 
@@ -789,38 +815,58 @@ function renderMyListings(){
 
     ownListings.forEach(([listingId, listing]) => {
 
+        const isSold =
+            listing.status === "sold";
+
         const row =
             document.createElement("div");
 
-        row.className = "myListing";
+        row.className =
+            "myListing" + (isSold ? " sold" : "");
 
         row.innerHTML = `
             <div>
                 <strong>${escapeHtml(listing.itemName)}</strong>
                 <br>
-                ${Number(listing.price).toLocaleString()}Pt ×
-                ${Number(listing.quantity || 0)}個
+                ${
+                    isSold
+                    ? "売れました"
+                    : Number(listing.price).toLocaleString() +
+                      "Pt × " +
+                      Number(listing.quantity || 0) +
+                      "個"
+                }
             </div>
 
             <div>
-                合計
-                ${(
-                    Number(listing.price) *
-                    Number(listing.quantity || 0)
-                ).toLocaleString()}Pt
+                ${
+                    isSold
+                    ? ""
+                    : "合計 " +
+                      (
+                          Number(listing.price) *
+                          Number(listing.quantity || 0)
+                      ).toLocaleString() +
+                      "Pt"
+                }
             </div>
 
-            <button class="cancelButton">
-                取り下げ
-            </button>
+            ${
+                isSold
+                ? ""
+                : '<button class="cancelButton">取り下げ</button>'
+            }
         `;
 
-        row
-            .querySelector(".cancelButton")
-            .addEventListener("click", () => {
+        if(!isSold){
 
-                cancelListing(listingId, listing);
-            });
+            row
+                .querySelector(".cancelButton")
+                .addEventListener("click", () => {
+
+                    cancelListing(listingId, listing);
+                });
+        }
 
         area.appendChild(row);
     });
