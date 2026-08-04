@@ -893,6 +893,19 @@ async function sellMerchantItem(item, quantity){
         return;
     }
 
+    const confirmed = confirm(
+        item.itemName +
+        "を" +
+        quantity +
+        "個、" +
+        Number(item.price * quantity).toLocaleString() +
+        "Ptで売りますか？"
+    );
+
+    if(!confirmed){
+        return;
+    }
+
     const inventoryRef = database.ref(
         "inventories/" +
         currentUser.uid +
