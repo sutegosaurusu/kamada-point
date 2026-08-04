@@ -737,7 +737,7 @@ async function claimRewards(){
         }
 
         if(
-            Date.now() 
+            Date.now()  <
             Number(latestExpedition.endAt)
         ){
 
