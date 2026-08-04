@@ -86,22 +86,48 @@ function renderInventory(){
         document.getElementById("inventory");
 
 
-    const items =
-        Object.entries(inventoryData)
-        .filter(([id,item])=>{
+   const items =
+    Object.entries(inventoryData)
+    .map(([id, item]) => {
 
-            if(!item){
-                return false;
+        if(!item){
+            return null;
+        }
+
+        let listedQuantity = 0;
+
+        Object.values(listingData).forEach(listing => {
+
+            if(
+                listing &&
+                listing.sellerId === currentUser.uid &&
+                listing.itemId === id
+            ){
+                listedQuantity += Number(listing.quantity || 0);
             }
-
-
-            return (
-                Number(item.quantity || 0) > 0 &&
-                item.category === currentCategory
-            );
 
         });
 
+        const displayQuantity =
+            Number(item.quantity || 0) - listedQuantity;
+
+        if(
+            displayQuantity <= 0 ||
+            item.category !== currentCategory
+        ){
+            return null;
+        }
+
+        return [
+            id,
+            {
+                ...item,
+                quantity: displayQuantity
+            }
+        ];
+
+    })
+    .filter(item => item !== null);
 
 
     if(items.length === 0){
@@ -204,18 +230,33 @@ function updateTotalItemCount(){
     let total=0;
 
 
-    Object.values(inventoryData)
-    .forEach(item=>{
+    Object.entries(inventoryData)
+.forEach(([id, item])=>{
 
-        if(item){
+    if(!item){
+        return;
+    }
 
-            total +=
-            Number(item.quantity || 0);
+    let listedQuantity = 0;
 
+    Object.values(listingData).forEach(listing => {
+
+        if(
+            listing &&
+            listing.sellerId === currentUser.uid &&
+            listing.itemId === id
+        ){
+            listedQuantity += Number(listing.quantity || 0);
         }
 
     });
 
+    total += Math.max(
+        0,
+        Number(item.quantity || 0) - listedQuantity
+    );
+
+});
 
 
     const element =
