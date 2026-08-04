@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投資</title>
+
+<style>
+
+body{
+    font-family:sans-serif;
+    margin:20px;
+}
+
+h1{
+    margin-bottom:20px;
+}
+
+button{
+    padding:10px 20px;
+    margin:5px;
+}
+
+input{
+    padding:8px;
+    width:180px;
+}
+
+#price{
+    font-size:28px;
+    font-weight:bold;
+}
+
+#status{
+    font-size:20px;
+    color:blue;
+}
+    #profit{
+    font-size:22px;
+    font-weight:bold;
+}
+#loadingScreen{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:white;
+    z-index:9999;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.loadingBox{
+    text-align:center;
+    padding:30px;
+}
+
+.loadingBox h2{
+    margin-bottom:10px;
+}
+</style>
+
+</head>
+
+<body>
+<div id="loadingScreen">
+    <div class="loadingBox">
+        <h2>準備中...</h2>
+        <p>ポイントとポジションを確認しています</p>
+    </div>
+</div>
+<h1>投資</h1>
+    <button onclick="location.href='user.html'">
+ユーザーページへ戻る
+</button>
+<h2>現在ポイント</h2>
+
+<div id="myPoint">
+読み込み中...
+</div>
+
+<hr>
+<h2>BTCチャート</h2>
+
+<div id="tradingview_chart"></div>
+
+<hr>
+
+<h2>現在価格</h2>
+
+<div id="price">取得中...</div>
+
+<hr>
+
+<h2>投資</h2>
+
+<input
+type="number"
+id="bet"
+placeholder="投資ポイント"
+disabled>
+<br><br>
+    <h3>レバレッジ</h3>
+
+<select id="leverage" disabled>
+    <option value="5">5倍</option>
+    <option value="10">10倍</option>
+    <option value="25">25倍</option>
+    <option value="50">50倍</option>
+    <option value="100">100倍</option>
+</select>
+
+<br><br>
+
+<button id="longButton" disabled>
+LONG
+</button>
+
+<button id="shortButton" disabled>
+SHORT
+</button>
+
+<hr>
+
+<h2>状態</h2>
+   <div id="status">
+ポジションなし
+</div>
+
+<div id="countdown"></div>
+    <div id="profit">
+現在損益：0 pt
+</div>
+    <hr>
+
+<h2>取引履歴</h2>
+
+<div id="history">
+読み込み中...
+</div>
+
+
+
+<script src="https://s3.tradingview.com/tv.js"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import { getDatabase, ref, get, update, push, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    const firebaseConfig = {
+  apiKey: "AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+  authDomain: "kamadapoint.firebaseapp.com",
+  databaseURL: "https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kamadapoint",
+  storageBucket: "kamadapoint.firebasestorage.app",
+  messagingSenderId: "601769416524",
+  appId: "1:601769416524:web:0be49ce5a0baf87f75e1e9"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+let uid = "";
+let myPoint = 0;
+    onAuthStateChanged(auth, async (user) => {
+
+    try{
+
+        if (!user) {
+            location.href = "login.html";
+            return;
+        }
+
+        uid = user.uid;
+
+        const snap = await get(ref(db, "members/" + uid));
+
+        if (!snap.exists()) {
+
+            document.getElementById("loadingScreen").innerHTML =
+            "<div class='loadingBox'><h2>エラー</h2><p>ユーザー情報がありません</p></div>";
+
+            return;
+        }
+        window.addEventListener("pageshow", (event)=>{
+
+    if(event.persisted){
+
+        // BFCacheから復元された場合
+        location.reload();
+
+    }
+
+});
+
+myPoint = Number(snap.val().point);
+
+document.getElementById("myPoint").textContent =
+myPoint + " pt";
+
+// ポジションを確認
+await checkPosition();
+
+// 履歴を読み込む
+await loadHistory();
+
+// Firebaseの読み込み完了
+document.getElementById("loadingScreen").style.display = "none";
+
+// ポジションがない場合だけ操作可能にする
+if(!position){
+
+    document.getElementById("longButton").disabled = false;
+    document.getElementById("shortButton").disabled = false;
+    document.getElementById("leverage").disabled = false;
+    document.getElementById("bet").disabled = false;
+
+}
+async function checkPosition(){
+
+    const snap = await get(ref(db,"positions/"+uid));
+
+    if(!snap.exists()){
+        return;
+    }
+
+    const data = snap.val();
+
+    const key = Object.keys(data)[0];
+    const trade = data[key];
+
+    position = trade.type;
+betPoint = trade.bet;
+entryPrice = trade.entryPrice;
+leverage = trade.leverage;
+
+    positionKey = key;
+    positionRef = ref(db,"positions/"+uid+"/"+key);
+
+    document.getElementById("status").textContent =
+    position + "保有中";
+
+    document.getElementById("longButton").disabled = true;
+    document.getElementById("shortButton").disabled = true;
+　　document.getElementById("leverage").disabled = true;
+　　document.getElementById("bet").disabled = true;
+   profitTimer = setInterval(updateProfit,1000);
+
+let elapsed = Math.floor(
+    (Date.now() - trade.startTime) / 1000
+);
+
+let remaining = 10 - elapsed;
+
+if(remaining <= 0){
+
+    // 既に決済時間を過ぎていたら
+    // 一度だけ決済する
+    if(!closing){
+        tradeActive = true;
+      await closePosition();
+    }
+
+}else{
+
+    tradeActive = true;
+    startCountdown(remaining);
+
+}
+
+}
+
+    }catch(error){
+
+        console.error("初期読み込みエラー", error);
+
+        document.getElementById("loadingScreen").innerHTML =
+        "<div class='loadingBox'>" +
+        "<h2>読み込みエラー</h2>" +
+        "<p>ページを再読み込みしてください</p>" +
+        "</div>";
+
+    }
+
+});
+    
+new TradingView.widget({
+
+container_id:"tradingview_chart",
+
+width:"100%",
+
+height:500,
+
+symbol:"BINANCE:BTCUSDT",
+
+interval:"1",
+
+timezone:"Asia/Tokyo",
+
+theme:"light",
+
+style:"1",
+
+locale:"ja",
+
+toolbar_bg:"#f1f3f6",
+
+hide_top_toolbar:false,
+
+allow_symbol_change:false
+
+});
+
+let position = null;
+
+let entryPrice = 0;
+
+let betPoint = 0;
+
+let leverage = 0;   
+
+let positionRef = null;
+let positionKey = null;
+
+let profitTimer = null;
+    let closing = false;
+    let countdownTimer = null;
+    let tradeActive = false;
+async function updatePrice(){
+
+    try{
+
+        const res=await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+
+        const data=await res.json();
+
+        document.getElementById("price").textContent=
+        Number(data.price).toLocaleString()+" USDT";
+
+    }
+
+    catch(e){
+
+        console.error(e);
+
+        document.getElementById("price").textContent="取得失敗";
+
+    }
+
+}
+
+updatePrice();
+
+setInterval(updatePrice,5000);
+    async function loadHistory(){
+
+    const snap = await get(ref(db,"tradeHistory/"+uid));
+
+    const history = document.getElementById("history");
+
+    if(!snap.exists()){
+
+        history.textContent="履歴なし";
+        return;
+
+    }
+
+    history.innerHTML="";
+
+    const data = snap.val();
+
+    Object.values(data).reverse().forEach(trade=>{
+
+        const div=document.createElement("div");
+
+        div.textContent =
+        trade.type +
+        " | 投資:" +
+        trade.bet +
+        "pt | 結果:" +
+        (trade.profit>=0 ? "+" : "") +
+        trade.profit +
+        "pt";
+
+        history.appendChild(div);
+
+    });
+
+}
+    /* ---------------- LONG ---------------- */
+
+document.getElementById("longButton").onclick = async () => {
+    if(position){
+
+        alert("すでにポジションを保有しています");
+
+        return;
+
+    }
+
+  betPoint = Number(document.getElementById("bet").value);
+leverage = Number(document.getElementById("leverage").value);
+
+if(isNaN(betPoint) || betPoint <= 0){
+
+    alert("投資ポイントを入力してください");
+    return;
+
+}
+
+if(isNaN(leverage) || leverage <= 0){
+
+    alert("レバレッジを選択してください");
+    return;
+
+}
+    let freshPriceLong;
+    try {
+        const resLong = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+        const dataLong = await resLong.json();
+        freshPriceLong = Number(dataLong.price);
+        if (!Number.isFinite(freshPriceLong)) throw new Error("invalid price");
+    } catch (e) {
+        alert("価格の取得に失敗しました。もう一度お試しください");
+        return;
+    }
+    entryPrice = freshPriceLong;
+console.log("LONGクリック");
+ const success = await startTrade("LONG");
+
+if(!success){
+    return;
+}
+
+position = "LONG";
+
+profitTimer = setInterval(updateProfit,1000);
+document.getElementById("status").textContent =
+"LONG保有中（10秒後に自動決済）";
+document.getElementById("longButton").disabled = true;
+document.getElementById("shortButton").disabled = true;
+document.getElementById("leverage").disabled = true;
+document.getElementById("bet").disabled = true;
+
+startCountdown();
+};
+
+
+/* ---------------- SHORT ---------------- */
+
+document.getElementById("shortButton").onclick = async () => {
+
+    if(position){
+
+        alert("すでにポジションを保有しています");
+
+        return;
+
+    }
+
+   betPoint = Number(document.getElementById("bet").value);
+leverage = Number(document.getElementById("leverage").value);
+
+if(isNaN(betPoint) || betPoint <= 0){
+
+    alert("投資ポイントを入力してください");
+    return;
+
+}
+
+if(isNaN(leverage) || leverage <= 0){
+
+    alert("レバレッジを選択してください");
+    return;
+
+}
+
+    let freshPriceShort;
+    try {
+        const resShort = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+        const dataShort = await resShort.json();
+        freshPriceShort = Number(dataShort.price);
+        if (!Number.isFinite(freshPriceShort)) throw new Error("invalid price");
+    } catch (e) {
+        alert("価格の取得に失敗しました。もう一度お試しください");
+        return;
+    }
+    entryPrice = freshPriceShort;
+
+  const success = await startTrade("SHORT");
+
+if(!success){
+    return;
+}
+
+position = "SHORT";
+profitTimer = setInterval(updateProfit,1000);
+
+document.getElementById("status").textContent =
+"SHORT保有中（10秒後に自動決済）";
+document.getElementById("longButton").disabled = true;
+document.getElementById("shortButton").disabled = true;
+document.getElementById("leverage").disabled = true;
+document.getElementById("bet").disabled = true;
+startCountdown();
+
+};
+  async function startTrade(type){
+
+    // ポイントを減らす
+    const userRef = ref(db,"members/" + uid);
+
+    const snap = await get(userRef);
+
+   let currentPoint = Number(snap.val().point);
+
+if (!Number.isFinite(currentPoint)) {
+    alert("ポイントデータが壊れています");
+    return false;
+}
+
+    if(currentPoint < betPoint){
+
+        alert("ポイント不足です");
+
+        position = null;
+
+        document.getElementById("longButton").disabled = false;
+        document.getElementById("shortButton").disabled = false;
+
+     return false;
+    }
+
+    await update(userRef,{
+        point: currentPoint - betPoint
+    });
+
+
+    // ポジション保存
+  const tradeRef = push(ref(db,"positions/"+uid));
+
+positionRef = tradeRef;
+positionKey = tradeRef.key;
+tradeActive = true;
+await set(tradeRef,{
+    type: type,
+    bet: betPoint,
+    leverage: leverage,   
+    entryPrice: entryPrice,
+    startTime: Date.now()
+});
+
+
+console.log("取引開始保存");
+
+return true;
+}
+
+   function startCountdown(seconds = 10){
+       if(countdownTimer){
+        clearInterval(countdownTimer);
+    }
+
+    document.getElementById("countdown").textContent =
+    "残り " + seconds + "秒";
+
+   countdownTimer = setInterval(()=>{
+
+        seconds--;
+
+        document.getElementById("countdown").textContent =
+        "残り " + seconds + "秒";
+
+        if(seconds <= 0){
+
+            clearInterval(countdownTimer);
+countdownTimer = null;
+
+            document.getElementById("countdown").textContent =
+            "";
+
+            closePosition();
+
+        }
+
+    },1000);
+
+}
+
+    async function updateProfit(){
+
+    if(!position){
+        return;
+    }
+
+    try{
+
+        const res = await fetch(
+            "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+        );
+
+        const data = await res.json();
+
+        const nowPrice = Number(data.price);
+
+        let rate = 0;
+
+        if(position === "LONG"){
+
+            rate = (nowPrice - entryPrice) / entryPrice;
+
+        }else{
+
+            rate = (entryPrice - nowPrice) / entryPrice;
+
+        }
+
+
+       const gameMultiplier = 1000;
+
+const profit = Math.round(
+    betPoint * rate * leverage * gameMultiplier
+);
+
+if (!Number.isFinite(profit)) {
+    return;
+}
+
+
+        const profitElement = document.getElementById("profit");
+
+profitElement.textContent =
+"現在損益：" +
+(profit >= 0 ? "+" : "") +
+profit +
+" pt";
+
+if(profit >= 0){
+
+    profitElement.style.color = "red";
+
+}else{
+
+    profitElement.style.color = "blue";
+
+}
+    }
+
+    catch(e){
+
+        console.error(e);
+
+    }
+
+}
+
+/* ---------------- 自動決済 ---------------- */
+async function closePosition(){
+
+    if(!tradeActive){
+        return;
+    }
+
+    if(closing){
+        return;
+    }
+
+    if(!positionRef || !positionKey){
+        return;
+    }
+
+    const snap = await get(positionRef);
+
+    if(!snap.exists()){
+        return;
+    }
+
+    closing = true;
+
+    try{
+
+        const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+
+        const data = await res.json();
+
+        const exitPrice = Number(data.price);
+
+        let rate = 0;
+
+        if(position==="LONG"){
+
+            rate = (exitPrice-entryPrice)/entryPrice;
+
+        }else{
+
+            rate = (entryPrice-exitPrice)/entryPrice;
+
+        }
+
+const gameMultiplier = 1000;
+        const profit = Math.round(
+    betPoint * rate * leverage * gameMultiplier
+);
+
+if (!Number.isFinite(profit)) {
+
+    alert("利益計算エラー");
+
+    closing = false;
+
+    return;
+
+}
+ // FX税計算
+let fxTax = 0;
+
+// 掛け金＋利益（口座に戻る総額）
+const totalReturn = betPoint + profit;
+
+// 戻る総額に課税
+if (totalReturn >= 1000000) {
+    fxTax = Math.floor(totalReturn * 0.5);
+}
+else if (totalReturn >= 10000) {
+    fxTax = Math.floor(totalReturn * 0.2);
+}
+else if (totalReturn >= 1000) {
+    fxTax = Math.floor(totalReturn * 0.1);
+}
+
+// 税引き後の利益
+const afterTaxProfit = profit - fxTax;
+
+let text = "";
+
+if (profit >= 0) {
+    text = "利益 +" + profit + " pt";
+} else {
+    text = "損失 " + profit + " pt";
+}
+        // ポイント更新用の最新値を取得
+const userRef = ref(db, "members/" + uid);
+
+const userSnap = await get(userRef);
+
+let currentPoint = Number(userSnap.val().point);
+
+if (!Number.isFinite(currentPoint)) {
+    alert("ポイントデータが壊れています");
+    closing = false;
+    return;
+}
+
+const newPoint = currentPoint + betPoint + afterTaxProfit;
+const historyKey = push(ref(db, "tradeHistory/" + uid)).key;
+
+// ポイント加算・履歴書き込み・ポジション削除を
+// 1回のマルチパスupdateにまとめてアトミックに実行する。
+// こうすることで、途中で通信が切れてもポジションが
+// 「残骸」として残って次回入室時に二重決済されることがなくなる。
+const updates = {};
+updates["members/" + uid + "/point"] = newPoint;
+updates["tradeHistory/" + uid + "/" + historyKey] = {
+    type: position,
+    bet: betPoint,
+    profit: profit,
+    afterTaxProfit: afterTaxProfit,
+    tax: fxTax,
+    entryPrice: entryPrice,
+    exitPrice: exitPrice,
+    time: Date.now()
+};
+updates["positions/" + uid + "/" + positionKey] = null; // nullで削除
+
+await update(ref(db), updates);
+
+// 表示ポイント更新
+myPoint = newPoint;
+document.getElementById("myPoint").textContent =
+myPoint + " pt";
+
+      document.getElementById("status").textContent =
+"決済完了　" + text;
+
+alert(
+    "10秒経過\n\n" +
+    "利益: " + (profit >= 0 ? "+" : "") + profit + " pt\n" +
+    "FX税: -" + fxTax + " pt\n" +
+    "最終利益: " + (afterTaxProfit >= 0 ? "+" : "") + afterTaxProfit + " pt"
+);
+        if(profitTimer){
+
+    clearInterval(profitTimer);
+
+    profitTimer = null;
+
+}
+
+position = null;
+entryPrice = 0;
+betPoint = 0;
+tradeActive = false;
+closing = false;
+leverage = 0;
+positionRef = null;
+positionKey = null;
+
+document.getElementById("longButton").disabled = false;
+document.getElementById("shortButton").disabled = false;
+document.getElementById("leverage").disabled = false;
+document.getElementById("bet").disabled = false;
+    }
+
+    catch(e){
+
+        console.error(e);
+
+        document.getElementById("status").textContent =
+        "決済エラー";
+        closing = false;
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>
