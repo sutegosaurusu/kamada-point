@@ -4,7 +4,7 @@
 
 let currentCategory = "food";
 let inventoryData = {};
-let listingData = {};
+
 
 // ===============================
 // ログイン後開始
@@ -20,7 +20,7 @@ auth.onAuthStateChanged(user => {
     currentUser = user;
 
     watchInventory();
-　　watchListings();
+　　
 });
 
 
@@ -42,20 +42,7 @@ function watchInventory(){
     });
 
 }
-function watchListings(){
 
-    database
-    .ref("marketListings")
-    .on("value", snapshot => {
-
-        listingData = snapshot.val() || {};
-
-        renderInventory();
-        updateTotalItemCount();
-
-    });
-
-}
 
 // ===============================
 // カテゴリ切り替え
@@ -99,27 +86,19 @@ function renderInventory(){
         document.getElementById("inventory");
 
 
-   const items =
+  const items =
     Object.entries(inventoryData)
-    .map(([id, item]) => {
+    .filter(([id, item]) => {
 
         if(!item){
-            return null;
+            return false;
         }
 
-        let listedQuantity = 0;
-
-        Object.values(listingData).forEach(listing => {
-
-            if(
-                listing &&
-                listing.sellerId === currentUser.uid &&
-                listing.itemId === id
-            ){
-                listedQuantity += Number(listing.quantity || 0);
-            }
-
-        });
+        return (
+            Number(item.quantity || 0) > 0 &&
+            item.category === currentCategory
+        );
+    });
 
         const displayQuantity =
             Number(item.quantity || 0) - listedQuantity;
@@ -240,51 +219,24 @@ function renderInventory(){
 
 function updateTotalItemCount(){
 
-    let total=0;
+    let total = 0;
 
+    Object.values(inventoryData)
+    .forEach(item => {
 
-    Object.entries(inventoryData)
-.forEach(([id, item])=>{
-
-    if(!item){
-        return;
-    }
-
-    let listedQuantity = 0;
-
-    Object.values(listingData).forEach(listing => {
-
-        if(
-            listing &&
-            listing.sellerId === currentUser.uid &&
-            listing.itemId === id
-        ){
-            listedQuantity += Number(listing.quantity || 0);
+        if(item){
+            total += Number(item.quantity || 0);
         }
 
     });
 
-    total += Math.max(
-        0,
-        Number(item.quantity || 0) - listedQuantity
-    );
-
-});
-
-
     const element =
         document.getElementById("totalItemCount");
 
-
     if(element){
-
-        element.textContent =
-        total.toLocaleString();
-
+        element.textContent = total.toLocaleString();
     }
-
 }
-
 
 // ===============================
 // 詳細表示
