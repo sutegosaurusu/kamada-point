@@ -179,38 +179,6 @@ document
    予想獲得数だけは、これまで通り時間で増える。
 ===================================================== */
 
-function getRequirements(location,hours){
-
-    const time =
-        timeSettings[hours];
-
-    const requiredFood =
-        Math.min(
-            SLOT_COUNTS.food,
-            location.foodRate
-        );
-
-    const requiredWater =
-        Math.min(
-            SLOT_COUNTS.water,
-            location.waterRate
-        );
-
-    const expectedReward =
-        Math.max(
-            1,
-            Math.round(
-                location.rewardRate *
-                time.rewardMultiplier
-            )
-        );
-
-    return {
-        requiredFood,
-        requiredWater,
-        expectedReward
-    };
-}
 
 /* =====================================================
    スロットのユーティリティ
@@ -1407,14 +1375,17 @@ function createRewardCount(
     location
 ){
 
-    const basicCount =
-        Number(
-            expedition.expectedReward || 1
-        );
+    const multiplier =
+        timeSettings[expedition.hours].rewardMultiplier;
 
-    /*
-    基本獲得数の80%から120%の範囲で変動
-    */
+    const basicCount =
+        Math.max(
+            1,
+            Math.round(
+                location.rewardRate *
+                multiplier
+            )
+        );
 
     const randomMultiplier =
         0.8 + Math.random() * 0.4;
