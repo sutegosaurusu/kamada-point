@@ -357,21 +357,13 @@ function computeEffectiveRewardWeights(location){
 
 function findRewardName(itemId){
 
-    for(const location of locations){
+    const item =
+        getItemById(itemId);
 
-        const found =
-            location.rewards.find(
-                reward => reward.itemId === itemId
-            );
-
-        if(found){
-            return found.name;
-        }
-    }
-
-    return null;
+    return item
+        ? item.name
+        : null;
 }
-
 /*
 1つのアイテムが複数の効果を持つ場合は
 すべて並べて表示する
@@ -1502,48 +1494,44 @@ function generateRewards(
 
     for(let i = 0; i < rewardCount; i++){
 
-        const reward =
+        const selectedReward =
             selectWeightedReward(
                 location.rewards
             );
 
-        if(!result[reward.itemId]){
+        if(!selectedReward){
+            continue;
+        }
 
-            result[reward.itemId] = {
-                ...reward,
+        const item =
+            getItemById(selectedReward.itemId);
+
+        if(!item){
+            console.error(
+                "items.jsに存在しない報酬ID:",
+                selectedReward.itemId
+            );
+
+            continue;
+        }
+
+        if(!result[item.id]){
+
+            result[item.id] = {
+                itemId:item.id,
+                name:item.name,
+                category:item.category,
+                icon:
+                    item.icon ||
+                    getDefaultIcon(item.category),
                 quantity:0
             };
         }
 
-        result[reward.itemId].quantity++;
+        result[item.id].quantity++;
     }
 
     return Object.values(result);
-}
-
-function selectWeightedReward(rewards){
-
-    const totalWeight =
-        rewards.reduce(
-            (total,reward) =>
-                total +
-                Number(reward.weight || 0),
-            0
-        );
-
-    let random =
-        Math.random() * totalWeight;
-
-    for(const reward of rewards){
-
-        random -= Number(reward.weight || 0);
-
-        if(random <= 0){
-            return reward;
-        }
-    }
-
-    return rewards[rewards.length - 1];
 }
 
 /* =====================================================
