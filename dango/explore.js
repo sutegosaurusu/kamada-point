@@ -761,8 +761,14 @@ function updateRequirementDisplay(){
         .textContent =
             Math.round(
                 computeEffectiveSuccessRate(location) * 100
-            ) +
-            "%";
+            ) + "%";
+
+    document
+        .getElementById("expectedReward")
+        .textContent =
+            "約" +
+            calculateExpectedReward(location) +
+            "個（成功時）";
 }
 
 /* =====================================================
