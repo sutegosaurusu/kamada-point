@@ -60,8 +60,24 @@ const items = [
     category:"food",
     price:100
 },
-
-
+{
+        id:"Ant eggs",
+        name:"アリの卵",
+        category:"food",
+        price:1000
+    },
+ {
+        id:"small bug",
+        name:"小さな虫",
+        category:"food",
+        price:100
+    },   
+ {
+        id:"larva",
+        name:"幼虫",
+        category:"food",
+        price:500
+    },  
     // ======================
     // 水
     // ======================
