@@ -100,7 +100,12 @@ const items = [
         category:"water",
         price:250
     },
-
+　　{
+    id:"cola",
+    name:"コーラ",
+    category:"water",
+    price:120
+}
 
     // ======================
     // 装備
