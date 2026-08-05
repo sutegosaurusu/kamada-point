@@ -1407,6 +1407,30 @@ function createRewardCount(
 }
 
 /* =====================================================
+   重み付き抽選で1つ報酬を選ぶ
+===================================================== */
+function selectWeightedReward(rewards){
+    if(!rewards || rewards.length === 0){
+        return null;
+    }
+    const totalWeight = rewards.reduce(
+        (sum, reward) => sum + (reward.weight || 0),
+        0
+    );
+    if(totalWeight <= 0){
+        return null;
+    }
+    let random = Math.random() * totalWeight;
+    for(const reward of rewards){
+        random -= (reward.weight || 0);
+        if(random <= 0){
+            return reward;
+        }
+    }
+    // 浮動小数点の誤差対策で最後の要素を返す
+    return rewards[rewards.length - 1];
+}
+/* =====================================================
    報酬抽選
 ===================================================== */
 
