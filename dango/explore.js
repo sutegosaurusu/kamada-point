@@ -25,14 +25,14 @@ let countdownTimer = null;
 
 const SELECTION_LIMITS = {
     food:3,
-    water:2,
+    water:3,
     equipment:3
 };
 
 let selectedItemIds = {
-    food:[],
-    water:[],
-    equipment:[]
+    food:["", "", ""],
+    water:["", "", ""],
+    equipment:["", "", ""]
 };
 
 /* =====================================================
@@ -199,7 +199,8 @@ function getAllSelectedItemIds(){
         ...selectedItemIds.food,
         ...selectedItemIds.water,
         ...selectedItemIds.equipment
-    ];
+    ]
+    .filter(itemId => itemId !== "");
 }
 
 function computeSuccessRateBonus(){
@@ -275,19 +276,41 @@ function findRewardName(itemId){
 
 function pruneSelectedItems(){
 
-    Object.keys(selectedItemIds).forEach(category => {
+    Object.keys(selectedItemIds)
+    .forEach(category => {
 
         selectedItemIds[category] =
-            selectedItemIds[category].filter(itemId => {
+            selectedItemIds[category]
+            .map(itemId => {
 
-                const item = inventoryData[itemId];
+                if(!itemId){
+                    return "";
+                }
 
-                return (
-                    item &&
-                    item.category === category &&
-                    Number(item.quantity || 0) > 0
-                );
+                const item =
+                    inventoryData[itemId];
+
+                if(
+                    !item ||
+                    item.category !== category ||
+                    Number(item.quantity || 0) <= 0
+                ){
+                    return "";
+                }
+
+                return itemId;
             });
+
+        while(
+            selectedItemIds[category].length < 3
+        ){
+            selectedItemIds[category].push("");
+        }
+
+        selectedItemIds[category] =
+            selectedItemIds[category].slice(0, 3);
+
+        validateSelectedQuantities(category);
     });
 }
 
@@ -295,48 +318,51 @@ function renderItemSelection(){
 
     pruneSelectedItems();
 
-    renderItemGroup("food","foodSelectList");
-    renderItemGroup("water","waterSelectList");
-    renderItemGroup("equipment","equipmentSelectList");
+    renderItemSlots("food", "foodSelectList");
+    renderItemSlots("water", "waterSelectList");
+    renderItemSlots("equipment", "equipmentSelectList");
 
     document
         .getElementById("foodSelectHeader")
         .textContent =
             "🍖 食べ物（" +
-            selectedItemIds.food.length +
-            "/" +
-            SELECTION_LIMITS.food +
-            "）";
+            countSelectedSlots("food") +
+            "/3）";
 
     document
         .getElementById("waterSelectHeader")
         .textContent =
             "💧 水（" +
-            selectedItemIds.water.length +
-            "/" +
-            SELECTION_LIMITS.water +
-            "）";
+            countSelectedSlots("water") +
+            "/3）";
 
     document
         .getElementById("equipmentSelectHeader")
         .textContent =
             "🎒 装備（" +
-            selectedItemIds.equipment.length +
-            "/" +
-            SELECTION_LIMITS.equipment +
-            "）";
+            countSelectedSlots("equipment") +
+            "/3）";
 }
+function countSelectedSlots(category){
 
-function renderItemGroup(category,containerId){
+    return selectedItemIds[category]
+        .filter(itemId => itemId !== "")
+        .length;
+}
+function renderItemSlots(category, containerId){
 
     const container =
         document.getElementById(containerId);
 
+    if(!container){
+        return;
+    }
+
     container.innerHTML = "";
 
-    const items =
+    const ownedItems =
         Object.entries(inventoryData)
-        .filter(([itemId,item]) => {
+        .filter(([itemId, item]) => {
 
             return (
                 item &&
@@ -344,6 +370,82 @@ function renderItemGroup(category,containerId){
                 Number(item.quantity || 0) > 0
             );
         });
+
+    for(let slotIndex = 0; slotIndex < 3; slotIndex++){
+
+        const select =
+            document.createElement("select");
+
+        select.className = "itemSlotSelect";
+
+        select.innerHTML =
+            '<option value="">選択しない</option>';
+
+        ownedItems.forEach(([itemId, item]) => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = itemId;
+
+            option.textContent =
+                (item.icon || getDefaultIcon(category)) +
+                " " +
+                item.name +
+                "　所持：" +
+                Number(item.quantity || 0);
+
+            select.appendChild(option);
+        });
+
+        select.value =
+            selectedItemIds[category][slotIndex] || "";
+
+        select.disabled =
+            !!activeExpedition;
+
+        select.addEventListener("change", () => {
+
+            selectedItemIds[category][slotIndex] =
+                select.value;
+
+            validateSelectedQuantities(category);
+            renderItemSelection();
+            updateRequirementDisplay();
+        });
+
+        container.appendChild(select);
+    }
+}
+function validateSelectedQuantities(category){
+
+    const selectedCounts = {};
+
+    selectedItemIds[category]
+    .forEach((itemId, slotIndex) => {
+
+        if(!itemId){
+            return;
+        }
+
+        selectedCounts[itemId] =
+            Number(selectedCounts[itemId] || 0) + 1;
+
+        const ownedQuantity =
+            Number(
+                inventoryData[itemId]?.quantity || 0
+            );
+
+        if(selectedCounts[itemId] > ownedQuantity){
+
+            selectedItemIds[category][slotIndex] = "";
+
+            showMessage(
+                "持っている個数を超えて選択できません"
+            );
+        }
+    });
+}
 
     if(items.length === 0){
 
@@ -467,20 +569,10 @@ function handleItemCheckboxChange(event){
 
 function getSelectedCategoryTotal(category){
 
-    return selectedItemIds[category].reduce(
-        (total,itemId) => {
-
-            const item = inventoryData[itemId];
-
-            return (
-                total +
-                Number(item?.quantity || 0)
-            );
-        },
-        0
-    );
+    return selectedItemIds[category]
+        .filter(itemId => itemId !== "")
+        .length;
 }
-
 /* =====================================================
    条件表示の更新
 ===================================================== */
@@ -706,25 +798,26 @@ async function startExpedition(){
 
         const updates = {};
 
-        consumeSelectedItems(
-            latestInventory,
-            selectedItemIds.food,
-            requirements.requiredFood,
-            updates
-        );
+        consumeSlotItems(
+    latestInventory,
+    selectedItemIds.food,
+    requirements.requiredFood,
+    updates
+);
 
-        consumeSelectedItems(
-            latestInventory,
-            selectedItemIds.water,
-            requirements.requiredWater,
-            updates
-        );
+consumeSlotItems(
+    latestInventory,
+    selectedItemIds.water,
+    requirements.requiredWater,
+    updates
+);
 
-        consumeEquipmentItems(
-            latestInventory,
-            selectedItemIds.equipment,
-            updates
-        );
+consumeSlotItems(
+    latestInventory,
+    selectedItemIds.equipment,
+    countSelectedSlots("equipment"),
+    updates
+);
 
         const startAt = Date.now();
 
@@ -768,7 +861,11 @@ async function startExpedition(){
 
         await database.ref().update(updates);
 
-        selectedItemIds = { food:[], water:[], equipment:[] };
+       selectedItemIds = {
+    food:["", "", ""],
+    water:["", "", ""],
+    equipment:["", "", ""]
+};
 
         showMessage("探検を開始しました");
 
@@ -792,90 +889,49 @@ async function startExpedition(){
    選択したアイテムから食料・水を減らす
 ===================================================== */
 
-function consumeSelectedItems(
+function consumeSlotItems(
     inventory,
-    itemIds,
-    amount,
+    selectedSlots,
+    requiredAmount,
     updates
 ){
 
-    let remaining = amount;
+    const selectedIds =
+        selectedSlots
+        .filter(itemId => itemId !== "")
+        .slice(0, requiredAmount);
 
-    for(const itemId of itemIds){
-
-        if(remaining <= 0){
-            break;
-        }
-
-        const item = inventory[itemId];
-
-        if(!item){
-            continue;
-        }
-
-        const quantity =
-            Number(item.quantity || 0);
-
-        const consumeAmount =
-            Math.min(quantity,remaining);
-
-        const newQuantity =
-            quantity - consumeAmount;
-
-        const path =
-            "inventories/" +
-            currentUser.uid +
-            "/" +
-            itemId;
-
-        if(newQuantity <= 0){
-
-            updates[path] = null;
-
-        }else{
-
-            updates[
-                path + "/quantity"
-            ] = newQuantity;
-
-            updates[
-                path + "/updatedAt"
-            ] =
-                firebase.database
-                    .ServerValue.TIMESTAMP;
-        }
-
-        remaining -= consumeAmount;
-    }
-
-    if(remaining > 0){
+    if(selectedIds.length < requiredAmount){
         throw new Error("物資が不足しています");
     }
-}
 
-/* =====================================================
-   選択した装備を1個ずつ消費する
-===================================================== */
+    const consumptionCounts = {};
 
-function consumeEquipmentItems(
-    inventory,
-    itemIds,
-    updates
-){
+    selectedIds.forEach(itemId => {
 
-    for(const itemId of itemIds){
+        consumptionCounts[itemId] =
+            Number(consumptionCounts[itemId] || 0) + 1;
+    });
 
-        const item = inventory[itemId];
+    Object.entries(consumptionCounts)
+    .forEach(([itemId, consumeQuantity]) => {
 
-        if(!item || Number(item.quantity || 0) <= 0){
+        const item =
+            inventory[itemId];
+
+        if(!item){
             throw new Error("物資が不足しています");
         }
 
-        const quantity =
-            Number(item.quantity);
+        const ownedQuantity =
+            Number(item.quantity || 0);
+
+        if(ownedQuantity < consumeQuantity){
+            throw new Error("物資が不足しています");
+        }
 
         const newQuantity =
-            quantity - 1;
+            ownedQuantity - consumeQuantity;
 
         const path =
             "inventories/" +
@@ -889,19 +945,15 @@ function consumeEquipmentItems(
 
         }else{
 
-            updates[
-                path + "/quantity"
-            ] = newQuantity;
+            updates[path + "/quantity"] =
+                newQuantity;
 
-            updates[
-                path + "/updatedAt"
-            ] =
+            updates[path + "/updatedAt"] =
                 firebase.database
                     .ServerValue.TIMESTAMP;
         }
-    }
+    });
 }
-
 /* =====================================================
    探検状態を監視
 ===================================================== */
