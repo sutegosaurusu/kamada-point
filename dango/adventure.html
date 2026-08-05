@@ -234,6 +234,202 @@ header p{
     color:#fff0d0;
 }
 
+/* 持ち物選択（スロット） */
+
+.itemSelectionBox{
+    width:100%;
+    max-width:1000px;
+    margin:16px auto 0;
+    padding:15px;
+
+    background:#cfb991;
+    border:3px solid #594029;
+    box-shadow:4px 4px 0 #715439;
+}
+
+.itemSelectGroup{
+    margin-bottom:14px;
+}
+
+.itemSelectGroup:last-child{
+    margin-bottom:0;
+}
+
+.itemSelectHeader{
+    margin-bottom:8px;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.slotGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:8px;
+}
+
+.slotBox{
+    position:relative;
+    min-height:74px;
+    padding:10px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    background:#e3d1ae;
+    border:2px dashed #8a6a42;
+
+    font-size:13px;
+    cursor:pointer;
+    text-align:center;
+}
+
+.slotBox.filled{
+    border-style:solid;
+    border-color:#6d5135;
+    background:#ecdcb8;
+    text-align:left;
+}
+
+.slotBox.locked{
+    opacity:.55;
+    cursor:not-allowed;
+}
+
+.slotPlaceholder{
+    color:#7a6142;
+}
+
+.slotItemName{
+    font-weight:bold;
+}
+
+.slotItemQty{
+    margin-top:2px;
+    font-size:12px;
+    color:#5c4529;
+}
+
+.slotEffect{
+    margin-top:4px;
+    padding:2px 6px;
+    align-self:flex-start;
+
+    background:#8a6a42;
+    color:#fff3da;
+    font-size:11px;
+}
+
+.slotClearButton{
+    position:absolute;
+    top:4px;
+    right:4px;
+
+    width:20px;
+    height:20px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#5c3a20;
+    color:#fff0d0;
+    border:none;
+
+    font-size:13px;
+    line-height:1;
+    cursor:pointer;
+}
+
+/* 持ち物選択モーダル */
+
+.slotModalOverlay{
+    position:fixed;
+    inset:0;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+
+    background:rgba(30,20,10,.55);
+    z-index:2000;
+}
+
+.slotModalOverlay.show{
+    display:flex;
+}
+
+.slotModalBox{
+    width:100%;
+    max-width:420px;
+    max-height:80vh;
+
+    display:flex;
+    flex-direction:column;
+
+    background:#e8d8b6;
+    border:3px solid #5c4229;
+    box-shadow:5px 5px 0 #4b3520;
+}
+
+.slotModalHeader{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 14px;
+
+    background:#cbb58e;
+    border-bottom:2px solid #5c4229;
+
+    font-size:17px;
+    font-weight:bold;
+}
+
+.slotModalClose{
+    border:none;
+    background:none;
+
+    font-size:20px;
+    cursor:pointer;
+    color:#3a2914;
+}
+
+.slotModalList{
+    padding:10px 14px 14px;
+    overflow-y:auto;
+}
+
+.slotModalOption{
+    width:100%;
+    padding:10px;
+    margin-bottom:6px;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    background:#f2e4c4;
+    border:2px solid #6d5135;
+
+    font-size:14px;
+    text-align:left;
+    cursor:pointer;
+}
+
+.slotModalOption.clearOption{
+    background:#d9c3a0;
+    justify-content:center;
+    font-weight:bold;
+}
+
+.slotModalEmpty{
+    margin:0;
+    color:#6d5439;
+    font-size:13px;
+    text-align:center;
+}
+
 /* 必要物資 */
 
 .requirementBox{
@@ -254,7 +450,7 @@ header p{
 
 .requirementGrid{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:repeat(2,1fr);
     gap:8px;
 }
 
@@ -405,6 +601,12 @@ header p{
     font-weight:bold;
 }
 
+.failText{
+    margin:0;
+    color:#6d3223;
+    font-weight:bold;
+}
+
 /* メッセージ */
 
 .message{
@@ -456,30 +658,10 @@ header p{
     .requirementGrid{
         grid-template-columns:1fr;
     }
-}
-.itemSlotSelect{
-    display:block;
-    width:100%;
-    margin-bottom:9px;
-    padding:11px;
 
-    background:#eadbbd;
-    color:#302318;
-
-    border:2px solid #63472c;
-
-    font-family:inherit;
-    font-size:15px;
-    cursor:pointer;
-}
-
-.itemSlotSelect:last-child{
-    margin-bottom:0;
-}
-
-.itemSlotSelect:disabled{
-    opacity:.55;
-    cursor:not-allowed;
+    .slotGrid{
+        grid-template-columns:repeat(2,1fr);
+    }
 }
 </style>
 </head>
@@ -545,6 +727,35 @@ header p{
 
 </div>
 
+<div class="itemSelectionBox">
+
+    <h2 id="itemSelectionTitle">
+        持っていく品を選ぶ（枠をタップして選択・1つだけでも可）
+    </h2>
+
+    <div class="itemSelectGroup">
+        <div class="itemSelectHeader" id="foodSelectHeader">
+            🍖 食べ物（0/3）
+        </div>
+        <div class="slotGrid" id="foodSlotList"></div>
+    </div>
+
+    <div class="itemSelectGroup">
+        <div class="itemSelectHeader" id="waterSelectHeader">
+            💧 水（0/2）
+        </div>
+        <div class="slotGrid" id="waterSlotList"></div>
+    </div>
+
+    <div class="itemSelectGroup">
+        <div class="itemSelectHeader" id="equipmentSelectHeader">
+            🎒 装備（0/3）
+        </div>
+        <div class="slotGrid" id="equipmentSlotList"></div>
+    </div>
+
+</div>
+
 <div class="requirementBox">
 
     <h2 id="selectedTitle">
@@ -554,16 +765,23 @@ header p{
     <div class="requirementGrid">
 
         <div class="requirementItem">
-            🍖 必要な食べ物
+            🍖 食べ物（選択/必要）
             <div class="requirementNumber" id="requiredFood">
-                0
+                0 / 0
             </div>
         </div>
 
         <div class="requirementItem">
-            💧 必要な水
+            💧 水（選択/必要）
             <div class="requirementNumber" id="requiredWater">
-                0
+                0 / 0
+            </div>
+        </div>
+
+        <div class="requirementItem">
+            🎯 成功率
+            <div class="requirementNumber" id="successRateDisplay">
+                0%
             </div>
         </div>
 
@@ -610,16 +828,30 @@ header p{
 
 <section class="rewardResult" id="rewardResult">
 
-    <h2>持ち帰った品物</h2>
+    <h2>探検の結果</h2>
 
     <div class="rewardList" id="rewardList"></div>
 
 </section>
 
+<div class="slotModalOverlay" id="slotModalOverlay">
+    <div class="slotModalBox">
+
+        <div class="slotModalHeader">
+            <span id="slotModalTitle">アイテムを選択</span>
+            <button class="slotModalClose" id="slotModalCloseButton">×</button>
+        </div>
+
+        <div class="slotModalList" id="slotModalList"></div>
+
+    </div>
+</div>
+
 <div class="message" id="message"></div>
 
 <script src="firebase.js"></script>
 <script src="common.js"></script>
+<script src="itemEffects.js"></script>
 <script src="locations.js"></script>
 <script src="explore.js"></script>
 </body>
