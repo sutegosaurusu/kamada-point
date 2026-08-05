@@ -32,8 +32,9 @@ const itemEffects = {
 
     honey:{
         successRate:0.05,
-        boostItemId:"honey",
+        boostItemId:"smallbug",
         boostAmount:20
+      
     },
 
     acorn:{
