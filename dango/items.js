@@ -4,54 +4,62 @@ const items = [
     // 食べ物
     // ======================
 
-    {
-        id:"apple",
-        name:"リンゴ",
-        category:"food",
-        price:120
-    },
-    {
-        id:"cucumber",
-        name:"キュウリ",
-        category:"food",
-        price:80
-    },
-    {
-        id:"watermelon",
-        name:"スイカ",
-        category:"food",
-        price:450
-    },
+    
     {
         id:"leaf",
         name:"落ち葉",
         category:"food",
         price:15
     },
-    {
-        id:"jelly",
-        name:"ゼリー",
-        category:"food",
-        price:100
-    },
-    {
-        id:"chinese_cabbage",
-        name:"白菜",
-        category:"food",
-        price:180
-    },
-    {
-        id:"azuki_bar",
-        name:"小豆バー",
-        category:"food",
-        price:160
-    },
+    
     {
         id:"honey",
         name:"蜜",
         category:"food",
         price:300
     },
+    {
+    id:"acorn",
+    name:"どんぐり",
+    category:"food",
+    price:30
+},
+{
+    id:"moss",
+    name:"コケ",
+    category:"food",
+    price:20
+},
+{
+    id:"berry",
+    name:"ベリー",
+    category:"food",
+    price:60
+},
+{
+    id:"gum",
+    name:"ガム",
+    category:"food",
+    price:50
+},
+{
+    id:"tree_sap",
+    name:"樹液",
+    category:"food",
+    price:80
+},
+{
+    id:"flower_petal",
+    name:"花びら",
+    category:"food",
+    price:15
+},
+{
+    id:"Chocolate",
+    name:"チョコ",
+    category:"food",
+    price:100
+},
 
 
     // ======================
@@ -88,6 +96,26 @@ const items = [
         category:"equipment",
         price:300
   },
+   
+{
+    id:"toothpick",
+    name:"つまようじ",
+    category:"material",
+    price:80
+},
+{
+    id:"pull_tab",
+    name:"プルタブ",
+    category:"material",
+    price:200
+},
+{
+    id:"bottle_cap",
+    name:"ペットボトルのふた",
+    category:"material",
+    price:300
+},
+
 
 
 // ======================
@@ -100,13 +128,31 @@ const items = [
     category:"material",
     price:20
 },
+
+ {
+    id:"cicada_shell",
+    name:"セミの抜け殻",
+    category:"material",
+    price:120
+},
 {
+    id:"snail_shell",
+    name:"カタツムリの殻",
+    category:"material",
+    price:150
+},
+{
+    id:"stag_beetle_jaw",
+    name:"クワガタのあご",
+    category:"material",
+    price:500
+},
+    {
     id:"twig",
     name:"小枝",
     category:"material",
     price:15
 }
-
 ];
 
 // ======================
