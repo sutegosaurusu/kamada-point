@@ -731,12 +731,19 @@ function updateRequirementDisplay(){
                 computeEffectiveSuccessRate(location) * 100
             ) + "%";
 
-    document
-        .getElementById("expectedReward")
-        .textContent =
-            "約" +
-            calculateExpectedReward(location) +
-            "個（成功時）";
+    const expectedReward =
+    Math.max(
+        1,
+        Math.round(
+            location.rewardRate *
+            timeSettings[selectedHours].rewardMultiplier
+        )
+    );
+
+document
+    .getElementById("expectedReward")
+    .textContent =
+    "約" + expectedReward + "個";
 }
 
 /* =====================================================
