@@ -115,10 +115,9 @@ const items = [
 
 const itemInformation = {};
 
-items.forEach(item=>{
+items.forEach(item => {
     itemInformation[item.id] = item;
 });
-
 
 const categoryInformation = {
 
@@ -133,17 +132,16 @@ const categoryInformation = {
     },
 
     equipment:{
-    name:"装備",
-    icon:"⚔️"
-},
+        name:"装備",
+        icon:"⚔️"
+    },
 
-material:{
-    name:"素材",
-    icon:"🪨"
-}
+    material:{
+        name:"素材",
+        icon:"🪨"
+    }
 
 };
-
 
 function getDefaultIcon(category){
 
@@ -158,27 +156,17 @@ function getDefaultIcon(category){
         case "equipment":
             return "⚔️";
 
-    　case "material":
-    return "🪨";
+        case "material":
+            return "🪨";
 
         default:
             return "📦";
     }
-
 }
-
 
 function getItemById(id){
 
-    return itemInformation[id] || {
-        price:0,
-        name:"不明"
-    };
-
+    return itemInformation[id] || null;
 }
 
-function getMerchantItems(){
-
-    return items;
-}
 console.log("items.js読み込み完了");
