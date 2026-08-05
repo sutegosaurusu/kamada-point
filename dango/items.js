@@ -61,13 +61,13 @@ const items = [
     price:100
 },
 {
-        id:"Ant eggs",
+        id:"Anteggs",
         name:"アリの卵",
         category:"food",
         price:1000
     },
  {
-        id:"small bug",
+        id:"smallbug",
         name:"小さな虫",
         category:"food",
         price:100
