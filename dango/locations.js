@@ -40,7 +40,7 @@ const locations = [
         { itemId:"toothpick", weight:1 },
         { itemId:"pull_tab", weight:0.7 },
         { itemId:"bottle_cap", weight:0.5 },
-        { itemId:"bottle_cap", weight:0.5 },
+        { itemId:"Anteggs", weight:0.5 },
         { itemId:"bottle_cap", weight:0.5 },
         { itemId:"bottle_cap", weight:0.5 },
         { itemId:"stag_beetle_jaw", weight:0.3 }
