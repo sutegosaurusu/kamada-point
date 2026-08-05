@@ -311,12 +311,20 @@ function computeEffectiveRewardWeights(location){
 
             const effect = itemEffects[itemId];
 
-            if(
-                effect &&
-                effect.boostItemId === reward.itemId
-            ){
-                weight += effect.boostAmount;
+            if(effect && effect.boosts){
+
+                effect.boosts.forEach(boost => {
+
+                    if(boost.itemId === reward.itemId){
+
+                        weight += boost.amount;
+
+                    }
+
+                });
+
             }
+
         });
 
         return { ...reward, weight };
