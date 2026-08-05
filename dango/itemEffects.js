@@ -70,24 +70,16 @@ const itemEffects = {
     Chocolate:{
         successRate:0.03
     },
-   {
-        id:"Ant eggs",
-        name:"アリの卵",
-        category:"food",
-        price:1000
+   Anteggs:{
+        successRate:0.03
     },
- {
-        id:"small bug",
-        name:"小さな虫",
-        category:"food",
-        price:100
-    },   
- {
-        id:"larva",
-        name:"幼虫",
-        category:"food",
-        price:500
+   smallbug:{
+        successRate:0.03
+    },
+   larva:{
+        successRate:0.03
     },  
+
 
     // ======================
     // 水
@@ -120,6 +112,9 @@ const itemEffects = {
     pull_tab:{
         boostItemId:"bottle_cap",
         boostAmount:15
+    },
+       feather:{
+        successRate:0.03
     }
 
     
