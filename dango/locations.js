@@ -25,7 +25,7 @@ const locations = [
 
     rewards:[
         { itemId:"fallen_leaf", weight:20 },
-        { itemId:"grass", weight:18 },
+        { itemId:"Chocolate", weight:18 },
         { itemId:"water", weight:12 },
         { itemId:"acorn", weight:10 },
         { itemId:"moss", weight:8 },
