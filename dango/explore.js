@@ -877,11 +877,7 @@ async function startExpedition(){
     const location =
         getSelectedLocation();
 
-    const requirements =
-        getRequirements(
-            location,
-            selectedHours
-        );
+   
 
     const selectedFoodIds =
         getSlotItemIds("food");
@@ -902,27 +898,7 @@ async function startExpedition(){
         return;
     }
 
-    if(selectedFoodIds.length < requirements.requiredFood){
-
-        showMessage(
-            "食べ物の枠があと" +
-            (requirements.requiredFood - selectedFoodIds.length) +
-            "個足りません"
-        );
-
-        return;
-    }
-
-    if(selectedWaterIds.length < requirements.requiredWater){
-
-        showMessage(
-            "水の枠があと" +
-            (requirements.requiredWater - selectedWaterIds.length) +
-            "個足りません"
-        );
-
-        return;
-    }
+   
 
     const successRate =
         computeEffectiveSuccessRate(location);
@@ -1006,15 +982,7 @@ async function startExpedition(){
 
             hours:selectedHours,
 
-            requiredFood:
-                requirements.requiredFood,
-
-            requiredWater:
-                requirements.requiredWater,
-
-            expectedReward:
-                requirements.expectedReward,
-
+            
             successRate:successRate,
             rewardWeights:rewardWeights,
 
