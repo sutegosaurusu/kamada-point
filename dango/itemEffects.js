@@ -22,36 +22,119 @@
 
 const itemEffects = {
 
-    /* 村外れのオリーブ畑 */
-    wild_olive:     { successRate:0.01 },
-    barley:         { successRate:0.01 },
-    small_stone:    { successRate:0.02 },
+    // ======================
+    // 食べ物
+    // ======================
 
-    /* 干上がった川床 */
-    dry_herb:       { successRate:0.01 },
-    clay:           { boostItemId:"flint", boostAmount:12 },
-    flint:          { successRate:0.03 },
+    leaf:{
+        boostItemId:"leaf",
+        boostAmount:15
+    },
 
-    /* 薄暗い松林 */
-    forest_mushroom:{ successRate:0.01 },
-    pine_resin:     { boostItemId:"strong_branch", boostAmount:12 },
-    strong_branch:  { successRate:0.03 },
+    honey:{
+        successRate:0.05,
+        boostItemId:"honey",
+        boostAmount:20
+    },
 
-    /* 岩だらけの丘陵 */
-    mountain_herb:  { successRate:0.02 },
-    hard_stone:     { boostItemId:"copper_fragment", boostAmount:12 },
-    copper_fragment:{ successRate:0.04 },
+    acorn:{
+        successRate:0.01,
+        boostItemId:"acorn",
+        boostAmount:15
+    },
 
-    /* 崩れた古代遺跡（old_potteryは成功率＋入手率アップの両方持ち） */
-    sacred_fig:     { successRate:0.02 },
-    old_pottery:    { successRate:0.02, boostItemId:"ancient_coin", boostAmount:15 },
-    ancient_coin:   { successRate:0.05 },
-    bronze_fragment:{ successRate:0.05 },
+    moss:{
+        successRate:0.01,
+        boostItemId:"moss",
+        boostAmount:15
+    },
 
-    /* 海辺の深い洞窟（rare_crystalは成功率＋入手率アップの両方持ち） */
-    cave_mushroom:      { successRate:0.02 },
-    underground_water:  { successRate:0.03 },
-    rare_crystal:       { successRate:0.03, boostItemId:"silver_fragment", boostAmount:15 },
-    silver_fragment:    { successRate:0.06 }
+    berry:{
+        successRate:0.02,
+        boostItemId:"berry",
+        boostAmount:15
+    },
+
+    gum:{
+        successRate:0.02
+    },
+
+    tree_sap:{
+        successRate:0.03,
+        boostItemId:"tree_sap",
+        boostAmount:15
+    },
+
+    flower_petal:{
+        successRate:0.01
+    },
+
+    Chocolate:{
+        successRate:0.08
+    },
+
+    // ======================
+    // 水
+    // ======================
+
+    water:{
+        successRate:0.02
+    },
+
+    slime:{
+        successRate:0.04
+    },
+
+    os1:{
+        successRate:0.08
+    },
+
+    // ======================
+    // 装備
+    // ======================
+
+    bou:{
+        successRate:0.05
+    },
+
+    // ======================
+    // 素材
+    // （持っていけるようになったら使用）
+    // ======================
+
+    toothpick:{
+        successRate:0.03
+    },
+
+    pull_tab:{
+        boostItemId:"bottle_cap",
+        boostAmount:15
+    },
+
+    bottle_cap:{
+        successRate:0.04
+    },
+
+    stone:{
+        boostItemId:"stone",
+        boostAmount:15
+    },
+
+    cicada_shell:{
+        successRate:0.02
+    },
+
+    snail_shell:{
+        successRate:0.02
+    },
+
+    stag_beetle_jaw:{
+        successRate:0.06
+    },
+
+    twig:{
+        boostItemId:"twig",
+        boostAmount:15
+    }
 
 };
