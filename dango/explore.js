@@ -1393,14 +1393,30 @@ function createRewardCount(
     const multiplier =
         timeSettings[expedition.hours].rewardMultiplier;
 
-    const basicCount =
-        Math.max(
-            1,
-            Math.round(
-                location.rewardRate *
-                multiplier
-            )
-        );
+   let rewardMultiplier = 1;
+
+getAllSelectedItemIds().forEach(itemId => {
+
+    const effect = itemEffects[itemId];
+
+    if(effect && effect.rewardMultiplier){
+
+        rewardMultiplier *= effect.rewardMultiplier;
+
+    }
+
+});
+
+
+const basicCount =
+    Math.max(
+        1,
+        Math.round(
+            location.rewardRate *
+            multiplier *
+            rewardMultiplier
+        )
+    );
 
     const randomMultiplier =
         0.8 + Math.random() * 0.4;
