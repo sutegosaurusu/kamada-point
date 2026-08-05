@@ -19,6 +19,22 @@ let selectedHours = 1;
 
 let countdownTimer = null;
 
+/*
+持っていくアイテム（食べ物3・水2・装備3まで）
+*/
+
+const SELECTION_LIMITS = {
+    food:3,
+    water:2,
+    equipment:3
+};
+
+let selectedItemIds = {
+    food:[],
+    water:[],
+    equipment:[]
+};
+
 /* =====================================================
    ログイン確認
 ===================================================== */
@@ -85,8 +101,8 @@ function renderLocations(){
             </div>
 
             <div class="rewardHint">
-                報酬倍率：
-                ×${location.rewardRate}
+                基本成功率：
+                ${Math.round(location.baseSuccessRate * 100)}%
             </div>
         `;
 
@@ -173,6 +189,302 @@ function getRequirements(location,hours){
     };
 }
 
+/* =====================================================
+   持っていくアイテムの効果を計算
+===================================================== */
+
+function getAllSelectedItemIds(){
+
+    return [
+        ...selectedItemIds.food,
+        ...selectedItemIds.water,
+        ...selectedItemIds.equipment
+    ];
+}
+
+function computeSuccessRateBonus(){
+
+    let bonus = 0;
+
+    getAllSelectedItemIds().forEach(itemId => {
+
+        const effect = itemEffects[itemId];
+
+        if(effect && effect.successRate){
+            bonus += effect.successRate;
+        }
+    });
+
+    return bonus;
+}
+
+function computeEffectiveSuccessRate(location){
+
+    const rate =
+        location.baseSuccessRate +
+        computeSuccessRateBonus();
+
+    return Math.min(0.95,Math.max(0.05,rate));
+}
+
+function computeEffectiveRewardWeights(location){
+
+    const selectedIds =
+        getAllSelectedItemIds();
+
+    return location.rewards.map(reward => {
+
+        let weight = reward.weight;
+
+        selectedIds.forEach(itemId => {
+
+            const effect = itemEffects[itemId];
+
+            if(
+                effect &&
+                effect.boostItemId === reward.itemId
+            ){
+                weight += effect.boostAmount;
+            }
+        });
+
+        return { ...reward, weight };
+    });
+}
+
+function findRewardName(itemId){
+
+    for(const location of locations){
+
+        const found =
+            location.rewards.find(
+                reward => reward.itemId === itemId
+            );
+
+        if(found){
+            return found.name;
+        }
+    }
+
+    return null;
+}
+
+/* =====================================================
+   持ち物選択欄の表示
+===================================================== */
+
+function pruneSelectedItems(){
+
+    Object.keys(selectedItemIds).forEach(category => {
+
+        selectedItemIds[category] =
+            selectedItemIds[category].filter(itemId => {
+
+                const item = inventoryData[itemId];
+
+                return (
+                    item &&
+                    item.category === category &&
+                    Number(item.quantity || 0) > 0
+                );
+            });
+    });
+}
+
+function renderItemSelection(){
+
+    pruneSelectedItems();
+
+    renderItemGroup("food","foodSelectList");
+    renderItemGroup("water","waterSelectList");
+    renderItemGroup("equipment","equipmentSelectList");
+
+    document
+        .getElementById("foodSelectHeader")
+        .textContent =
+            "🍖 食べ物（" +
+            selectedItemIds.food.length +
+            "/" +
+            SELECTION_LIMITS.food +
+            "）";
+
+    document
+        .getElementById("waterSelectHeader")
+        .textContent =
+            "💧 水（" +
+            selectedItemIds.water.length +
+            "/" +
+            SELECTION_LIMITS.water +
+            "）";
+
+    document
+        .getElementById("equipmentSelectHeader")
+        .textContent =
+            "🎒 装備（" +
+            selectedItemIds.equipment.length +
+            "/" +
+            SELECTION_LIMITS.equipment +
+            "）";
+}
+
+function renderItemGroup(category,containerId){
+
+    const container =
+        document.getElementById(containerId);
+
+    container.innerHTML = "";
+
+    const items =
+        Object.entries(inventoryData)
+        .filter(([itemId,item]) => {
+
+            return (
+                item &&
+                item.category === category &&
+                Number(item.quantity || 0) > 0
+            );
+        });
+
+    if(items.length === 0){
+
+        container.innerHTML =
+            "<p class='emptyHint'>持っている品がありません</p>";
+
+        return;
+    }
+
+    const maxCount =
+        SELECTION_LIMITS[category];
+
+    items.forEach(([itemId,item]) => {
+
+        const row =
+            document.createElement("label");
+
+        row.className = "itemCheckboxRow";
+
+        const checked =
+            selectedItemIds[category].includes(itemId);
+
+        const limitReached =
+            selectedItemIds[category].length >= maxCount &&
+            !checked;
+
+        const lockedByExpedition =
+            !!activeExpedition;
+
+        const disabled =
+            limitReached || lockedByExpedition;
+
+        if(disabled){
+            row.classList.add("disabled");
+        }
+
+        const effect = itemEffects[itemId];
+
+        let effectText = "";
+
+        if(effect && effect.successRate){
+
+            effectText =
+                "成功率+" +
+                Math.round(effect.successRate * 100) +
+                "%";
+
+        }else if(effect && effect.boostItemId){
+
+            const targetName =
+                findRewardName(effect.boostItemId);
+
+            effectText =
+                (targetName || effect.boostItemId) +
+                "の入手率アップ";
+        }
+
+        row.innerHTML = `
+            <input
+                type="checkbox"
+                data-category="${category}"
+                data-item-id="${itemId}"
+                ${checked ? "checked" : ""}
+                ${disabled ? "disabled" : ""}
+            >
+            <span>
+                ${item.icon || ""}
+                ${escapeHtml(item.name)}
+                （所持${item.quantity}）
+            </span>
+            ${
+                effectText
+                ? `<span class="effectHint">${escapeHtml(effectText)}</span>`
+                : ""
+            }
+        `;
+
+        row
+            .querySelector("input")
+            .addEventListener(
+                "change",
+                handleItemCheckboxChange
+            );
+
+        container.appendChild(row);
+    });
+}
+
+function handleItemCheckboxChange(event){
+
+    const category = event.target.dataset.category;
+    const itemId = event.target.dataset.itemId;
+
+    if(event.target.checked){
+
+        if(
+            selectedItemIds[category].length >=
+            SELECTION_LIMITS[category]
+        ){
+            event.target.checked = false;
+            return;
+        }
+
+        selectedItemIds[category].push(itemId);
+
+    }else{
+
+        selectedItemIds[category] =
+            selectedItemIds[category].filter(
+                id => id !== itemId
+            );
+    }
+
+    renderItemSelection();
+    updateRequirementDisplay();
+}
+
+/* =====================================================
+   選択中アイテムの合計数
+===================================================== */
+
+function getSelectedCategoryTotal(category){
+
+    return selectedItemIds[category].reduce(
+        (total,itemId) => {
+
+            const item = inventoryData[itemId];
+
+            return (
+                total +
+                Number(item?.quantity || 0)
+            );
+        },
+        0
+    );
+}
+
+/* =====================================================
+   条件表示の更新
+===================================================== */
+
 function updateRequirementDisplay(){
 
     const location =
@@ -195,19 +507,31 @@ function updateRequirementDisplay(){
     document
         .getElementById("requiredFood")
         .textContent =
+            getSelectedCategoryTotal("food") +
+            " / " +
             requirements.requiredFood;
 
     document
         .getElementById("requiredWater")
         .textContent =
+            getSelectedCategoryTotal("water") +
+            " / " +
             requirements.requiredWater;
+
+    document
+        .getElementById("successRateDisplay")
+        .textContent =
+            Math.round(
+                computeEffectiveSuccessRate(location) * 100
+            ) +
+            "%";
 
     document
         .getElementById("expectedReward")
         .textContent =
             "約" +
             requirements.expectedReward +
-            "個";
+            "個（成功時）";
 }
 
 /* =====================================================
@@ -224,6 +548,8 @@ function watchInventory(){
                 snapshot.val() || {};
 
             updateSupplyDisplay();
+            renderItemSelection();
+            updateRequirementDisplay();
         });
 }
 
@@ -295,33 +621,49 @@ async function startExpedition(){
             selectedHours
         );
 
-    const foodTotal =
-        getCategoryTotal("food");
+    if(selectedItemIds.food.length === 0){
+        showMessage("持っていく食べ物を選んでください");
+        return;
+    }
 
-    const waterTotal =
-        getCategoryTotal("water");
+    if(selectedItemIds.water.length === 0){
+        showMessage("持っていく水を選んでください");
+        return;
+    }
 
-    if(foodTotal < requirements.requiredFood){
+    const selectedFoodTotal =
+        getSelectedCategoryTotal("food");
+
+    const selectedWaterTotal =
+        getSelectedCategoryTotal("water");
+
+    if(selectedFoodTotal < requirements.requiredFood){
 
         showMessage(
-            "食べ物が" +
-            (requirements.requiredFood - foodTotal) +
+            "選んだ食べ物が" +
+            (requirements.requiredFood - selectedFoodTotal) +
             "個足りません"
         );
 
         return;
     }
 
-    if(waterTotal < requirements.requiredWater){
+    if(selectedWaterTotal < requirements.requiredWater){
 
         showMessage(
-            "水が" +
-            (requirements.requiredWater - waterTotal) +
+            "選んだ水が" +
+            (requirements.requiredWater - selectedWaterTotal) +
             "個足りません"
         );
 
         return;
     }
+
+    const successRate =
+        computeEffectiveSuccessRate(location);
+
+    const rewardWeights =
+        computeEffectiveRewardWeights(location);
 
     const confirmed = confirm(
         location.name +
@@ -333,7 +675,13 @@ async function startExpedition(){
         "個\n" +
         "水：" +
         requirements.requiredWater +
-        "個\n\n" +
+        "個\n" +
+        "装備：" +
+        selectedItemIds.equipment.length +
+        "個\n" +
+        "成功率：約" +
+        Math.round(successRate * 100) +
+        "%\n\n" +
         "開始しますか？"
     );
 
@@ -356,41 +704,25 @@ async function startExpedition(){
         const latestInventory =
             latestSnapshot.val() || {};
 
-        if(
-            getCategoryTotalFromData(
-                latestInventory,
-                "food"
-            ) < requirements.requiredFood
-        ){
-
-            showMessage("食べ物が足りません");
-            return;
-        }
-
-        if(
-            getCategoryTotalFromData(
-                latestInventory,
-                "water"
-            ) < requirements.requiredWater
-        ){
-
-            showMessage("水が足りません");
-            return;
-        }
-
         const updates = {};
 
-        consumeCategoryItems(
+        consumeSelectedItems(
             latestInventory,
-            "food",
+            selectedItemIds.food,
             requirements.requiredFood,
             updates
         );
 
-        consumeCategoryItems(
+        consumeSelectedItems(
             latestInventory,
-            "water",
+            selectedItemIds.water,
             requirements.requiredWater,
+            updates
+        );
+
+        consumeEquipmentItems(
+            latestInventory,
+            selectedItemIds.equipment,
             updates
         );
 
@@ -420,6 +752,9 @@ async function startExpedition(){
             expectedReward:
                 requirements.expectedReward,
 
+            successRate:successRate,
+            rewardWeights:rewardWeights,
+
             startAt:startAt,
             endAt:endAt,
 
@@ -433,12 +768,19 @@ async function startExpedition(){
 
         await database.ref().update(updates);
 
+        selectedItemIds = { food:[], water:[], equipment:[] };
+
         showMessage("探検を開始しました");
 
     }catch(error){
 
         console.error(error);
-        showMessage("探検を開始できませんでした");
+
+        showMessage(
+            error.message === "物資が不足しています"
+            ? "物資が不足しています"
+            : "探検を開始できませんでした"
+        );
 
     }finally{
 
@@ -447,33 +789,28 @@ async function startExpedition(){
 }
 
 /* =====================================================
-   食料・水を複数のアイテムから減らす
+   選択したアイテムから食料・水を減らす
 ===================================================== */
 
-function consumeCategoryItems(
+function consumeSelectedItems(
     inventory,
-    category,
+    itemIds,
     amount,
     updates
 ){
 
     let remaining = amount;
 
-    const items =
-        Object.entries(inventory)
-        .filter(([itemId,item]) => {
-
-            return (
-                item &&
-                item.category === category &&
-                Number(item.quantity || 0) > 0
-            );
-        });
-
-    for(const [itemId,item] of items){
+    for(const itemId of itemIds){
 
         if(remaining <= 0){
             break;
+        }
+
+        const item = inventory[itemId];
+
+        if(!item){
+            continue;
         }
 
         const quantity =
@@ -517,6 +854,55 @@ function consumeCategoryItems(
 }
 
 /* =====================================================
+   選択した装備を1個ずつ消費する
+===================================================== */
+
+function consumeEquipmentItems(
+    inventory,
+    itemIds,
+    updates
+){
+
+    for(const itemId of itemIds){
+
+        const item = inventory[itemId];
+
+        if(!item || Number(item.quantity || 0) <= 0){
+            throw new Error("物資が不足しています");
+        }
+
+        const quantity =
+            Number(item.quantity);
+
+        const newQuantity =
+            quantity - 1;
+
+        const path =
+            "inventories/" +
+            currentUser.uid +
+            "/" +
+            itemId;
+
+        if(newQuantity <= 0){
+
+            updates[path] = null;
+
+        }else{
+
+            updates[
+                path + "/quantity"
+            ] = newQuantity;
+
+            updates[
+                path + "/updatedAt"
+            ] =
+                firebase.database
+                    .ServerValue.TIMESTAMP;
+        }
+    }
+}
+
+/* =====================================================
    探検状態を監視
 ===================================================== */
 
@@ -540,6 +926,8 @@ function watchExpedition(){
 
                 hideActiveExpedition();
             }
+
+            renderItemSelection();
         });
 }
 
@@ -565,7 +953,11 @@ function showActiveExpedition(){
         )
         .textContent =
             activeExpedition.hours +
-            "時間の探検に出ています。";
+            "時間の探検に出ています。（成功率 約" +
+            Math.round(
+                Number(activeExpedition.successRate || 0) * 100
+            ) +
+            "%）";
 
     document
         .getElementById("startButton")
@@ -650,7 +1042,7 @@ function updateCountdown(){
 
         claimButton.disabled = false;
         claimButton.textContent =
-            "持ち帰った品物を受け取る";
+            "結果を受け取る";
 
         clearInterval(countdownTimer);
 
@@ -693,7 +1085,7 @@ function formatTime(milliseconds){
 }
 
 /* =====================================================
-   報酬受け取り
+   結果受け取り（成功/失敗判定）
 ===================================================== */
 
 document
@@ -755,6 +1147,37 @@ async function claimRewards(){
             throw new Error("場所が見つかりません");
         }
 
+        const successRate =
+            Number(
+                latestExpedition.successRate ??
+                location.baseSuccessRate
+            );
+
+        const isSuccess =
+            Math.random() < successRate;
+
+        const updates = {};
+
+        updates[
+            "activeExpeditions/" +
+            currentUser.uid
+        ] = null;
+
+        if(!isSuccess){
+
+            await database.ref().update(updates);
+
+            showRewardResult([],false);
+
+            showMessage("探検は失敗に終わりました…");
+
+            return;
+        }
+
+        const rewardWeights =
+            latestExpedition.rewardWeights ||
+            location.rewards;
+
         const rewardCount =
             createRewardCount(
                 latestExpedition,
@@ -763,11 +1186,9 @@ async function claimRewards(){
 
         const rewards =
             generateRewards(
-                location,
+                { rewards:rewardWeights },
                 rewardCount
             );
-
-        const updates = {};
 
         for(const reward of rewards){
 
@@ -798,14 +1219,9 @@ async function claimRewards(){
             };
         }
 
-        updates[
-            "activeExpeditions/" +
-            currentUser.uid
-        ] = null;
-
         await database.ref().update(updates);
 
-        showRewardResult(rewards);
+        showRewardResult(rewards,true);
 
         showMessage(
             "探検の報酬を受け取りました"
@@ -814,7 +1230,7 @@ async function claimRewards(){
     }catch(error){
 
         console.error(error);
-        showMessage("報酬を受け取れませんでした");
+        showMessage("結果を受け取れませんでした");
 
     }finally{
 
@@ -910,10 +1326,10 @@ function selectWeightedReward(rewards){
 }
 
 /* =====================================================
-   報酬画面
+   結果画面（成功時はアイテム、失敗時は失敗メッセージ）
 ===================================================== */
 
-function showRewardResult(rewards){
+function showRewardResult(rewards,isSuccess){
 
     const resultArea =
         document.getElementById(
@@ -927,29 +1343,37 @@ function showRewardResult(rewards){
 
     rewardList.innerHTML = "";
 
-    rewards.forEach(reward => {
+    if(!isSuccess){
 
-        const item =
-            document.createElement("div");
+        rewardList.innerHTML =
+            "<p class='failText'>今回の探検は失敗し、持ち帰れた品はありませんでした。</p>";
 
-        item.className = "rewardItem";
+    }else{
 
-        item.innerHTML = `
-            <div class="rewardIcon">
-                ${reward.icon}
-            </div>
+        rewards.forEach(reward => {
 
-            <div class="rewardName">
-                ${escapeHtml(reward.name)}
-            </div>
+            const item =
+                document.createElement("div");
 
-            <div>
-                ×${reward.quantity}
-            </div>
-        `;
+            item.className = "rewardItem";
 
-        rewardList.appendChild(item);
-    });
+            item.innerHTML = `
+                <div class="rewardIcon">
+                    ${reward.icon}
+                </div>
+
+                <div class="rewardName">
+                    ${escapeHtml(reward.name)}
+                </div>
+
+                <div>
+                    ×${reward.quantity}
+                </div>
+            `;
+
+            rewardList.appendChild(item);
+        });
+    }
 
     resultArea.classList.add("show");
 
@@ -973,32 +1397,6 @@ function getSelectedLocation(){
         ) ||
         locations[0]
     );
-}
-
-function getCategoryTotal(category){
-
-    return getCategoryTotalFromData(
-        inventoryData,
-        category
-    );
-}
-
-function getCategoryTotalFromData(
-    inventory,
-    category
-){
-
-    return Object.values(inventory)
-        .filter(item =>
-            item &&
-            item.category === category
-        )
-        .reduce(
-            (total,item) =>
-                total +
-                Number(item.quantity || 0),
-            0
-        );
 }
 
 function getDurationMilliseconds(hours){
