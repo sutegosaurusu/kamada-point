@@ -96,6 +96,11 @@ const itemEffects = {
     os1:{
         successRate:0.20
     },
+  cola:{
+    successRate:-0.30,
+    rewardMultiplier:2
+}
+      
     // ======================
     // 装備
     // ======================
