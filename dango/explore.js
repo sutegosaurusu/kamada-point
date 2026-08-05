@@ -295,7 +295,7 @@ function computeEffectiveSuccessRate(location){
         location.baseSuccessRate +
         computeSuccessRateBonus();
 
-    return Math.min(0.95,Math.max(0.05,rate));
+    return Math.min(0.99,Math.max(0.01,rate));
 }
 
 function computeEffectiveRewardWeights(location){
