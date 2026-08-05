@@ -99,7 +99,7 @@ const itemEffects = {
   cola:{
     successRate:-0.30,
     rewardMultiplier:2
-}
+ },
       
     // ======================
     // 装備
