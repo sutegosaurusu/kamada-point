@@ -21,7 +21,7 @@ const locations = [
 
     rewardRate:1,
 
-    baseSuccessRate:0.90,
+    baseSuccessRate:0.70,
 
     rewards:[
         { itemId:"leaf", weight:20 },
