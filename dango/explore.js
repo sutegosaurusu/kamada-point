@@ -491,6 +491,14 @@ function renderSlotGrid(category,containerId){
             const effectTexts =
                 getEffectTexts(itemId);
 
+            const remainingQuantity =
+                Number(item?.quantity || 0) -
+                countUsedElsewhere(
+                    category,
+                    itemId,
+                    slotIndex
+                );
+
             slotBox.innerHTML = `
                 <div class="slotItemName">
                     ${item?.icon || ""}
@@ -498,7 +506,7 @@ function renderSlotGrid(category,containerId){
                 </div>
 
                 <div class="slotItemQty">
-                    所持${item?.quantity ?? 0}
+                    残り${remainingQuantity}
                 </div>
 
                 ${
@@ -686,6 +694,14 @@ function renderSlotModal(){
         const effectTexts =
             getEffectTexts(itemId);
 
+        const remainingQuantity =
+            Number(item.quantity || 0) -
+            countUsedElsewhere(
+                category,
+                itemId,
+                slotIndex
+            );
+
         const option =
             document.createElement("button");
 
@@ -696,7 +712,7 @@ function renderSlotModal(){
             <span>
                 ${item.icon || ""}
                 ${escapeHtml(item.name)}
-                （所持${item.quantity}）
+                （残り${remainingQuantity}）
                 ${
                     effectTexts.length > 0
                     ? " ／ " + effectTexts.map(escapeHtml).join("・")
