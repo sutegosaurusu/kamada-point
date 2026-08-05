@@ -25,7 +25,7 @@ const locations = [
 
     rewards:[
         { itemId:"leaf", weight:20 },
-        { itemId:"Chocolate", weight:18 },
+        { itemId:"Chocolate", weight:0.5 },
         { itemId:"water", weight:12 },
         { itemId:"acorn", weight:10 },
         { itemId:"moss", weight:8 },
@@ -40,9 +40,9 @@ const locations = [
         { itemId:"toothpick", weight:1 },
         { itemId:"pull_tab", weight:0.7 },
         { itemId:"bottle_cap", weight:0.5 },
-        { itemId:"Anteggs", weight:0.5 },
-        { itemId:"smallbug", weight:0.5 },
-        { itemId:"bottle_cap", weight:0.5 },
+        { itemId:"Anteggs", weight:5.5 },
+        { itemId:"smallbug", weight:6 },
+        { itemId:"larva", weight:6 },
         { itemId:"stag_beetle_jaw", weight:0.3 }
        
        
