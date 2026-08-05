@@ -76,17 +76,17 @@ function renderMarket(){
 
     offers.push({
         type:"merchant",
-       id:item.id,
-　　　　itemId:item.id,
+        id:item.id,
+        itemId:item.id,
         itemName:item.name,
         category:item.category,
         sellerId:"merchant",
         sellerName:"商人",
         price:Number(item.price),
+        sellPrice:Number(item.sellPrice),   
         quantity:null,
         createdAt:0
     });
-
 });
 
     /*
@@ -953,7 +953,7 @@ async function sellMerchantItem(item, quantity){
         "を" +
         quantity +
         "個、" +
-        Number(item.price * quantity).toLocaleString() +
+        Number(item.sellPrice * quantity).toLocaleString() +   // ← price → sellPrice
         "Ptで売りますか？"
     );
 
@@ -1001,7 +1001,7 @@ async function sellMerchantItem(item, quantity){
     )
     .transaction(point =>
         Number(point || 0) +
-        Number(item.price) * quantity
+        Number(item.sellPrice) * quantity   // ← price → sellPrice
     );
 
     showMessage(
