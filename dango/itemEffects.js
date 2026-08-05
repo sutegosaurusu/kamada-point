@@ -37,9 +37,8 @@ const itemEffects = {
     },
 
     acorn:{
-        successRate:0.01,
-        boostItemId:"acorn",
-        boostAmount:15
+        successRate:0.05,
+       
     },
 
     moss:{
@@ -69,7 +68,7 @@ const itemEffects = {
     },
 
     Chocolate:{
-        successRate:0.08
+        successRate:0.03
     },
 
     // ======================
