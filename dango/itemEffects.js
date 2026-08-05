@@ -27,31 +27,48 @@ const itemEffects = {
     // ======================
 
     leaf:{
-       successRate:0.05,
+        successRate:0.05
     },
 
     honey:{
         successRate:0.05,
-        boostItemId:"smallbug",
-        boostAmount:20
-      
+
+        boosts:[
+            {
+                itemId:"smallbug",
+                amount:20
+            },
+            {
+                itemId:"larva",
+                amount:10
+            }
+        ]
     },
 
     acorn:{
-        successRate:0.05,
-       
+        successRate:0.05
     },
 
     moss:{
         successRate:0.01,
-        boostItemId:"moss",
-        boostAmount:15
+
+        boosts:[
+            {
+                itemId:"moss",
+                amount:15
+            }
+        ]
     },
 
     berry:{
         successRate:0.02,
-        boostItemId:"berry",
-        boostAmount:15
+
+        boosts:[
+            {
+                itemId:"berry",
+                amount:15
+            }
+        ]
     },
 
     gum:{
@@ -60,8 +77,13 @@ const itemEffects = {
 
     tree_sap:{
         successRate:0.03,
-        boostItemId:"tree_sap",
-        boostAmount:15
+
+        boosts:[
+            {
+                itemId:"tree_sap",
+                amount:15
+            }
+        ]
     },
 
     flower_petal:{
@@ -71,15 +93,18 @@ const itemEffects = {
     Chocolate:{
         successRate:0.03
     },
-   Anteggs:{
+
+    Anteggs:{
         successRate:0.03
     },
-   smallbug:{
+
+    smallbug:{
         successRate:0.03
     },
-   larva:{
+
+    larva:{
         successRate:0.03
-    },  
+    },
 
 
     // ======================
@@ -98,6 +123,7 @@ const itemEffects = {
         successRate:0.08
     },
 
+
     // ======================
     // 装備
     // ======================
@@ -106,17 +132,25 @@ const itemEffects = {
         successRate:0.05
     },
 
-　　toothpick:{
+    toothpick:{
         successRate:0.03
     },
 
     pull_tab:{
-        boostItemId:"bottle_cap",
-        boostAmount:15
+        boosts:[
+            {
+                itemId:"bottle_cap",
+                amount:15
+            },
+            {
+                itemId:"metal_piece",
+                amount:10
+            }
+        ]
     },
-       feather:{
+
+    feather:{
         successRate:0.03
     }
 
-    
 };
