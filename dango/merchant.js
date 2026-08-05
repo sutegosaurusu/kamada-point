@@ -1,7 +1,4 @@
-window.merchantItems = [
-    "leaf",
-    "water"
-];
+window.merchantItems = items.map(item => item.id);
 
 function getMerchantItems(){
 
