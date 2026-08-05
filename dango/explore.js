@@ -748,12 +748,6 @@ function updateRequirementDisplay(){
     const location =
         getSelectedLocation();
 
-    const requirements =
-        getRequirements(
-            location,
-            selectedHours
-        );
-
     document
         .getElementById("selectedTitle")
         .textContent =
@@ -763,33 +757,12 @@ function updateRequirementDisplay(){
             "時間";
 
     document
-        .getElementById("requiredFood")
-        .textContent =
-            getSelectedCategoryTotal("food") +
-            " / " +
-            requirements.requiredFood;
-
-    document
-        .getElementById("requiredWater")
-        .textContent =
-            getSelectedCategoryTotal("water") +
-            " / " +
-            requirements.requiredWater;
-
-    document
         .getElementById("successRateDisplay")
         .textContent =
             Math.round(
                 computeEffectiveSuccessRate(location) * 100
             ) +
             "%";
-
-    document
-        .getElementById("expectedReward")
-        .textContent =
-            "約" +
-            requirements.expectedReward +
-            "個（成功時）";
 }
 
 /* =====================================================
