@@ -15,7 +15,9 @@
       抽選ウェイトに boostAmount を加算する。
       → そのアイテムを持ち帰りやすくなる。
 
-   1つのアイテムが両方の効果を持つことはない想定。
+   ①と②は同時に持たせることができる。
+   例）{ successRate:0.02, boostItemId:"ancient_coin", boostAmount:15 }
+   → 成功率+2%と、古代の硬貨の入手率アップを両方発動する。
 ===================================================== */
 
 const itemEffects = {
@@ -40,16 +42,16 @@ const itemEffects = {
     hard_stone:     { boostItemId:"copper_fragment", boostAmount:12 },
     copper_fragment:{ successRate:0.04 },
 
-    /* 崩れた古代遺跡 */
+    /* 崩れた古代遺跡（old_potteryは成功率＋入手率アップの両方持ち） */
     sacred_fig:     { successRate:0.02 },
-    old_pottery:    { boostItemId:"ancient_coin", boostAmount:15 },
+    old_pottery:    { successRate:0.02, boostItemId:"ancient_coin", boostAmount:15 },
     ancient_coin:   { successRate:0.05 },
     bronze_fragment:{ successRate:0.05 },
 
-    /* 海辺の深い洞窟 */
+    /* 海辺の深い洞窟（rare_crystalは成功率＋入手率アップの両方持ち） */
     cave_mushroom:      { successRate:0.02 },
     underground_water:  { successRate:0.03 },
-    rare_crystal:       { boostItemId:"silver_fragment", boostAmount:15 },
+    rare_crystal:       { successRate:0.03, boostItemId:"silver_fragment", boostAmount:15 },
     silver_fragment:    { successRate:0.06 }
 
 };
