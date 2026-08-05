@@ -20,27 +20,20 @@ let selectedHours = 1;
 let countdownTimer = null;
 
 /*
-持っていくアイテムのスロット
-（食べ物3枠・水2枠・装備3枠、埋まっていない枠があってもよい）
+持っていくアイテム（食べ物3・水2・装備3まで）
 */
 
-const SLOT_COUNTS = {
+const SELECTION_LIMITS = {
     food:3,
     water:2,
     equipment:3
 };
 
-let selectedSlots = {
-    food:[null,null,null],
-    water:[null,null],
-    equipment:[null,null,null]
+let selectedItemIds = {
+    food:[],
+    water:[],
+    equipment:[]
 };
-
-/*
-現在開いているスロット選択モーダル
-*/
-
-let openSlot = null;
 
 /* =====================================================
    ログイン確認
@@ -197,71 +190,17 @@ function getRequirements(location,hours){
 }
 
 /* =====================================================
-   スロットのユーティリティ
+   持っていくアイテムの効果を計算
 ===================================================== */
-
-function getSlotItemIds(category){
-
-    return selectedSlots[category]
-        .filter(itemId => itemId !== null);
-}
 
 function getAllSelectedItemIds(){
 
     return [
-        ...getSlotItemIds("food"),
-        ...getSlotItemIds("water"),
-        ...getSlotItemIds("equipment")
+        ...selectedItemIds.food,
+        ...selectedItemIds.water,
+        ...selectedItemIds.equipment
     ];
 }
-
-function getSelectedCategoryTotal(category){
-
-    return getSlotItemIds(category).reduce(
-        (total,itemId) => {
-
-            const item = inventoryData[itemId];
-
-            return (
-                total +
-                Number(item?.quantity || 0)
-            );
-        },
-        0
-    );
-}
-
-/*
-枠に入っているアイテムが無効になっていないか
-（所持数0・消滅など）を確認して取り除く
-*/
-
-function pruneSelectedSlots(){
-
-    Object.keys(selectedSlots).forEach(category => {
-
-        selectedSlots[category] =
-            selectedSlots[category].map(itemId => {
-
-                if(itemId === null){
-                    return null;
-                }
-
-                const item = inventoryData[itemId];
-
-                const valid =
-                    item &&
-                    item.category === category &&
-                    Number(item.quantity || 0) > 0;
-
-                return valid ? itemId : null;
-            });
-    });
-}
-
-/* =====================================================
-   持っていくアイテムの効果を計算
-===================================================== */
 
 function computeSuccessRateBonus(){
 
@@ -330,347 +269,217 @@ function findRewardName(itemId){
     return null;
 }
 
-function getEffectText(itemId){
-
-    const effect = itemEffects[itemId];
-
-    if(!effect){
-        return "";
-    }
-
-    if(effect.successRate){
-
-        return (
-            "成功率+" +
-            Math.round(effect.successRate * 100) +
-            "%"
-        );
-    }
-
-    if(effect.boostItemId){
-
-        const targetName =
-            findRewardName(effect.boostItemId);
-
-        return (
-            (targetName || effect.boostItemId) +
-            "の入手率アップ"
-        );
-    }
-
-    return "";
-}
-
 /* =====================================================
-   スロット枠の表示
+   持ち物選択欄の表示
 ===================================================== */
+
+function pruneSelectedItems(){
+
+    Object.keys(selectedItemIds).forEach(category => {
+
+        selectedItemIds[category] =
+            selectedItemIds[category].filter(itemId => {
+
+                const item = inventoryData[itemId];
+
+                return (
+                    item &&
+                    item.category === category &&
+                    Number(item.quantity || 0) > 0
+                );
+            });
+    });
+}
 
 function renderItemSelection(){
 
-    pruneSelectedSlots();
+    pruneSelectedItems();
 
-    renderSlotGrid("food","foodSlotList");
-    renderSlotGrid("water","waterSlotList");
-    renderSlotGrid("equipment","equipmentSlotList");
-
-    updateSlotHeaders();
-}
-
-function updateSlotHeaders(){
+    renderItemGroup("food","foodSelectList");
+    renderItemGroup("water","waterSelectList");
+    renderItemGroup("equipment","equipmentSelectList");
 
     document
         .getElementById("foodSelectHeader")
         .textContent =
             "🍖 食べ物（" +
-            getSlotItemIds("food").length +
+            selectedItemIds.food.length +
             "/" +
-            SLOT_COUNTS.food +
+            SELECTION_LIMITS.food +
             "）";
 
     document
         .getElementById("waterSelectHeader")
         .textContent =
             "💧 水（" +
-            getSlotItemIds("water").length +
+            selectedItemIds.water.length +
             "/" +
-            SLOT_COUNTS.water +
+            SELECTION_LIMITS.water +
             "）";
 
     document
         .getElementById("equipmentSelectHeader")
         .textContent =
             "🎒 装備（" +
-            getSlotItemIds("equipment").length +
+            selectedItemIds.equipment.length +
             "/" +
-            SLOT_COUNTS.equipment +
+            SELECTION_LIMITS.equipment +
             "）";
 }
 
-function renderSlotGrid(category,containerId){
+function renderItemGroup(category,containerId){
 
     const container =
         document.getElementById(containerId);
 
     container.innerHTML = "";
 
-    const slotCount =
-        SLOT_COUNTS[category];
-
-    for(let slotIndex = 0; slotIndex < slotCount; slotIndex++){
-
-        const itemId =
-            selectedSlots[category][slotIndex];
-
-        const slotBox =
-            document.createElement("div");
-
-        slotBox.className = "slotBox";
-
-        const locked = !!activeExpedition;
-
-        if(locked){
-            slotBox.classList.add("locked");
-        }
-
-        if(itemId){
-
-            slotBox.classList.add("filled");
-
-            const item =
-                inventoryData[itemId];
-
-            const effectText =
-                getEffectText(itemId);
-
-            slotBox.innerHTML = `
-                <div class="slotItemName">
-                    ${item?.icon || ""}
-                    ${escapeHtml(item?.name || "")}
-                </div>
-
-                <div class="slotItemQty">
-                    所持${item?.quantity ?? 0}
-                </div>
-
-                ${
-                    effectText
-                    ? `<div class="slotEffect">${escapeHtml(effectText)}</div>`
-                    : ""
-                }
-
-                ${
-                    locked
-                    ? ""
-                    : `<button class="slotClearButton" type="button">×</button>`
-                }
-            `;
-
-            if(!locked){
-
-                const clearButton =
-                    slotBox.querySelector(
-                        ".slotClearButton"
-                    );
-
-                clearButton.addEventListener(
-                    "click",
-                    event => {
-
-                        event.stopPropagation();
-
-                        selectedSlots[category][slotIndex] = null;
-
-                        renderItemSelection();
-                        updateRequirementDisplay();
-                    }
-                );
-            }
-
-        }else{
-
-            slotBox.innerHTML = `
-                <div class="slotPlaceholder">
-                    ＋ タップして選択
-                </div>
-            `;
-        }
-
-        if(!locked){
-
-            slotBox.addEventListener("click", () => {
-                openSlotPicker(category,slotIndex);
-            });
-        }
-
-        container.appendChild(slotBox);
-    }
-}
-
-/* =====================================================
-   スロット選択モーダル
-===================================================== */
-
-function openSlotPicker(category,slotIndex){
-
-    if(activeExpedition){
-        return;
-    }
-
-    openSlot = { category, slotIndex };
-
-    renderSlotModal();
-
-    document
-        .getElementById("slotModalOverlay")
-        .classList.add("show");
-}
-
-function closeSlotPicker(){
-
-    openSlot = null;
-
-    document
-        .getElementById("slotModalOverlay")
-        .classList.remove("show");
-}
-
-function renderSlotModal(){
-
-    if(!openSlot){
-        return;
-    }
-
-    const { category, slotIndex } = openSlot;
-
-    const categoryLabel = {
-        food:"食べ物",
-        water:"水",
-        equipment:"装備"
-    }[category];
-
-    document
-        .getElementById("slotModalTitle")
-        .textContent =
-            categoryLabel + "を選択";
-
-    const list =
-        document.getElementById("slotModalList");
-
-    list.innerHTML = "";
-
-    const currentItemId =
-        selectedSlots[category][slotIndex];
-
-    /*
-    他の枠ですでに選ばれているアイテムは
-    候補から除く（同じアイテムの重複選択を防ぐ）
-    */
-
-    const usedElsewhere =
-        selectedSlots[category]
-        .filter((id,index) =>
-            id !== null && index !== slotIndex
-        );
-
-    const options =
+    const items =
         Object.entries(inventoryData)
         .filter(([itemId,item]) => {
 
             return (
                 item &&
                 item.category === category &&
-                Number(item.quantity || 0) > 0 &&
-                !usedElsewhere.includes(itemId)
+                Number(item.quantity || 0) > 0
             );
         });
 
-    if(currentItemId){
+    if(items.length === 0){
 
-        const clearOption =
-            document.createElement("button");
-
-        clearOption.type = "button";
-        clearOption.className =
-            "slotModalOption clearOption";
-
-        clearOption.textContent = "選択を解除する";
-
-        clearOption.addEventListener("click", () => {
-
-            selectedSlots[category][slotIndex] = null;
-
-            closeSlotPicker();
-            renderItemSelection();
-            updateRequirementDisplay();
-        });
-
-        list.appendChild(clearOption);
-    }
-
-    if(options.length === 0){
-
-        const empty =
-            document.createElement("p");
-
-        empty.className = "slotModalEmpty";
-
-        empty.textContent =
-            "持っている" + categoryLabel + "がありません";
-
-        list.appendChild(empty);
+        container.innerHTML =
+            "<p class='emptyHint'>持っている品がありません</p>";
 
         return;
     }
 
-    options.forEach(([itemId,item]) => {
+    const maxCount =
+        SELECTION_LIMITS[category];
 
-        const effectText =
-            getEffectText(itemId);
+    items.forEach(([itemId,item]) => {
 
-        const option =
-            document.createElement("button");
+        const row =
+            document.createElement("label");
 
-        option.type = "button";
-        option.className = "slotModalOption";
+        row.className = "itemCheckboxRow";
 
-        option.innerHTML = `
+        const checked =
+            selectedItemIds[category].includes(itemId);
+
+        const limitReached =
+            selectedItemIds[category].length >= maxCount &&
+            !checked;
+
+        const lockedByExpedition =
+            !!activeExpedition;
+
+        const disabled =
+            limitReached || lockedByExpedition;
+
+        if(disabled){
+            row.classList.add("disabled");
+        }
+
+        const effect = itemEffects[itemId];
+
+        let effectText = "";
+
+        if(effect && effect.successRate){
+
+            effectText =
+                "成功率+" +
+                Math.round(effect.successRate * 100) +
+                "%";
+
+        }else if(effect && effect.boostItemId){
+
+            const targetName =
+                findRewardName(effect.boostItemId);
+
+            effectText =
+                (targetName || effect.boostItemId) +
+                "の入手率アップ";
+        }
+
+        row.innerHTML = `
+            <input
+                type="checkbox"
+                data-category="${category}"
+                data-item-id="${itemId}"
+                ${checked ? "checked" : ""}
+                ${disabled ? "disabled" : ""}
+            >
             <span>
                 ${item.icon || ""}
                 ${escapeHtml(item.name)}
                 （所持${item.quantity}）
-                ${
-                    effectText
-                    ? " ／ " + escapeHtml(effectText)
-                    : ""
-                }
             </span>
+            ${
+                effectText
+                ? `<span class="effectHint">${escapeHtml(effectText)}</span>`
+                : ""
+            }
         `;
 
-        option.addEventListener("click", () => {
+        row
+            .querySelector("input")
+            .addEventListener(
+                "change",
+                handleItemCheckboxChange
+            );
 
-            selectedSlots[category][slotIndex] = itemId;
-
-            closeSlotPicker();
-            renderItemSelection();
-            updateRequirementDisplay();
-        });
-
-        list.appendChild(option);
+        container.appendChild(row);
     });
 }
 
-document
-    .getElementById("slotModalCloseButton")
-    .addEventListener("click", closeSlotPicker);
+function handleItemCheckboxChange(event){
 
-document
-    .getElementById("slotModalOverlay")
-    .addEventListener("click", event => {
+    const category = event.target.dataset.category;
+    const itemId = event.target.dataset.itemId;
 
-        if(event.target.id === "slotModalOverlay"){
-            closeSlotPicker();
+    if(event.target.checked){
+
+        if(
+            selectedItemIds[category].length >=
+            SELECTION_LIMITS[category]
+        ){
+            event.target.checked = false;
+            return;
         }
-    });
+
+        selectedItemIds[category].push(itemId);
+
+    }else{
+
+        selectedItemIds[category] =
+            selectedItemIds[category].filter(
+                id => id !== itemId
+            );
+    }
+
+    renderItemSelection();
+    updateRequirementDisplay();
+}
+
+/* =====================================================
+   選択中アイテムの合計数
+===================================================== */
+
+function getSelectedCategoryTotal(category){
+
+    return selectedItemIds[category].reduce(
+        (total,itemId) => {
+
+            const item = inventoryData[itemId];
+
+            return (
+                total +
+                Number(item?.quantity || 0)
+            );
+        },
+        0
+    );
+}
 
 /* =====================================================
    条件表示の更新
@@ -741,10 +550,6 @@ function watchInventory(){
             updateSupplyDisplay();
             renderItemSelection();
             updateRequirementDisplay();
-
-            if(openSlot){
-                renderSlotModal();
-            }
         });
 }
 
@@ -816,21 +621,12 @@ async function startExpedition(){
             selectedHours
         );
 
-    const selectedFoodIds =
-        getSlotItemIds("food");
-
-    const selectedWaterIds =
-        getSlotItemIds("water");
-
-    const selectedEquipmentIds =
-        getSlotItemIds("equipment");
-
-    if(selectedFoodIds.length === 0){
+    if(selectedItemIds.food.length === 0){
         showMessage("持っていく食べ物を選んでください");
         return;
     }
 
-    if(selectedWaterIds.length === 0){
+    if(selectedItemIds.water.length === 0){
         showMessage("持っていく水を選んでください");
         return;
     }
@@ -881,7 +677,7 @@ async function startExpedition(){
         requirements.requiredWater +
         "個\n" +
         "装備：" +
-        selectedEquipmentIds.length +
+        selectedItemIds.equipment.length +
         "個\n" +
         "成功率：約" +
         Math.round(successRate * 100) +
@@ -912,21 +708,21 @@ async function startExpedition(){
 
         consumeSelectedItems(
             latestInventory,
-            selectedFoodIds,
+            selectedItemIds.food,
             requirements.requiredFood,
             updates
         );
 
         consumeSelectedItems(
             latestInventory,
-            selectedWaterIds,
+            selectedItemIds.water,
             requirements.requiredWater,
             updates
         );
 
         consumeEquipmentItems(
             latestInventory,
-            selectedEquipmentIds,
+            selectedItemIds.equipment,
             updates
         );
 
@@ -972,11 +768,7 @@ async function startExpedition(){
 
         await database.ref().update(updates);
 
-        selectedSlots = {
-            food:[null,null,null],
-            water:[null,null],
-            equipment:[null,null,null]
-        };
+        selectedItemIds = { food:[], water:[], equipment:[] };
 
         showMessage("探検を開始しました");
 
