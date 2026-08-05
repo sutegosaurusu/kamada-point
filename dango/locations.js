@@ -11,25 +11,38 @@
 
 const locations = [
 
-    {
-        id:"olive_field",
-        name:"村外れのオリーブ畑",
-        icon:"🫒",
-        difficulty:1,
-        description:
-            "村に近い安全な畑。初心者でも歩きやすい。",
+   {
+    id:"park",
+    name:"近所の公園",
+    icon:"🌳",
+    difficulty:1,
+    description:
+        "ダンゴムシたちが最初に探検する身近な場所。落ち葉や木の実、小さな素材が見つかる。",
 
-       
-        rewardRate:1,
+    rewardRate:1,
 
-        baseSuccessRate:0.90,
+    baseSuccessRate:0.90,
 
-        rewards:[
-            { itemId:"wild_olive", weight:50 },
-            { itemId:"barley", weight:35 },
-            { itemId:"small_stone", weight:15 }
-        ]
-    },
+    rewards:[
+        { itemId:"fallen_leaf", weight:20 },
+        { itemId:"grass", weight:18 },
+        { itemId:"water", weight:12 },
+        { itemId:"acorn", weight:10 },
+        { itemId:"moss", weight:8 },
+        { itemId:"flower_petal", weight:7 },
+        { itemId:"berry", weight:5 },
+        { itemId:"small_stone", weight:5 },
+        { itemId:"tree_sap", weight:4 },
+        { itemId:"cicada_shell", weight:3 },
+        { itemId:"snail_shell", weight:2 },
+        { itemId:"gum", weight:2 },
+        { itemId:"honey", weight:1.5 },
+        { itemId:"toothpick", weight:1 },
+        { itemId:"pull_tab", weight:0.7 },
+        { itemId:"bottle_cap", weight:0.5 },
+        { itemId:"stag_beetle_jaw", weight:0.3 }
+    ]
+},
 
     {
         id:"dry_river",
