@@ -100,22 +100,27 @@ const items = [
 {
     id:"toothpick",
     name:"つまようじ",
-    category:"material",
+    category:"equipment",
     price:80
 },
 {
     id:"pull_tab",
     name:"プルタブ",
-    category:"material",
+    category:"equipment",
     price:200
 },
 {
     id:"bottle_cap",
     name:"ペットボトルのふた",
-    category:"material",
+    category:"equipment",
     price:300
 },
-
+ {
+        id:"feather",
+        name:"羽",
+        category:"equipment",
+        price:300
+  },
 
 
 // ======================
