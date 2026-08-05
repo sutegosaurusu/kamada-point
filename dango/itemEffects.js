@@ -27,8 +27,7 @@ const itemEffects = {
     // ======================
 
     leaf:{
-        boostItemId:"leaf",
-        boostAmount:15
+       successRate:0.05,
     },
 
     honey:{
@@ -97,44 +96,14 @@ const itemEffects = {
         successRate:0.05
     },
 
-    // ======================
-    // 素材
-    // （持っていけるようになったら使用）
-    // ======================
-
-    toothpick:{
+　　toothpick:{
         successRate:0.03
     },
 
     pull_tab:{
         boostItemId:"bottle_cap",
         boostAmount:15
-    },
-
-    bottle_cap:{
-        successRate:0.04
-    },
-
-    stone:{
-        boostItemId:"stone",
-        boostAmount:15
-    },
-
-    cicada_shell:{
-        successRate:0.02
-    },
-
-    snail_shell:{
-        successRate:0.02
-    },
-
-    stag_beetle_jaw:{
-        successRate:0.06
-    },
-
-    twig:{
-        boostItemId:"twig",
-        boostAmount:15
     }
 
+    
 };
