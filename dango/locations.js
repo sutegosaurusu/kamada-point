@@ -1,6 +1,12 @@
 // ===============================
 // 探検場所マスターデータ
 // 右にある場所ほどdifficultyが高い
+//
+// baseSuccessRate：
+//   この場所の探検が「成功」する基本確率（0〜1）。
+//   持っていくアイテムの効果（itemEffects.js）で
+//   上昇させることができる。
+//   失敗した場合、持ち帰れるアイテムは0個になる。
 // ===============================
 
 const locations = [
@@ -16,6 +22,8 @@ const locations = [
         foodRate:1,
         waterRate:1,
         rewardRate:1,
+
+        baseSuccessRate:0.90,
 
         rewards:[
             { itemId:"wild_olive", name:"野生のオリーブ", category:"food", icon:"🫒", weight:50 },
@@ -36,6 +44,8 @@ const locations = [
         waterRate:2,
         rewardRate:1.25,
 
+        baseSuccessRate:0.83,
+
         rewards:[
             { itemId:"dry_herb", name:"乾燥した薬草", category:"food", icon:"🌿", weight:35 },
             { itemId:"clay", name:"粘土", category:"equipment", icon:"🟤", weight:35 },
@@ -54,6 +64,8 @@ const locations = [
         foodRate:2,
         waterRate:2,
         rewardRate:1.55,
+
+        baseSuccessRate:0.75,
 
         rewards:[
             { itemId:"forest_mushroom", name:"森のキノコ", category:"food", icon:"🍄", weight:40 },
@@ -74,6 +86,8 @@ const locations = [
         waterRate:3,
         rewardRate:2,
 
+        baseSuccessRate:0.65,
+
         rewards:[
             { itemId:"copper_fragment", name:"銅の欠片", category:"equipment", icon:"🟠", weight:40 },
             { itemId:"mountain_herb", name:"山の薬草", category:"food", icon:"🌿", weight:30 },
@@ -92,6 +106,8 @@ const locations = [
         foodRate:4,
         waterRate:4,
         rewardRate:2.6,
+
+        baseSuccessRate:0.55,
 
         rewards:[
             { itemId:"bronze_fragment", name:"青銅の欠片", category:"equipment", icon:"🟤", weight:35 },
@@ -112,6 +128,8 @@ const locations = [
         foodRate:5,
         waterRate:5,
         rewardRate:3.4,
+
+        baseSuccessRate:0.42,
 
         rewards:[
             { itemId:"silver_fragment", name:"銀の欠片", category:"equipment", icon:"⚪", weight:25 },
