@@ -46,7 +46,17 @@ const itemEffects = {
     },
 
     acorn:{
-        successRate:0.05
+    boosts:[
+        {
+            itemId:"smallbug",
+            amount:5
+        },
+        {
+            itemId:"larva",
+            amount:5
+        }
+    ]
+}
     },
 
     moss:{
@@ -54,25 +64,41 @@ const itemEffects = {
 
         boosts:[
             {
-                itemId:"moss",
-                amount:15
+                itemId:"smallbug",
+                amount:5
             }
         ]
     },
 
     berry:{
-        successRate:0.02,
+        successRate:-0.10,
 
         boosts:[
             {
-                itemId:"berry",
-                amount:15
-            }
-        ]
+                itemId:"feather",
+                amount:10
+           },
+           {
+            itemId:"larva",
+            amount:5
+        }
+    ]
+}
     },
-
+     
     gum:{
         successRate:0.02
+        boosts:[
+            {
+                itemId:"toothpick",
+                amount:15
+            },
+        {
+            itemId:"pull_tab",
+            amount:5
+        }
+    ]
+}
     },
 
     tree_sap:{
@@ -88,10 +114,16 @@ const itemEffects = {
 
     flower_petal:{
         successRate:0.01
+        boosts:[
+            {
+                itemId:"smallbug",
+                amount:15
+            }
+        ]
     },
 
     Chocolate:{
-        successRate:0.03
+        successRate:0.30
     },
 
     Anteggs:{
@@ -112,15 +144,15 @@ const itemEffects = {
     // ======================
 
     water:{
-        successRate:0.02
+        successRate:0.05
     },
 
     slime:{
-        successRate:0.04
+        successRate:0.08
     },
 
     os1:{
-        successRate:0.08
+        successRate:0.20
     },
 
 
@@ -129,11 +161,11 @@ const itemEffects = {
     // ======================
 
     bou:{
-        successRate:0.05
+        successRate:0.10
     },
 
     toothpick:{
-        successRate:0.03
+        successRate:0.15
     },
 
     pull_tab:{
@@ -141,16 +173,22 @@ const itemEffects = {
             {
                 itemId:"bottle_cap",
                 amount:15
-            },
+             }
+           
+        ]
+    },
+bottle_cap:{
+        successRate:0.03,
+
+        boosts:[
             {
-                itemId:"metal_piece",
-                amount:10
+                itemId:"water",
+                amount:20
             }
         ]
     },
-
     feather:{
-        successRate:0.03
+        successRate:0.10
     }
 
 };
