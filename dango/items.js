@@ -172,6 +172,12 @@ const items = [
     category:"material",
     price:500
 },
+{
+    id:"small_stone",
+    name:"小石",
+    category:"material",
+    price:10
+},
     {
     id:"twig",
     name:"小枝",
