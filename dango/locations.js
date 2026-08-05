@@ -24,7 +24,7 @@ const locations = [
     baseSuccessRate:0.90,
 
     rewards:[
-        { itemId:"fallen_leaf", weight:20 },
+        { itemId:"leaf", weight:20 },
         { itemId:"Chocolate", weight:18 },
         { itemId:"water", weight:12 },
         { itemId:"acorn", weight:10 },
