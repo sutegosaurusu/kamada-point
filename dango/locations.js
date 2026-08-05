@@ -19,8 +19,7 @@ const locations = [
         description:
             "村に近い安全な畑。初心者でも歩きやすい。",
 
-        foodRate:1,
-        waterRate:1,
+       
         rewardRate:1,
 
         baseSuccessRate:0.90,
@@ -40,8 +39,7 @@ const locations = [
         description:
             "乾いた岩場。水は少ないが、珍しい物が落ちている。",
 
-        foodRate:1,
-        waterRate:2,
+       
         rewardRate:1.25,
 
         baseSuccessRate:0.83,
@@ -61,8 +59,7 @@ const locations = [
         description:
             "木々が密集した森。食料は多いが危険な生物もいる。",
 
-        foodRate:2,
-        waterRate:2,
+       
         rewardRate:1.55,
 
         baseSuccessRate:0.75,
@@ -82,8 +79,7 @@ const locations = [
         description:
             "急な岩山。長い探検には多くの食料と水が必要。",
 
-        foodRate:3,
-        waterRate:3,
+      
         rewardRate:2,
 
         baseSuccessRate:0.65,
@@ -103,8 +99,7 @@ const locations = [
         description:
             "古い石造建築の跡。危険だが貴重な品が眠っている。",
 
-        foodRate:3,
-        waterRate:3,
+        
         rewardRate:2.6,
 
         baseSuccessRate:0.55,
@@ -125,8 +120,7 @@ const locations = [
         description:
             "暗く深い最難関の洞窟。十分な準備が必要。",
 
-        foodRate:3,
-        waterRate:3,
+       
         rewardRate:3.4,
 
         baseSuccessRate:0.42,
