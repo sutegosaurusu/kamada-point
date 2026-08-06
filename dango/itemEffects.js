@@ -164,3 +164,4 @@ const itemEffects = {
     }
 
 };
+console.log("itemEffects.js読み込み完了");
