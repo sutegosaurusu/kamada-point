@@ -310,6 +310,10 @@ function getItemInformation(item){
     const savedInformation =
         itemInformation[item.id] || {};
 
+    const effectInformation =
+        itemEffects[item.id] || {};
+
+
     return {
 
         icon:
@@ -317,10 +321,11 @@ function getItemInformation(item){
             savedInformation.icon ||
             getDefaultIcon(item.category),
 
+
         effect:
-            item.effect ||
-            savedInformation.effect ||
-            "このアイテムの効果は設定されていません。"
+            effectInformation.description ||
+            "このアイテムの効果はありません。"
+
     };
 }
 
