@@ -119,17 +119,16 @@ function renderInventory(){
     inventory.innerHTML="";
 
 
-    items.forEach(([id,item])=>{
+ items.forEach(([id,item])=>{
 
 
         const info =
-            getItemInformation(item);
+            getItemInformation(id, item);
 
 
 
         const card =
             document.createElement("div");
-
 
         card.className="itemCard";
 
@@ -169,12 +168,11 @@ function renderInventory(){
 
 
 
-        card.onclick=()=>{
+      card.onclick=()=>{
 
-            openItemDetail(item);
+            openItemDetail(id, item);
 
         };
-
 
         inventory.appendChild(card);
 
@@ -213,12 +211,11 @@ function updateTotalItemCount(){
 // 詳細表示
 // ===============================
 
-function openItemDetail(item){
+function openItemDetail(id, item){
 
 
     const info =
-        getItemInformation(item);
-
+        getItemInformation(id, item);
 
     const category =
         categoryInformation[item.category] || {
@@ -305,13 +302,13 @@ document
     }
     
 });
-function getItemInformation(item){
+function getItemInformation(id, item){
 
     const savedInformation =
-        itemInformation[item.id] || {};
+        itemInformation[id] || {};
 
     const effectInformation =
-        itemEffects[item.id] || {};
+        itemEffects[id] || {};
 
 
     return {
