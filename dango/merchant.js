@@ -1,214 +1,232 @@
-// =====================================================
+// ===============================
 // 商人在庫設定
-// =====================================================
+// ===============================
 
-const MERCHANT_STOCK_LIMITS = {
-    food: 200,
-    water: 50,
-    equipment: 10,
-    material: 100
-};
-
-// 毎日、商人が補充する必需品
-const DAILY_SUPPLY = {
-    leaf: 30,
-    water: 30
-};
-
-const ONE_DAY = 24 * 60 * 60 * 1000;
-
-// 全アイテムを商人が取り扱う
+// 商品一覧
 window.merchantItems = items.map(item => item.id);
 
-// Firebaseから取得した商人在庫
-let merchantStockData = {};
+// カテゴリーごとの最大在庫
+const merchantStockLimit = {
+    food:200,
+    water:50,
+    material:100,
+    equipment:10
+};
 
-// 在庫監視を開始
-function watchMerchantStock(){
+// 毎日補充する商品
+const merchantDailySupply = {
+    leaf:30,
+    water:30
+};
 
-    database
+// ===============================
+// 在庫取得
+// ===============================
+
+async function getMerchantStock(){
+
+    const snapshot =
+        await database
         .ref("merchantStock")
-        .on("value", snapshot => {
+        .once("value");
 
-            merchantStockData = snapshot.val() || {};
-
-            // 市場がすでに読み込まれていれば再表示
-            if(typeof renderMarket === "function"){
-                renderMarket();
-            }
-        });
+    return snapshot.val() || {};
 }
 
-// カテゴリーごとの在庫上限
-function getMerchantStockLimit(category){
+// ===============================
+// 在庫保存
+// ===============================
 
-    return Number(
-        MERCHANT_STOCK_LIMITS[category] || 0
-    );
+async function setMerchantStock(stock){
+
+    await database
+        .ref("merchantStock")
+        .set(stock);
+
 }
 
-// 現在の在庫
-function getMerchantStock(itemId){
+// ===============================
+// 商人商品一覧
+// ===============================
 
-    return Number(
-        merchantStockData[itemId]?.quantity || 0
-    );
-}
+async function getMerchantItems(){
 
-// 在庫量による販売価格倍率
-function getMerchantPriceMultiplier(stock){
+    await updateMerchantStock();
 
-    if(stock >= 200){
-        return 0.60;
-    }
-
-    if(stock >= 100){
-        return 0.80;
-    }
-
-    if(stock >= 50){
-        return 0.90;
-    }
-
-    return 1;
-}
-
-// 商人の商品一覧
-function getMerchantItems(){
+    const stock =
+        await getMerchantStock();
 
     return window.merchantItems
-        .map(id => items.find(item => item.id === id))
-        .filter(Boolean)
-        .map(item => {
+        .map(id=>{
 
-            const stock =
-                getMerchantStock(item.id);
+            const item =
+                items.find(i=>i.id===id);
 
-            const multiplier =
-                getMerchantPriceMultiplier(stock);
+            if(!item){
+                return null;
+            }
 
-            const currentPrice =
-                Math.max(
-                    1,
-                    Math.floor(
-                        Number(item.price) * multiplier
-                    )
-                );
+            const quantity =
+                Number(stock[id]?.quantity || 0);
 
             return {
+
                 ...item,
 
-                stock: stock,
+                quantity,
 
-                stockLimit:
-                    getMerchantStockLimit(item.category),
-
-                price: currentPrice,
-
-                // 買取価格は現在の販売価格の30%
                 sellPrice:
-                    Math.max(
-                        1,
-                        Math.floor(currentPrice * 0.3)
-                    )
+                    Math.floor(item.price*0.3)
+
             };
-        });
+
+        })
+        .filter(item=>item);
+
 }
 
-// =====================================================
-// 初期在庫と日次更新
-// =====================================================
+// ===============================
+// 商人へ売る
+// ===============================
 
-async function updateMerchantStockDaily(){
+async function merchantReceiveItem(itemId,quantity){
 
-    const stockRef =
-        database.ref("merchantStock");
+    const stock =
+        await getMerchantStock();
 
-    await stockRef.transaction(currentData => {
+    const item =
+        items.find(i=>i.id===itemId);
 
-        const now = Date.now();
+    if(!item){
+        return;
+    }
 
-        const data =
-            currentData &&
-            typeof currentData === "object"
-            ? currentData
-            : {};
+    if(!stock[itemId]){
 
-        const lastUpdatedAt =
-            Number(data._meta?.lastUpdatedAt || 0);
+        stock[itemId]={
+            quantity:0
+        };
 
-        // 初回作成
-        if(lastUpdatedAt === 0){
+    }
 
-            const initialData = {
-                _meta:{
-                    lastUpdatedAt: now
-                }
-            };
+    const limit =
+        merchantStockLimit[item.category] || 100;
 
-            items.forEach(item => {
+    stock[itemId].quantity =
+        Math.min(
+            limit,
+            Number(stock[itemId].quantity||0)+quantity
+        );
 
-                const initialQuantity =
-                    Number(DAILY_SUPPLY[item.id] || 0);
+    await setMerchantStock(stock);
 
-                initialData[item.id] = {
-                    quantity:
-                        Math.min(
-                            initialQuantity,
-                            getMerchantStockLimit(item.category)
-                        )
-                };
-            });
+}
 
-            return initialData;
-        }
+// ===============================
+// 商人から買う
+// ===============================
 
-        const passedDays =
-            Math.floor(
-                (now - lastUpdatedAt) / ONE_DAY
-            );
+async function merchantTakeItem(itemId,quantity){
 
-        if(passedDays <= 0){
+    const stock =
+        await getMerchantStock();
+
+    if(!stock[itemId]){
+        return false;
+    }
+
+    if(stock[itemId].quantity<quantity){
+        return false;
+    }
+
+    stock[itemId].quantity-=quantity;
+
+    await setMerchantStock(stock);
+
+    return true;
+
+}
+
+// ===============================
+// 毎日更新
+// ===============================
+
+async function updateMerchantStock(){
+
+    const snapshot =
+        await database
+        .ref("merchantStock")
+        .once("value");
+
+    const stock =
+        snapshot.val() || {};
+
+    const today =
+        new Date().toISOString().slice(0,10);
+
+    if(stock.lastUpdate===today){
+        return;
+    }
+
+    // 在庫20%減少
+    Object.keys(stock).forEach(id=>{
+
+        if(id==="lastUpdate"){
             return;
         }
 
-        items.forEach(item => {
+        stock[id].quantity=
+            Math.floor(
+                Number(stock[id].quantity||0)*0.8
+            );
 
-            const limit =
-                getMerchantStockLimit(item.category);
-
-            let quantity =
-                Number(data[item.id]?.quantity || 0);
-
-            for(
-                let day = 0;
-                day < passedDays;
-                day++
-            ){
-
-                // 在庫を毎日20%減らす
-                quantity =
-                    Math.floor(quantity * 0.8);
-
-                // 落ち葉と水を毎日30個補充
-                quantity +=
-                    Number(DAILY_SUPPLY[item.id] || 0);
-
-                quantity =
-                    Math.min(quantity, limit);
-            }
-
-            data[item.id] = {
-                quantity: Math.max(0, quantity)
-            };
-        });
-
-        data._meta = {
-            lastUpdatedAt:
-                lastUpdatedAt +
-                passedDays * ONE_DAY
-        };
-
-        return data;
     });
+
+    // 落ち葉補充
+    if(!stock.leaf){
+
+        stock.leaf={quantity:0};
+
+    }
+
+    stock.leaf.quantity+=30;
+
+    // 水補充
+    if(!stock.water){
+
+        stock.water={quantity:0};
+
+    }
+
+    stock.water.quantity+=30;
+
+    // 最大在庫を超えない
+    Object.keys(stock).forEach(id=>{
+
+        if(id==="lastUpdate"){
+            return;
+        }
+
+        const item =
+            items.find(i=>i.id===id);
+
+        if(!item){
+            return;
+        }
+
+        const limit =
+            merchantStockLimit[item.category] || 100;
+
+        stock[id].quantity =
+            Math.min(
+                limit,
+                stock[id].quantity
+            );
+
+    });
+
+    stock.lastUpdate=today;
+
+    await setMerchantStock(stock);
+
 }
