@@ -1,9 +1,4 @@
-const merchantStockLimit = {
-    food: 200,
-    water: 50,
-    equipment: 10,
-    material: 100
-};
+
 
 let currentCategory = "food";
 let listingData = {};
