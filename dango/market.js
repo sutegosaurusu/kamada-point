@@ -6,6 +6,15 @@ let merchantData = {};
 
 function watchListings(){
 
+   const REGEN_ITEMS = {
+    leaf: 30,
+    water: 30
+};
+
+const oneDayMilliseconds = 24 * 60 * 60 * 1000;
+
+function watchListings(){
+
     database
         .ref("marketListings")
         .on("value", snapshot => {
@@ -29,40 +38,88 @@ function watchListings(){
 
                 items.forEach(item => {
 
-                    let quantity = 0;
-
-                    switch(item.category){
-
-                        case "food":
-                            quantity = 200;
-                            break;
-
-                        case "water":
-                            quantity = 50;
-                            break;
-
-                        case "equipment":
-                            quantity = 10;
-                            break;
-
-                        case "material":
-                            quantity = 100;
-                            break;
-                    }
-
-                    // 落ち葉と水は常に30個追加
-                    if(item.id === "leaf"){
-                        quantity += 30;
-                    }
-
-                    if(item.id === "water"){
-                        quantity += 30;
-                    }
-
                     stock[item.id] = {
-                        quantity: quantity
+                        quantity: 0
                     };
+
+                    if(REGEN_ITEMS[item.id] !== undefined){
+                        stock[item.id].lastRestockAt =
+                            firebase.database.ServerValue.TIMESTAMP;
+                    }
                 });
+
+                await database.ref("merchantStock").set(stock);
+
+                merchantData = stock;
+            }
+
+            await checkMerchantRestock();
+
+            renderMarket();
+        });
+}
+
+/* =====================================================
+   落ち葉・水の自動回復（1日30個）
+===================================================== */
+
+async function checkMerchantRestock(){
+
+    const now = Date.now();
+
+    for(const itemId in REGEN_ITEMS){
+
+        const regenAmount = REGEN_ITEMS[itemId];
+
+        const item =
+            items.find(i => i.id === itemId);
+
+        if(!item){
+            continue;
+        }
+
+        const limit =
+            merchantStockLimit[item.category] || 0;
+
+        const stockRef =
+            database.ref("merchantStock/" + itemId);
+
+        await stockRef.transaction(currentStock => {
+
+            if(!currentStock){
+                return;
+            }
+
+            const lastRestockAt =
+                Number(currentStock.lastRestockAt || now);
+
+            const elapsedDays =
+                Math.floor(
+                    (now - lastRestockAt) / oneDayMilliseconds
+                );
+
+            if(elapsedDays <= 0){
+                return currentStock;
+            }
+
+            const currentQuantity =
+                Number(currentStock.quantity || 0);
+
+            const newQuantity =
+                Math.min(
+                    limit,
+                    currentQuantity + regenAmount * elapsedDays
+                );
+
+            currentStock.quantity = newQuantity;
+
+            currentStock.lastRestockAt =
+                lastRestockAt + elapsedDays * oneDayMilliseconds;
+
+            return currentStock;
+        });
+    }
+}
 
                 await database.ref("merchantStock").set(stock);
 
