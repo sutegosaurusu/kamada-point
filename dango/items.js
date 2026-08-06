@@ -147,12 +147,7 @@ const items = [
 // 素材
 // ======================
 
-{
-    id:"stone",
-    name:"小石",
-    category:"material",
-    price:20
-},
+
 
  {
     id:"cicada_shell",
