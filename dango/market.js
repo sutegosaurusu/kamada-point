@@ -4,9 +4,7 @@ let currentCategory = "food";
 let listingData = {};
 let merchantData = {};
 
-function watchListings(){
-
-   const REGEN_ITEMS = {
+const REGEN_ITEMS = {
     leaf: 30,
     water: 30
 };
@@ -119,15 +117,6 @@ async function checkMerchantRestock(){
             return currentStock;
         });
     }
-}
-
-                await database.ref("merchantStock").set(stock);
-
-                merchantData = stock;
-            }
-
-            renderMarket();
-        });
 }
 
 document.querySelectorAll(".categoryTabs button")
