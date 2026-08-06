@@ -283,7 +283,7 @@ function renderMarket(){
                 offer.type === "merchant" &&
                 offer.quantity <= 0;
 
-            row.innerHTML = `
+           row.innerHTML = `
                 <div class="${sellerClass}">
                     ${escapeHtml(offer.sellerName || "名無し")}
                 </div>
@@ -303,23 +303,22 @@ function renderMarket(){
                 <div class="buyArea">
 
                     ${
+                        offer.type === "merchant"
+                        ? `
+                            <input
+                                class="buyQuantity"
+                                type="number"
+                                min="1"
+                                value="1"
+                            >
+                        `
+                        : ""
+                    }
+
+                    ${
                         isSoldOut
                         ? `<div class="soldOut">売り切れ</div>`
                         : `
-                            ${
-                                offer.type === "merchant"
-                                ? `
-                                    <input
-                                        class="buyQuantity"
-                                        type="number"
-                                        min="1"
-                                        max="${offer.quantity}"
-                                        value="1"
-                                    >
-                                `
-                                : ""
-                            }
-
                             <button
                                 class="buyButton"
                                 ${isOwnListing ? "disabled" : ""}
