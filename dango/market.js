@@ -58,12 +58,30 @@ function watchListings(){
 }
 
 /* =====================================================
-   落ち葉・水の自動回復（1日30個）
+   落ち葉・水の自動回復（毎朝5時に30個）
 ===================================================== */
+
+const RESTOCK_HOUR = 5;
+
+function getLastRestockTime(baseTime){
+
+    const date = new Date(baseTime);
+
+    date.setHours(RESTOCK_HOUR, 0, 0, 0);
+
+    if(date.getTime() > baseTime){
+        date.setDate(date.getDate() - 1);
+    }
+
+    return date.getTime();
+}
 
 async function checkMerchantRestock(){
 
     const now = Date.now();
+
+    const latestRestockTime =
+        getLastRestockTime(now);
 
     for(const itemId in REGEN_ITEMS){
 
@@ -89,16 +107,22 @@ async function checkMerchantRestock(){
             }
 
             const lastRestockAt =
-                Number(currentStock.lastRestockAt || now);
+                Number(currentStock.lastRestockAt || 0);
 
-            const elapsedDays =
-                Math.floor(
-                    (now - lastRestockAt) / oneDayMilliseconds
-                );
-
-            if(elapsedDays <= 0){
+            // 前回の補充が「直近の朝5時」より前なら、
+            // その5時の回を1回ぶん反映する
+            if(lastRestockAt >= latestRestockTime){
                 return currentStock;
             }
+
+            // 何回分の朝5時を跨いだか
+            const dayMilliseconds = 24 * 60 * 60 * 1000;
+
+            const elapsedRestocks =
+                Math.floor(
+                    (latestRestockTime - lastRestockAt) /
+                    dayMilliseconds
+                ) + 1;
 
             const currentQuantity =
                 Number(currentStock.quantity || 0);
@@ -106,13 +130,11 @@ async function checkMerchantRestock(){
             const newQuantity =
                 Math.min(
                     limit,
-                    currentQuantity + regenAmount * elapsedDays
+                    currentQuantity + regenAmount * elapsedRestocks
                 );
 
             currentStock.quantity = newQuantity;
-
-            currentStock.lastRestockAt =
-                lastRestockAt + elapsedDays * oneDayMilliseconds;
+            currentStock.lastRestockAt = latestRestockTime;
 
             return currentStock;
         });
