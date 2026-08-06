@@ -22,13 +22,9 @@
 
 const itemEffects = {
 
-    // ======================
-    // 食べ物
-    // ======================
-
     leaf:{
         successRate:0.05,
-        description:"普通の葉っぱ。探索の成功率を少し上げる。"
+        description:"探索成功率 +5%"
     },
 
     honey:{
@@ -37,7 +33,7 @@ const itemEffects = {
             { itemId:"smallbug", amount:20 },
             { itemId:"larva", amount:10 }
         ],
-        description:"甘い蜂蜜。小さな虫や幼虫を引き寄せる。"
+        description:"探索成功率 +5%。小さな虫を20個、幼虫を10個追加発見する"
     },
 
     acorn:{
@@ -45,7 +41,7 @@ const itemEffects = {
             { itemId:"smallbug", amount:5 },
             { itemId:"larva", amount:5 }
         ],
-        description:"栄養のある木の実。虫を集める効果がある。"
+        description:"小さな虫を5個、幼虫を5個追加発見する"
     },
 
     moss:{
@@ -53,7 +49,7 @@ const itemEffects = {
         boosts:[
             { itemId:"smallbug", amount:5 }
         ],
-        description:"湿った苔。小さな虫を見つけやすくする。"
+        description:"探索成功率 +1%。小さな虫を5個追加発見する"
     },
 
     berry:{
@@ -62,7 +58,7 @@ const itemEffects = {
             { itemId:"feather", amount:10 },
             { itemId:"larva", amount:5 }
         ],
-        description:"甘い果実。ただし探索は少し不安定になる。"
+        description:"探索成功率 -10%。羽根を10個、幼虫を5個追加発見する"
     },
 
     gum:{
@@ -71,7 +67,7 @@ const itemEffects = {
             { itemId:"toothpick", amount:15 },
             { itemId:"pull_tab", amount:5 }
         ],
-        description:"強い香りのガム。人工物を集めやすくする。"
+        description:"探索成功率 +2%。つまようじ15個、プルタブ5個を追加発見する"
     },
 
     tree_sap:{
@@ -79,7 +75,7 @@ const itemEffects = {
         findBonus:{
             tree_sap:0.20
         },
-        description:"木の甘い樹液。樹液を見つける確率を上げる。"
+        description:"探索成功率 +3%。樹液の発見確率 +20%"
     },
 
     flower_petal:{
@@ -87,94 +83,84 @@ const itemEffects = {
         boosts:[
             { itemId:"smallbug", amount:15 }
         ],
-        description:"花びらの香りで虫を引き寄せる。"
+        description:"探索成功率 +1%。小さな虫を15個追加発見する"
     },
 
     Chocolate:{
         successRate:0.30,
-        description:"高級なお菓子。探索成功率を大きく上げる。"
+        description:"探索成功率 +30%"
     },
 
     Anteggs:{
         successRate:0.03,
-        description:"珍しい卵。探索を少し有利にする。"
+        description:"探索成功率 +3%"
     },
 
     smallbug:{
         successRate:0.03,
-        description:"小さな虫。食料として利用できる。"
+        description:"探索成功率 +3%"
     },
 
     larva:{
         successRate:0.03,
-        description:"幼虫。貴重な食料になる。"
+        description:"探索成功率 +3%"
     },
 
 
-    // ======================
     // 水
-    // ======================
 
     water:{
         successRate:0.05,
-        description:"飲み水。体力を保ち探索を安定させる。"
+        description:"探索成功率 +5%"
     },
 
     slime:{
         successRate:0.08,
-        description:"不思議な液体。探索成功率を上げる。"
+        description:"探索成功率 +8%"
     },
 
     os1:{
         successRate:0.20,
-        description:"特別な飲み物。探索を大きく助ける。"
+        description:"探索成功率 +20%"
     },
 
     cola:{
         successRate:-0.30,
         rewardMultiplier:2,
-        description:"刺激の強い飲み物。危険だが報酬が2倍になる。"
+        description:"探索成功率 -30%。獲得報酬2倍"
     },
 
 
-    // ======================
     // 装備
-    // ======================
 
     bou:{
         successRate:0.10,
-        description:"棒。探索時の成功率を上げる道具。"
+        description:"探索成功率 +10%"
     },
 
     toothpick:{
         successRate:0.15,
-        description:"つまようじ。細かい物を集めやすくする。"
+        description:"探索成功率 +15%"
     },
 
     pull_tab:{
         boosts:[
-            {
-                itemId:"bottle_cap",
-                amount:15
-            }
+            { itemId:"bottle_cap", amount:15 }
         ],
-        description:"缶のプルタブ。人工物を集める材料になる。"
+        description:"ペットボトルキャップ15個を追加発見する"
     },
 
     bottle_cap:{
         successRate:0.03,
         boosts:[
-            {
-                itemId:"water",
-                amount:20
-            }
+            { itemId:"water", amount:20 }
         ],
-        description:"ペットボトルのふた。水を集める材料になる。"
+        description:"探索成功率 +3%。水20個を追加発見する"
     },
 
     feather:{
         successRate:0.10,
-        description:"羽根。探索成功率を上げる珍しい装備。"
+        description:"探索成功率 +10%"
     }
 
 };
