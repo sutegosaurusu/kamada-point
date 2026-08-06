@@ -1,6 +1,12 @@
+const merchantStockLimit = {
+    food: 200,
+    water: 50,
+    equipment: 10,
+    material: 100
+};
+
 let currentCategory = "food";
 let listingData = {};
-
 let merchantData = {};
 
 function watchListings(){
@@ -17,15 +23,61 @@ function watchListings(){
 
     database
         .ref("merchantStock")
-        .on("value", snapshot => {
+        .on("value", async snapshot => {
 
             merchantData = snapshot.val() || {};
 
+            // 初回だけ在庫を作る
+            if(Object.keys(merchantData).length === 0){
+
+                const stock = {};
+
+                items.forEach(item => {
+
+                    let quantity = 0;
+
+                    switch(item.category){
+
+                        case "food":
+                            quantity = 200;
+                            break;
+
+                        case "water":
+                            quantity = 50;
+                            break;
+
+                        case "equipment":
+                            quantity = 10;
+                            break;
+
+                        case "material":
+                            quantity = 100;
+                            break;
+                    }
+
+                    // 落ち葉と水は常に30個追加
+                    if(item.id === "leaf"){
+                        quantity += 30;
+                    }
+
+                    if(item.id === "water"){
+                        quantity += 30;
+                    }
+
+                    stock[item.id] = {
+                        quantity: quantity
+                    };
+                });
+
+                await database.ref("merchantStock").set(stock);
+
+                merchantData = stock;
+            }
+
             renderMarket();
-
         });
-
 }
+
 document.querySelectorAll(".categoryTabs button")
 .forEach(button => {
 
@@ -49,6 +101,7 @@ const searchInput = document.getElementById("searchInput");
 if(searchInput){
     searchInput.addEventListener("input", renderMarket);
 }
+
 document
     .getElementById("sortSelect")
     .addEventListener("change", renderMarket);
@@ -78,57 +131,42 @@ function renderMarket(){
 
     /*
     商人の商品を一覧に追加
+    （在庫が0でも表示だけはする。売り切れとして扱う）
     */
 
-  window.merchantItems.forEach(itemId => {
+    window.merchantItems.forEach(itemId => {
 
-    const item =
-        items.find(i => i.id === itemId);
+        const item =
+            items.find(i => i.id === itemId);
 
-    if(!item){
-        return;
-    }
+        if(!item){
+            return;
+        }
 
-    if(item.category !== currentCategory){
-        return;
-    }
+        if(item.category !== currentCategory){
+            return;
+        }
 
-    const quantity =
-        Number(
-            merchantData[itemId]?.quantity || 0
-        );
+        const quantity =
+            Number(
+                merchantData[itemId]?.quantity || 0
+            );
 
-    if(quantity <= 0){
-        return;
-    }
-
-    offers.push({
-
-        type:"merchant",
-
-        id:item.id,
-
-        itemId:item.id,
-
-        itemName:item.name,
-
-        category:item.category,
-
-        sellerId:"merchant",
-
-        sellerName:"商人",
-
-        price:Number(item.price),
-
-        sellPrice:Math.floor(item.price*0.3),
-
-        quantity:quantity,
-
-        createdAt:0
-
+        offers.push({
+            type:"merchant",
+            id:item.id,
+            itemId:item.id,
+            itemName:item.name,
+            category:item.category,
+            sellerId:"merchant",
+            sellerName:"商人",
+            price:getMerchantPrice(item, quantity),
+            sellPrice:Math.floor(item.price * 0.3),
+            quantity:quantity,
+            createdAt:0
+        });
     });
 
-});
     /*
     会員の出品を一覧に追加
     */
@@ -246,113 +284,116 @@ function renderMarket(){
                 ? "seller merchant"
                 : "seller";
 
-         row.innerHTML = `
-    <div class="${sellerClass}">
-        ${escapeHtml(offer.sellerName || "名無し")}
-    </div>
+            const isSoldOut =
+                offer.type === "merchant" &&
+                offer.quantity <= 0;
 
-    <div class="price">
-        ${Number(offer.price).toLocaleString()} Pt
-    </div>
+            row.innerHTML = `
+                <div class="${sellerClass}">
+                    ${escapeHtml(offer.sellerName || "名無し")}
+                </div>
 
-   <div class="stock">
-    ${
-        offer.type === "merchant"
-        ? "在庫：${offer.quantity}個 ∞"
-        : "残り " + offer.quantity + "（まとめ買い）"
-    }
-</div>
+                <div class="price">
+                    ${Number(offer.price).toLocaleString()} Pt
+                </div>
 
-<div class="buyArea">
+                <div class="stock">
+                    ${
+                        offer.type === "merchant"
+                        ? `在庫：${offer.quantity}個`
+                        : "残り " + offer.quantity + "（まとめ買い）"
+                    }
+                </div>
 
-    ${
-        offer.type === "merchant"
-        ? `
-            <input
-                class="buyQuantity"
-                type="number"
-                min="1"
-                value="1"
-            >
-        `
-        : ""
-    }
+                <div class="buyArea">
 
-    <button
-    class="buyButton"
-    ${isOwnListing ? "disabled" : ""}
->
-    ${
-        isOwnListing
-        ? "自分"
-        : (offer.type === "merchant" ? "買う" : "まとめて買う")
-    }
-</button>
+                    ${
+                        isSoldOut
+                        ? `<div class="soldOut">売り切れ</div>`
+                        : `
+                            ${
+                                offer.type === "merchant"
+                                ? `
+                                    <input
+                                        class="buyQuantity"
+                                        type="number"
+                                        min="1"
+                                        max="${offer.quantity}"
+                                        value="1"
+                                    >
+                                `
+                                : ""
+                            }
 
-    ${
-        offer.type === "merchant"
-        ? `
-            <button class="sellButton">
-                売る
-            </button>
-        `
-        : ""
-    }
+                            <button
+                                class="buyButton"
+                                ${isOwnListing ? "disabled" : ""}
+                            >
+                                ${
+                                    isOwnListing
+                                    ? "自分"
+                                    : (offer.type === "merchant" ? "買う" : "まとめて買う")
+                                }
+                            </button>
+                        `
+                    }
 
-</div>
+                    ${
+                        offer.type === "merchant"
+                        ? `
+                            <button class="sellButton">
+                                売る
+                            </button>
+                        `
+                        : ""
+                    }
 
-`;
+                </div>
+            `;
+
             const buyButton =
                 row.querySelector(".buyButton");
             const sellButton =
-    row.querySelector(".sellButton");
+                row.querySelector(".sellButton");
 
+            if(sellButton){
 
-if(sellButton){
+                sellButton.addEventListener("click", () => {
 
-    sellButton.addEventListener("click", () => {
+                    const quantity = Number(
+                        row.querySelector(".buyQuantity")?.value || 1
+                    );
 
-        const quantity = Number(
-            row.querySelector(".buyQuantity").value
-        );
+                    if(!Number.isInteger(quantity) || quantity <= 0){
+                        showMessage("個数を正しく入力してください");
+                        return;
+                    }
 
-        if(!Number.isInteger(quantity) || quantity <= 0){
-            showMessage("個数を正しく入力してください");
-            return;
-        }
+                    sellMerchantItem(offer, quantity);
+                });
+            }
 
-        sellMerchantItem(offer, quantity);
-    });
-}
-            if(!isOwnListing){
+            if(buyButton && !isOwnListing){
 
-               buyButton.addEventListener("click", () => {
+                buyButton.addEventListener("click", () => {
 
-   let quantity = 1;
+                    let quantity = 1;
 
-if(offer.type === "member"){
-    quantity = Number(offer.quantity);
-}else{
-    quantity = Number(
-        row.querySelector(".buyQuantity").value
-    );
-}
+                    if(offer.type === "member"){
+                        quantity = Number(offer.quantity);
+                    }else{
+                        quantity = Number(
+                            row.querySelector(".buyQuantity").value
+                        );
+                    }
 
-
-if(offer.type === "merchant"){
- if(offer.quantity<=0){
-
-    row.innerHTML += `
-        <div class="soldOut">
-            売り切れ
-        </div>
-    `;
-
-}else{
-
-    // 今までの購入ボタン
-
-}
+                    if(offer.type === "merchant"){
+                        buyMerchantItem(offer, quantity);
+                    }else{
+                        buyMemberListing(offer);
+                    }
+                });
+            }
 
             card.appendChild(row);
         });
@@ -360,16 +401,39 @@ if(offer.type === "merchant"){
         market.appendChild(card);
     });
 }
+
+/* =====================================================
+   商人から購入
+===================================================== */
+
 async function buyMerchantItem(item, quantity){
 
-   const confirmed = confirm(
-    item.itemName +
-    "を" +
-    quantity +
-    "個、" +
-    Number(item.price * quantity).toLocaleString() +
-    "Ptで購入しますか？"
-);
+    if(!Number.isInteger(quantity) || quantity <= 0){
+        showMessage("個数を正しく入力してください");
+        return;
+    }
+
+    const stockRef =
+        database.ref("merchantStock/" + item.itemId);
+
+    const stockSnapshot =
+        await stockRef.once("value");
+
+    const stock = stockSnapshot.val();
+
+    if(!stock || stock.quantity < quantity){
+        showMessage("商人の在庫が足りません");
+        return;
+    }
+
+    const confirmed = confirm(
+        item.itemName +
+        "を" +
+        quantity +
+        "個、" +
+        Number(item.price * quantity).toLocaleString() +
+        "Ptで購入しますか？"
+    );
 
     if(!confirmed){
         return;
@@ -389,11 +453,11 @@ async function buyMerchantItem(item, quantity){
 
                 const point = Number(currentPoint || 0);
 
-              if(point < item.price * quantity){
-    return;
-}
+                if(point < item.price * quantity){
+                    return;
+                }
 
-              return point - (item.price * quantity);
+                return point - (item.price * quantity);
             });
 
         if(!pointResult.committed){
@@ -403,12 +467,17 @@ async function buyMerchantItem(item, quantity){
         }
 
         await addItemToInventory(
-    currentUser.uid,
-    item.itemId,
-    item.itemName,
-    item.category,
-    quantity
-);
+            currentUser.uid,
+            item.itemId,
+            item.itemName,
+            item.category,
+            quantity
+        );
+
+        await merchantTakeItem(
+            item.itemId,
+            quantity
+        );
 
         showMessage(item.itemName + "を購入しました");
 
@@ -424,7 +493,7 @@ async function buyMerchantItem(item, quantity){
 ===================================================== */
 
 async function buyMemberListing(listing){
-    
+
     const quantity = Number(listing.quantity || 0);
 
     if(listing.sellerId === currentUser.uid){
@@ -435,11 +504,11 @@ async function buyMemberListing(listing){
 
     const confirmed = confirm(
         listing.itemName +
-"を" +
-quantity +
-"個、" +
-Number(listing.price * quantity).toLocaleString() +
-"Ptで購入しますか？"
+        "を" +
+        quantity +
+        "個、" +
+        Number(listing.price * quantity).toLocaleString() +
+        "Ptで購入しますか？"
     );
 
     if(!confirmed){
@@ -466,11 +535,11 @@ Number(listing.price * quantity).toLocaleString() +
 
                 const point = Number(currentPoint || 0);
 
-              if(point < listing.price * quantity){
+                if(point < listing.price * quantity){
                     return;
                 }
 
-               return point - Number(listing.price) * quantity;
+                return point - Number(listing.price) * quantity;
             });
 
         if(!pointResult.committed){
@@ -490,34 +559,34 @@ Number(listing.price * quantity).toLocaleString() +
                 "marketListings/" + listing.id
             );
 
-       const listingResult =
-    await listingRef.transaction(currentListing => {
+        const listingResult =
+            await listingRef.transaction(currentListing => {
 
-        if(!currentListing){
-            return;
-        }
+                if(!currentListing){
+                    return;
+                }
 
-        const stock =
-            Number(currentListing.quantity || 0);
+                const stock =
+                    Number(currentListing.quantity || 0);
 
-        if(stock <= quantity){
+                if(stock <= quantity){
 
-            currentListing.earnedPoints =
-                Number(currentListing.price) * stock;
+                    currentListing.earnedPoints =
+                        Number(currentListing.price) * stock;
 
-            currentListing.quantity = 0;
-            currentListing.status = "sold";
-            currentListing.soldAt =
-                firebase.database.ServerValue.TIMESTAMP;
+                    currentListing.quantity = 0;
+                    currentListing.status = "sold";
+                    currentListing.soldAt =
+                        firebase.database.ServerValue.TIMESTAMP;
 
-            return currentListing;
-        }
+                    return currentListing;
+                }
 
-        currentListing.quantity =
-            stock - quantity;
+                currentListing.quantity =
+                    stock - quantity;
 
-        return currentListing;
-    });
+                return currentListing;
+            });
 
         if(!listingResult.committed){
 
@@ -539,7 +608,7 @@ Number(listing.price * quantity).toLocaleString() +
             )
             .transaction(currentPoint =>
                 Number(currentPoint || 0) +
-               Number(listing.price) * quantity
+                Number(listing.price) * quantity
             );
 
         /*
@@ -561,7 +630,7 @@ Number(listing.price * quantity).toLocaleString() +
         console.error(error);
 
         if(pointDeducted){
-          await refundPoints(listing.price * quantity);
+            await refundPoints(listing.price * quantity);
         }
 
         showMessage("購入処理に失敗しました");
@@ -581,6 +650,7 @@ async function refundPoints(amount){
             Number(amount)
         );
 }
+
 async function addItemToInventory(
     uid,
     itemId,
@@ -619,6 +689,51 @@ async function addItemToInventory(
             firebase.database.ServerValue.TIMESTAMP;
 
         return currentItem;
+    });
+}
+
+/* =====================================================
+   商人在庫の増減
+===================================================== */
+
+async function merchantTakeItem(itemId, quantity){
+
+    const stockRef =
+        database.ref("merchantStock/" + itemId);
+
+    await stockRef.transaction(currentStock => {
+
+        if(!currentStock){
+            return;
+        }
+
+        const stock = Number(currentStock.quantity || 0);
+
+        if(stock < quantity){
+            return;
+        }
+
+        currentStock.quantity = stock - quantity;
+
+        return currentStock;
+    });
+}
+
+async function merchantReceiveItem(itemId, quantity){
+
+    const stockRef =
+        database.ref("merchantStock/" + itemId);
+
+    await stockRef.transaction(currentStock => {
+
+        if(!currentStock){
+            return { quantity: quantity };
+        }
+
+        currentStock.quantity =
+            Number(currentStock.quantity || 0) + quantity;
+
+        return currentStock;
     });
 }
 
@@ -874,7 +989,7 @@ function renderMyListings(){
         row.className =
             "myListing" + (isSold ? " sold" : "");
 
-       row.innerHTML = `
+        row.innerHTML = `
             <div>
                 <strong>${escapeHtml(listing.itemName)}</strong>
                 <br>
@@ -988,6 +1103,11 @@ async function cancelListing(listingId, listing){
         showMessage("取り下げに失敗しました");
     }
 }
+
+/* =====================================================
+   商人へ売却
+===================================================== */
+
 async function sellMerchantItem(item, quantity){
 
     if(!Number.isInteger(quantity) || quantity <= 0){
@@ -1000,7 +1120,7 @@ async function sellMerchantItem(item, quantity){
         "を" +
         quantity +
         "個、" +
-        Number(item.sellPrice * quantity).toLocaleString() +   // ← price → sellPrice
+        Number(item.sellPrice * quantity).toLocaleString() +
         "Ptで売りますか？"
     );
 
@@ -1045,10 +1165,14 @@ async function sellMerchantItem(item, quantity){
         "members/" +
         currentUser.uid +
         "/point"
-    )
-    .transaction(point =>
+    ).transaction(point =>
         Number(point || 0) +
-        Number(item.sellPrice) * quantity   // ← price → sellPrice
+        Number(item.sellPrice) * quantity
+    );
+
+    await merchantReceiveItem(
+        item.itemId,
+        quantity
     );
 
     showMessage(
@@ -1056,5 +1180,33 @@ async function sellMerchantItem(item, quantity){
         "を" +
         quantity +
         "個売りました"
+    );
+}
+
+/* =====================================================
+   商人の販売価格を計算
+   （在庫が少ないほど高く、多いほど安く売る）
+===================================================== */
+
+function getMerchantPrice(item, quantity){
+
+    const limit =
+        merchantStockLimit[item.category] || 100;
+
+    const ratio = quantity / limit;
+
+    let multiplier = 1.0;
+
+    if(ratio <= 0.1){
+        multiplier = 1.5;
+    }else if(ratio <= 0.3){
+        multiplier = 1.2;
+    }else if(ratio >= 0.8){
+        multiplier = 0.8;
+    }
+
+    return Math.max(
+        1,
+        Math.round(item.price * multiplier)
     );
 }
