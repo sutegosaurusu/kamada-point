@@ -1,6 +1,8 @@
 let currentCategory = "food";
 let listingData = {};
 
+let merchantData = {};
+
 function watchListings(){
 
     database
@@ -12,6 +14,17 @@ function watchListings(){
             renderMarket();
             renderMyListings();
         });
+
+    database
+        .ref("merchantStock")
+        .on("value", snapshot => {
+
+            merchantData = snapshot.val() || {};
+
+            renderMarket();
+
+        });
+
 }
 document.querySelectorAll(".categoryTabs button")
 .forEach(button => {
@@ -67,28 +80,55 @@ function renderMarket(){
     商人の商品を一覧に追加
     */
 
-   getMerchantItems().forEach(item => {
-    if(!item) return;
+  window.merchantItems.forEach(itemId => {
+
+    const item =
+        items.find(i => i.id === itemId);
+
+    if(!item){
+        return;
+    }
 
     if(item.category !== currentCategory){
         return;
     }
 
-    offers.push({
-        type:"merchant",
-        id:item.id,
-        itemId:item.id,
-        itemName:item.name,
-        category:item.category,
-        sellerId:"merchant",
-        sellerName:"商人",
-        price:Number(item.price),
-        sellPrice:Number(item.sellPrice),   
-        quantity:null,
-        createdAt:0
-    });
-});
+    const quantity =
+        Number(
+            merchantData[itemId]?.quantity || 0
+        );
 
+    if(quantity <= 0){
+        return;
+    }
+
+    offers.push({
+
+        type:"merchant",
+
+        id:item.id,
+
+        itemId:item.id,
+
+        itemName:item.name,
+
+        category:item.category,
+
+        sellerId:"merchant",
+
+        sellerName:"商人",
+
+        price:Number(item.price),
+
+        sellPrice:Math.floor(item.price*0.3),
+
+        quantity:quantity,
+
+        createdAt:0
+
+    });
+
+});
     /*
     会員の出品を一覧に追加
     */
@@ -218,7 +258,7 @@ function renderMarket(){
    <div class="stock">
     ${
         offer.type === "merchant"
-        ? "在庫 ∞"
+        ? "在庫：${offer.quantity}個 ∞"
         : "残り " + offer.quantity + "（まとめ買い）"
     }
 </div>
@@ -300,12 +340,19 @@ if(offer.type === "member"){
 
 
 if(offer.type === "merchant"){
-    buyMerchantItem(offer, quantity);
+ if(offer.quantity<=0){
+
+    row.innerHTML += `
+        <div class="soldOut">
+            売り切れ
+        </div>
+    `;
+
 }else{
-    buyMemberListing(offer);
+
+    // 今までの購入ボタン
+
 }
-});
-            }
 
             card.appendChild(row);
         });
