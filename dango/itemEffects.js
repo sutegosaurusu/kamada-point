@@ -19,7 +19,7 @@
    例）{ successRate:0.02, boostItemId:"ancient_coin", boostAmount:15 }
    → 成功率+2%と、古代の硬貨の入手率アップを両方発動する。
 ===================================================== */
-
+console.log("itemEffects開始");
 const itemEffects = {
 
     leaf:{
