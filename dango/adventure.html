@@ -971,6 +971,55 @@ header p{
     </div>
 
 </div>
+<div class="slotModalOverlay" id="slotModalOverlay">
+    <div class="slotModalBox">
+
+        <div class="slotModalHeader">
+            <span id="slotModalTitle">アイテムを選択</span>
+            <button class="slotModalClose" id="slotModalCloseButton">×</button>
+        </div>
+
+        <div class="slotModalList" id="slotModalList"></div>
+
+    </div>
+</div>
+
+<!-- 確率表 -->
+
+<div class="rewardTableOverlay" id="rewardTableOverlay">
+
+    <div class="rewardTablePanel">
+
+        <div class="rewardTableHeaderBar">
+
+            <span id="rewardTableTitle">
+                取れるもの
+            </span>
+
+            <button
+                class="rewardTableClose"
+                id="rewardTableCloseButton"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="rewardTableBody">
+
+            <div class="rewardTableColumnHeader">
+                <span>アイテム</span>
+                <span>確率</span>
+            </div>
+
+            <div id="rewardTableList"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
 <div class="message" id="message"></div>
 
 <script src="firebase.js"></script>
