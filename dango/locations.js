@@ -37,7 +37,7 @@ const locations = [
         { itemId:"larva", weight:1 },
         { itemId:"Anteggs", weight:0.5 }
     ]
-},   ← ここは「,」（配列の続き）にする
+},  
 
     {
         id:"dry_river",
