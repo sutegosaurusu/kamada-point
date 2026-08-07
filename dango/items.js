@@ -78,6 +78,12 @@ const items = [
         category:"food",
         price:500
     },  
+    {
+    id:"rice",
+    name:"落ちた米粒",
+    category:"food",
+    price:80
+},
     // ======================
     // 水
     // ======================
@@ -180,6 +186,19 @@ const items = [
     name:"小石",
     category:"material",
     price:10
+},
+
+{
+    id:"grasshopper_leg",
+    name:"バッタの脚",
+    category:"material",
+    price:120
+},
+    {
+    id:"frog_skin",
+    name:"カエルの抜け殻",
+    category:"material",
+    price:250
 },
     {
     id:"twig",
