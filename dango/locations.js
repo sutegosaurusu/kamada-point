@@ -68,22 +68,32 @@ const locations = [
 },
 
     {
-        id:"pine_forest",
-        name:"薄暗い松林",
-        icon:"🌲",
-        difficulty:3,
-        description:
-            "木々が密集した森。食料は多いが危険な生物もいる。",
+    id:"rice_field",
+    name:"田んぼ",
+    icon:"🌾",
+    difficulty:3,
+    description:
+    "水が豊富な田んぼ。食べ物や虫が多く見つかるが、鳥やカエルなどの天敵も多い。",
 
-        rewardRate:1.55,
-        baseSuccessRate:0.75,
-        rewards:[
-            { itemId:"forest_mushroom", weight:40 },
-            { itemId:"pine_resin", weight:30 },
-            { itemId:"strong_branch", weight:30 }
-        ]
-    },
+    rewardRate:1.55,
+    baseSuccessRate:0.60,
 
+    rewards:[
+        { itemId:"water", weight:18 },
+        { itemId:"rice", weight:15 },
+        { itemId:"smallbug", weight:12 },
+        { itemId:"larva", weight:10 },
+        { itemId:"moss", weight:10 },
+        { itemId:"twig", weight:8 },
+        { itemId:"small_stone", weight:8 },
+        { itemId:"leaf", weight:6 },
+        { itemId:"snail_shell", weight:5 },
+        { itemId:"honey", weight:3 },
+        { itemId:"feather", weight:2 },
+        { itemId:"grasshopper_leg", weight:2 },
+        { itemId:"frog_skin", weight:1 }
+    ]
+},
     {
         id:"rocky_hills",
         name:"岩だらけの丘陵",
