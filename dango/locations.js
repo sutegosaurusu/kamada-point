@@ -11,43 +11,40 @@
 
 const locations = [
 
-   {
+{
     id:"park",
     name:"近所の公園",
     icon:"🌳",
     difficulty:1,
+
     description:
-        "ダンゴムシたちが最初に探検する身近な場所。落ち葉や木の実、小さな素材が見つかる。",
+    "ダンゴムシたちが最初に探検する身近な場所。落ち葉や木の実、小さな素材が見つかる。",
 
     rewardRate:1,
 
     baseSuccessRate:0.70,
 
     rewards:[
-        { itemId:"leaf", weight:20 },
-{ itemId:"water", weight:12 },
-{ itemId:"acorn", weight:10 },
-{ itemId:"moss", weight:8 },
-{ itemId:"flower_petal", weight:7 },
-{ itemId:"berry", weight:5 },
-{ itemId:"small_stone", weight:5 },
-{ itemId:"smallbug", weight:8 },
-{ itemId:"larva", weight:5 },
-{ itemId:"tree_sap", weight:4 },
-{ itemId:"cicada_shell", weight:3 },
-{ itemId:"snail_shell", weight:2 },
-{ itemId:"gum", weight:2 },
-{ itemId:"honey", weight:1.5 },
-{ itemId:"toothpick", weight:1 },
-{ itemId:"pull_tab", weight:0.7 },
-{ itemId:"bottle_cap", weight:0.5 },
-{ itemId:"Chocolate", weight:0.5 },
-{ itemId:"Anteggs", weight:1 },
-{ itemId:"stag_beetle_jaw", weight:0.3 },
-{ itemId:"cola", weight:4 }
-       
+        { itemId:"leaf", weight:25 },
+        { itemId:"water", weight:15 },
+        { itemId:"acorn", weight:12 },
+        { itemId:"moss", weight:10 },
+        { itemId:"flower_petal", weight:10 },
+        { itemId:"small_stone", weight:10 },
+        { itemId:"twig", weight:10 },
+        { itemId:"berry", weight:8 },
+        { itemId:"smallbug", weight:6 },
+        { itemId:"cicada_shell", weight:4 },
+        { itemId:"snail_shell", weight:3 },
+        { itemId:"tree_sap", weight:2 },
+        { itemId:"honey", weight:1 },
+        { itemId:"larva", weight:1 },
+        { itemId:"Anteggs", weight:0.5 }
     ]
-},
+
+}
+
+];
 
     {
         id:"dry_river",
