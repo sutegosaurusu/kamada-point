@@ -631,7 +631,121 @@ header p{
 .message.show{
     opacity:1;
 }
+/* 場所カード内・確率を見るボタン */
 
+.rewardTableButton{
+    width:100%;
+    margin-top:10px;
+    padding:9px 5px;
+
+    border:2px solid #594026;
+    background:#a9895e;
+    color:#fff3da;
+
+    font-size:13px;
+    cursor:pointer;
+}
+
+.rewardTableButton:hover{
+    background:#bb9a6c;
+}
+
+/* 確率表モーダル */
+
+.rewardTableOverlay{
+    position:fixed;
+    inset:0;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+
+    background:rgba(30,20,10,.55);
+    z-index:2000;
+}
+
+.rewardTableOverlay.show{
+    display:flex;
+}
+
+.rewardTablePanel{
+    width:100%;
+    max-width:420px;
+    max-height:80vh;
+
+    display:flex;
+    flex-direction:column;
+
+    background:#e8d8b6;
+    border:3px solid #5c4229;
+    box-shadow:5px 5px 0 #4b3520;
+}
+
+.rewardTableHeaderBar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 14px;
+
+    background:#cbb58e;
+    border-bottom:2px solid #5c4229;
+
+    font-size:17px;
+    font-weight:bold;
+}
+
+.rewardTableClose{
+    border:none;
+    background:none;
+
+    font-size:20px;
+    cursor:pointer;
+    color:#3a2914;
+}
+
+.rewardTableBody{
+    padding:12px 14px 14px;
+    overflow-y:auto;
+}
+
+.rewardTableColumnHeader{
+    display:flex;
+    justify-content:space-between;
+
+    padding:0 2px 8px;
+    margin-bottom:6px;
+
+    border-bottom:2px solid #806749;
+
+    font-size:13px;
+    color:#5c4529;
+    font-weight:bold;
+}
+
+.rewardTableRow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 4px;
+
+    border-bottom:1px solid #c7ac81;
+
+    font-size:14px;
+}
+
+.rewardTableIcon{
+    font-size:20px;
+}
+
+.rewardTableName{
+    flex:1;
+}
+
+.rewardTablePercent{
+    font-weight:bold;
+    color:#5c3a1e;
+}
 @media(max-width:600px){
 
     body{
