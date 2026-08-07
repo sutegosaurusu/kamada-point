@@ -163,7 +163,7 @@ const timeSettings = {
         rewardMultiplier:2.5
     },
 
-    5:{
+    6:{
         rewardMultiplier:4.2
     },
 
