@@ -871,6 +871,14 @@ function updateRequirementDisplay(){
         .getElementById("expectedReward")
         .textContent =
         "約" + expectedReward + "個";
+
+    const requiredWater =
+        waterRequirements[selectedHours] || 0;
+
+    document
+        .getElementById("requiredWaterDisplay")
+        .textContent =
+        requiredWater + "個";
 }
 /* =====================================================
    インベントリ監視
