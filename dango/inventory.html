@@ -513,7 +513,27 @@ header p{
     </div>
 
 </div>
+<div class="equipPanel" id="equipPanel">
 
+    <div class="equipSlotBox" data-slot="head">
+        <div class="equipSlotLabel">頭</div>
+        <div class="equipSlotIcon">—</div>
+        <div class="equipSlotName equipSlotEmpty">なし</div>
+    </div>
+
+    <div class="equipSlotBox" data-slot="weapon">
+        <div class="equipSlotLabel">武器</div>
+        <div class="equipSlotIcon">—</div>
+        <div class="equipSlotName equipSlotEmpty">なし</div>
+    </div>
+
+    <div class="equipSlotBox" data-slot="shield">
+        <div class="equipSlotLabel">盾</div>
+        <div class="equipSlotIcon">—</div>
+        <div class="equipSlotName equipSlotEmpty">なし</div>
+    </div>
+
+</div>
 <div class="categoryTabs">
 
     <button
@@ -576,9 +596,11 @@ header p{
             アイテムの効果
         </div>
 
-        <div class="effectText" id="detailEffect">
+       <div class="effectText" id="detailEffect">
             効果はありません。
         </div>
+
+        <div class="detailEquipArea" id="detailEquipArea"></div>
 
         <button
             class="closeButton"
