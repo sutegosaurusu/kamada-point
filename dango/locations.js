@@ -94,22 +94,33 @@ const locations = [
         { itemId:"frog_skin", weight:1 }
     ]
 },
-    {
-        id:"rocky_hills",
-        name:"岩だらけの丘陵",
-        icon:"⛰️",
-        difficulty:4,
-        description:
-            "急な岩山。長い探検には多くの食料と水が必要。",
+   {
+    id:"stream",
+    name:"小川",
+    icon:"🌊",
+    difficulty:4,
+    description:
+    "透き通った小川。水辺ならではの素材や生き物が見つかるが、流れが速く探索は難しい。",
 
-        rewardRate:2,
-        baseSuccessRate:0.65,
-        rewards:[
-            { itemId:"copper_fragment", weight:40 },
-            { itemId:"mountain_herb", weight:30 },
-            { itemId:"hard_stone", weight:30 }
-        ]
-    },
+    rewardRate:2,
+    baseSuccessRate:0.55,
+
+    rewards:[
+        { itemId:"water", weight:20 },
+        { itemId:"moss", weight:15 },
+        { itemId:"round_stone", weight:14 },
+        { itemId:"reed_stem", weight:12 },
+        { itemId:"driftwood", weight:10 },
+        { itemId:"smallbug", weight:8 },
+        { itemId:"larva", weight:7 },
+        { itemId:"river_snail_shell", weight:6 },
+        { itemId:"honey", weight:3 },
+        { itemId:"feather", weight:2 },
+        { itemId:"shrimp_shell", weight:1 },
+        { itemId:"snail_shell", weight:1 },
+        { itemId:"cicada_shell", weight:1 }
+    ]
+},
 
     {
         id:"ancient_ruins",
