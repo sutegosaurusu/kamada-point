@@ -110,38 +110,45 @@ const items = [
     // 装備
     // ======================
 
-    {
-        id:"bou",
-        name:"茎",
-        category:"equipment",
-        price:300
-  },
-   
+   {
+    id:"bou",
+    name:"茎",
+    category:"equipment",
+    price:300,
+    equipSlot:"weapon"
+},
+
 {
     id:"toothpick",
     name:"つまようじ",
     category:"equipment",
-    price:80
+    price:80,
+    equipSlot:"weapon"
 },
+
 {
     id:"pull_tab",
     name:"プルタブ",
     category:"equipment",
-    price:200
+    price:200,
+    equipSlot:"weapon"
 },
+
 {
     id:"bottle_cap",
     name:"ペットボトルのふた",
     category:"equipment",
-    price:300
+    price:300,
+    equipSlot:"shield"
 },
- {
-        id:"feather",
-        name:"羽",
-        category:"equipment",
-        price:300
-  },
 
+{
+    id:"feather",
+    name:"羽",
+    category:"equipment",
+    price:300,
+    equipSlot:"head"
+},
 
 // ======================
 // 素材
