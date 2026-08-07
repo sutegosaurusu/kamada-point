@@ -774,6 +774,30 @@ header p{
         grid-template-columns:repeat(2,1fr);
     }
 }
+    .waterRequirement{
+    font-size:11px;
+    opacity:.8;
+}
+
+.equippedDisplay{
+    display:flex;
+    gap:8px;
+}
+
+.equippedItem{
+    flex:1;
+    padding:8px;
+    text-align:center;
+
+    background:#e3d1ae;
+    border:2px solid #6d5135;
+
+    font-size:12px;
+}
+
+.equippedItem.empty{
+    color:#8a7457;
+}
 </style>
 </head>
 
@@ -852,18 +876,31 @@ header p{
     </div>
 
     <div class="itemSelectGroup">
-        <div class="itemSelectHeader" id="waterSelectHeader">
-            💧 水（0/2）
+        <div class="itemSelectHeader">
+            🛡 現在の装備
         </div>
-        <div class="slotGrid" id="waterSlotList"></div>
+        <div class="equippedDisplay" id="equippedDisplay"></div>
     </div>
+<div class="timeButtons">
 
-    <div class="itemSelectGroup">
-        <div class="itemSelectHeader" id="equipmentSelectHeader">
-            🎒 装備（0/3）
-        </div>
-        <div class="slotGrid" id="equipmentSlotList"></div>
-    </div>
+    <button class="timeButton active" data-hours="1">
+        1時間<br><span class="waterRequirement">水0個</span>
+    </button>
+
+    <button class="timeButton" data-hours="3">
+        3時間<br><span class="waterRequirement">水1個</span>
+    </button>
+
+    <button class="timeButton" data-hours="6">
+        6時間<br><span class="waterRequirement">水2個</span>
+    </button>
+
+    <button class="timeButton" data-hours="12">
+        12時間<br><span class="waterRequirement">水3個</span>
+    </button>
+
+</div>
+   
 
 </div>
 
