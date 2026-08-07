@@ -16,14 +16,10 @@ const locations = [
     name:"近所の公園",
     icon:"🌳",
     difficulty:1,
-
     description:
     "ダンゴムシたちが最初に探検する身近な場所。落ち葉や木の実、小さな素材が見つかる。",
-
     rewardRate:1,
-
     baseSuccessRate:0.70,
-
     rewards:[
         { itemId:"leaf", weight:25 },
         { itemId:"water", weight:15 },
@@ -41,10 +37,7 @@ const locations = [
         { itemId:"larva", weight:1 },
         { itemId:"Anteggs", weight:0.5 }
     ]
-
-}
-
-];
+},   ← ここは「,」（配列の続き）にする
 
     {
         id:"dry_river",
@@ -54,11 +47,8 @@ const locations = [
         description:
             "乾いた岩場。水は少ないが、珍しい物が落ちている。",
 
-       
         rewardRate:1.25,
-
         baseSuccessRate:0.83,
-
         rewards:[
             { itemId:"dry_herb", weight:35 },
             { itemId:"clay", weight:35 },
@@ -74,11 +64,8 @@ const locations = [
         description:
             "木々が密集した森。食料は多いが危険な生物もいる。",
 
-       
         rewardRate:1.55,
-
         baseSuccessRate:0.75,
-
         rewards:[
             { itemId:"forest_mushroom", weight:40 },
             { itemId:"pine_resin", weight:30 },
@@ -94,11 +81,8 @@ const locations = [
         description:
             "急な岩山。長い探検には多くの食料と水が必要。",
 
-      
         rewardRate:2,
-
         baseSuccessRate:0.65,
-
         rewards:[
             { itemId:"copper_fragment", weight:40 },
             { itemId:"mountain_herb", weight:30 },
@@ -114,11 +98,8 @@ const locations = [
         description:
             "古い石造建築の跡。危険だが貴重な品が眠っている。",
 
-        
         rewardRate:2.6,
-
         baseSuccessRate:0.55,
-
         rewards:[
             { itemId:"bronze_fragment", weight:35 },
             { itemId:"ancient_coin", weight:25 },
@@ -135,11 +116,8 @@ const locations = [
         description:
             "暗く深い最難関の洞窟。十分な準備が必要。",
 
-       
         rewardRate:3.4,
-
         baseSuccessRate:0.42,
-
         rewards:[
             { itemId:"silver_fragment", weight:25 },
             { itemId:"rare_crystal", weight:20 },
