@@ -21,6 +21,7 @@ auth.onAuthStateChanged(user => {
 
     watchInventory();
 　　
+    watchEquipment(renderEquipPanel);
 });
 
 
@@ -180,7 +181,46 @@ function renderInventory(){
     });
 
 }
+// ===============================
+// 装備パネル表示
+// ===============================
 
+function renderEquipPanel(){
+
+    document
+    .querySelectorAll(".equipSlotBox")
+    .forEach(box => {
+
+        const slot = box.dataset.slot;
+
+        const itemId = equipmentData[slot];
+
+        const iconElement =
+            box.querySelector(".equipSlotIcon");
+
+        const nameElement =
+            box.querySelector(".equipSlotName");
+
+        if(!itemId){
+
+            iconElement.textContent = "—";
+            nameElement.textContent = "なし";
+            nameElement.classList.add("equipSlotEmpty");
+
+            return;
+        }
+
+        const info = itemInformation[itemId];
+
+        iconElement.textContent =
+            info?.icon || getDefaultIcon("equipment");
+
+        nameElement.textContent =
+            info?.name || itemId;
+
+        nameElement.classList.remove("equipSlotEmpty");
+    });
+}
 
 // ===============================
 // 合計個数
@@ -216,6 +256,7 @@ function openItemDetail(id, item){
 
     const info =
         getItemInformation(id, item);
+
 
     const category =
         categoryInformation[item.category] || {
@@ -261,6 +302,8 @@ function openItemDetail(id, item){
     info.effect;
 
 
+    renderDetailEquipArea(id, item);
+
 
     document
     .getElementById("detailOverlay")
@@ -268,6 +311,68 @@ function openItemDetail(id, item){
 
 }
 
+function renderDetailEquipArea(id, item){
+
+    const area =
+        document.getElementById("detailEquipArea");
+
+    area.innerHTML = "";
+
+    if(item.category !== "equipment"){
+        return;
+    }
+
+    const itemData = itemInformation[id];
+
+    const slot = itemData?.equipSlot;
+
+    if(!slot){
+        return;
+    }
+
+    const isEquipped =
+        equipmentData[slot] === id;
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "equipButton" + (isEquipped ? " unequip" : "");
+
+    button.textContent =
+        isEquipped
+        ? equipSlotLabels[slot] + "から外す"
+        : equipSlotLabels[slot] + "に装備する";
+
+    button.addEventListener("click", async () => {
+
+        button.disabled = true;
+
+        try{
+
+            if(isEquipped){
+                await unequipItem(slot);
+                showMessage(item.name + "を外しました");
+            }else{
+                await equipItem(slot, id);
+                showMessage(item.name + "を装備しました");
+            }
+
+            closeItemDetail();
+
+        }catch(error){
+
+            console.error(error);
+            showMessage("装備の変更に失敗しました");
+
+        }finally{
+
+            button.disabled = false;
+        }
+    });
+
+    area.appendChild(button);
+}
 
 
 // ===============================
