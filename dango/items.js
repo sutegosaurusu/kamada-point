@@ -230,11 +230,7 @@ const items = [
     category:"material",
     price:200
 },
-    material:{
-        name:"素材",
-        icon:"🪨"
-    }
-
+    
     {
     id:"twig",
     name:"小枝",
@@ -269,6 +265,10 @@ const categoryInformation = {
         name:"装備",
         icon:"⚔️"
     },
+material:{
+        name:"素材",
+        icon:"🪨"
+    }
 
 };
 
