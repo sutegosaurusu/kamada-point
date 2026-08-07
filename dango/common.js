@@ -120,3 +120,62 @@ function escapeHtml(value){
         .replaceAll("'","&#039;");
 
 }
+// ======================
+// 装備（頭・武器・盾）
+// ======================
+
+let equipmentData = {
+    head:null,
+    weapon:null,
+    shield:null
+};
+
+const equipSlotLabels = {
+    head:"頭",
+    weapon:"武器",
+    shield:"盾"
+};
+
+function watchEquipment(onChange){
+
+    database
+        .ref("members/" + currentUser.uid + "/equipment")
+        .on("value", snapshot => {
+
+            const data = snapshot.val() || {};
+
+            equipmentData = {
+                head: data.head || null,
+                weapon: data.weapon || null,
+                shield: data.shield || null
+            };
+
+            if(onChange){
+                onChange(equipmentData);
+            }
+        });
+}
+
+async function equipItem(slot, itemId){
+
+    await database
+        .ref(
+            "members/" +
+            currentUser.uid +
+            "/equipment/" +
+            slot
+        )
+        .set(itemId);
+}
+
+async function unequipItem(slot){
+
+    await database
+        .ref(
+            "members/" +
+            currentUser.uid +
+            "/equipment/" +
+            slot
+        )
+        .remove();
+}
