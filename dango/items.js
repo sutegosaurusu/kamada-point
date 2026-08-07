@@ -149,7 +149,13 @@ const items = [
     price:300,
     equipSlot:"head"
 },
-
+{
+    id:"snail_shell",
+    name:"カタツムリの殻",
+    category:"equipment",
+    price:300,
+    equipSlot:"weapon"
+},
 // ======================
 // 素材
 // ======================
@@ -162,12 +168,7 @@ const items = [
     category:"material",
     price:120
 },
-{
-    id:"snail_shell",
-    name:"カタツムリの殻",
-    category:"material",
-    price:150
-},
+
 {
     id:"stag_beetle_jaw",
     name:"クワガタのあご",
