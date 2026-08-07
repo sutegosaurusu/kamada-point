@@ -37,22 +37,35 @@ const locations = [
     ]
 },  
 
-    {
-        id:"dry_river",
-        name:"干上がった川床",
-        icon:"🏜️",
-        difficulty:2,
-        description:
-            "乾いた岩場。水は少ないが、珍しい物が落ちている。",
+   {
+    id:"forest",
+    name:"雑木林",
+    icon:"🌲",
+    difficulty:2,
 
-        rewardRate:1.25,
-        baseSuccessRate:0.83,
-        rewards:[
-            { itemId:"dry_herb", weight:35 },
-            { itemId:"clay", weight:35 },
-            { itemId:"flint", weight:30 }
-        ]
-    },
+    description:
+    "公園の奥に広がる雑木林。木々が生い茂り、虫や樹液、珍しい素材が多く見つかる。",
+
+    rewardRate:1.25,
+    baseSuccessRate:0.60,
+
+    rewards:[
+        { itemId:"twig", weight:20 },
+        { itemId:"small_stone", weight:15 },
+        { itemId:"moss", weight:12 },
+        { itemId:"tree_sap", weight:10 },
+        { itemId:"smallbug", weight:10 },
+        { itemId:"berry", weight:8.2 },
+        { itemId:"honey", weight:7 },
+        { itemId:"larva", weight:8.7 },
+        { itemId:"leaf", weight:5 },
+        { itemId:"cicada_shell", weight:3 },
+        { itemId:"snail_shell", weight:0.3},
+        { itemId:"feather", weight:0.3 },
+        { itemId:"stag_beetle_jaw", weight:0.1 },
+        { itemId:"Anteggs", weight:0.3 }
+    ]
+},
 
     {
         id:"pine_forest",
