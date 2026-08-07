@@ -22,101 +22,90 @@
 console.log("itemEffects開始");
 const itemEffects = {
 
+    // ======================
+    // 食べ物
+    // ======================
+
     leaf:{
         successRate:0.05,
         description:"探索成功率 +5%"
     },
 
-    honey:{
-        successRate:0.05,
-        boosts:[
-            { itemId:"smallbug", amount:20 },
-            { itemId:"larva", amount:10 }
-        ],
-        description:"探索成功率 +5%。小さな虫を20個、幼虫を10個追加発見する"
-    },
-
     acorn:{
-        boosts:[
-            { itemId:"smallbug", amount:5 },
-            { itemId:"larva", amount:5 }
-        ],
-        description:"小さな虫を5個、幼虫を5個追加発見する"
-    },
-
-    moss:{
-        successRate:0.01,
-        boosts:[
-            { itemId:"smallbug", amount:5 }
-        ],
-        description:"探索成功率 +1%。小さな虫を5個追加発見する"
-    },
-
-    berry:{
-        successRate:-0.10,
-        boosts:[
-            { itemId:"feather", amount:10 },
-            { itemId:"larva", amount:5 }
-        ],
-        description:"探索成功率 -10%。羽根を10個、幼虫を5個追加発見する"
-    },
-
-    gum:{
-        successRate:0.02,
-        boosts:[
-            { itemId:"toothpick", amount:15 },
-            { itemId:"pull_tab", amount:5 }
-        ],
-        description:"探索成功率 +2%。つまようじ15個、プルタブ5個を追加発見する"
-    },
-
-    tree_sap:{
-        successRate:0.03,
-        findBonus:{
-            tree_sap:0.20
-        },
-        description:"探索成功率 +3%。樹液の発見確率 +20%"
+        rewardMultiplier:1.2,
+        description:"獲得アイテム数 +20%"
     },
 
     flower_petal:{
-        successRate:0.01,
-        boosts:[
-            { itemId:"smallbug", amount:15 }
-        ],
-        description:"探索成功率 +1%。小さな虫を15個追加発見する"
+        findBonus:{
+            smallbug:0.20,
+            honey:0.10
+        },
+        description:"小さな虫・蜜の発見率アップ"
+    },
+
+    moss:{
+        successRate:0.03,
+        description:"探索成功率 +3%"
+    },
+
+    berry:{
+        successRate:0.08,
+        description:"探索成功率 +8%"
+    },
+
+    gum:{
+        rewardMultiplier:1.3,
+        description:"獲得アイテム数 +30%"
+    },
+
+    tree_sap:{
+        successRate:0.10,
+        description:"探索成功率 +10%"
+    },
+
+    honey:{
+        successRate:0.12,
+        description:"探索成功率 +12%"
     },
 
     Chocolate:{
-        successRate:0.30,
-        description:"探索成功率 +30%"
+        successRate:0.20,
+        description:"探索成功率 +20%"
     },
 
     Anteggs:{
-        successRate:0.03,
-        description:"探索成功率 +3%"
+        successRate:0.15,
+        description:"探索成功率 +15%"
     },
 
     smallbug:{
-        successRate:0.03,
-        description:"探索成功率 +3%"
-    },
-
-    larva:{
-        successRate:0.03,
-        description:"探索成功率 +3%"
-    },
-
-
-    // 水
-
-    water:{
         successRate:0.05,
         description:"探索成功率 +5%"
     },
 
-    slime:{
+    larva:{
+        successRate:0.10,
+        description:"探索成功率 +10%"
+    },
+
+    // ======================
+    // 水
+    // ======================
+
+    morning_dew:{
+        successRate:0.05,
+        description:"探索成功率 +5%"
+    },
+
+    water:{
         successRate:0.08,
         description:"探索成功率 +8%"
+    },
+
+    slime:{
+        successRate:0.12,
+        description:"探索成功率 +12%"
     },
 
     os1:{
@@ -125,13 +114,14 @@ const itemEffects = {
     },
 
     cola:{
-        successRate:-0.30,
+        successRate:-0.20,
         rewardMultiplier:2,
-        description:"探索成功率 -30%。獲得報酬2倍"
+        description:"探索成功率 -20%。獲得報酬2倍"
     },
 
-
-    // 装備
+    // ======================
+    // 装備（消費しない）
+    // ======================
 
     bou:{
         successRate:0.10,
@@ -144,23 +134,20 @@ const itemEffects = {
     },
 
     pull_tab:{
-        boosts:[
-            { itemId:"bottle_cap", amount:15 }
-        ],
-        description:"ペットボトルキャップ15個を追加発見する"
+        findBonus:{
+            bottle_cap:0.20
+        },
+        description:"ペットボトルのふたの発見率 +20%"
     },
 
     bottle_cap:{
-        successRate:0.03,
-        boosts:[
-            { itemId:"water", amount:20 }
-        ],
-        description:"探索成功率 +3%。水20個を追加発見する"
+        successRate:0.05,
+        description:"探索成功率 +5%"
     },
 
     feather:{
-        successRate:0.10,
-        description:"探索成功率 +10%"
+        rewardMultiplier:1.2,
+        description:"獲得アイテム数 +20%"
     }
 
 };
