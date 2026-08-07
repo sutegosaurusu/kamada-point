@@ -201,40 +201,6 @@ const items = [
     price:250
 },
     {
-    id:"twig",
-    name:"小枝",
-    category:"material",
-    price:15
-}
-];
-
-// ======================
-// ID検索
-// ======================
-
-const itemInformation = {};
-
-items.forEach(item => {
-    itemInformation[item.id] = item;
-});
-
-const categoryInformation = {
-
-    food:{
-        name:"食べ物",
-        icon:"🍎"
-    },
-
-    water:{
-        name:"水",
-        icon:"💧"
-    },
-
-    equipment:{
-        name:"装備",
-        icon:"⚔️"
-    },
-{
     id:"round_stone",
     name:"丸石",
     category:"material",
@@ -268,6 +234,41 @@ const categoryInformation = {
         name:"素材",
         icon:"🪨"
     }
+
+    {
+    id:"twig",
+    name:"小枝",
+    category:"material",
+    price:15
+}
+];
+
+// ======================
+// ID検索
+// ======================
+
+const itemInformation = {};
+
+items.forEach(item => {
+    itemInformation[item.id] = item;
+});
+
+const categoryInformation = {
+
+    food:{
+        name:"食べ物",
+        icon:"🍎"
+    },
+
+    water:{
+        name:"水",
+        icon:"💧"
+    },
+
+    equipment:{
+        name:"装備",
+        icon:"⚔️"
+    },
 
 };
 
