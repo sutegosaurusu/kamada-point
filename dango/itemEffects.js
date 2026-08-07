@@ -88,7 +88,11 @@ const itemEffects = {
         successRate:0.10,
         description:"探索成功率 +10%"
     },
-
+　rice:{
+    successRate:0.05,
+    rewardMultiplier:1.1,
+    description:"探索成功率 +5%。獲得アイテム数 +10%"
+},
     // ======================
     // 水
     // ======================
@@ -144,6 +148,15 @@ const itemEffects = {
         successRate:0.05,
         description:"探索成功率 +5%"
     },
+   grasshopper_leg:{
+    successRate:0.08,
+    description:"探索成功率 +8%"
+},
+
+ frog_skin:{
+    rewardMultiplier:1.5,
+    description:"獲得アイテム数 +50%"
+},
 
     feather:{
         rewardMultiplier:1.2,
