@@ -226,6 +226,18 @@ function closeRewardTable(){
         .getElementById("rewardTableOverlay")
         .classList.remove("show");
 }
+document
+    .getElementById("rewardTableCloseButton")
+    .addEventListener("click", closeRewardTable);
+
+document
+    .getElementById("rewardTableOverlay")
+    .addEventListener("click", event => {
+
+        if(event.target.id === "rewardTableOverlay"){
+            closeRewardTable();
+        }
+    });
 
 /* =====================================================
    時間選択
