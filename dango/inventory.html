@@ -129,7 +129,73 @@ header p{
     background:#705036;
     color:#fff0d0;
 }
+/* 装備パネル */
 
+.equipPanel{
+    width:100%;
+    max-width:900px;
+    margin:0 auto 14px;
+    padding:12px;
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+
+    background:#d5c29e;
+    border:2px solid #60472e;
+}
+
+.equipSlotBox{
+    padding:10px;
+    text-align:center;
+
+    background:#c6ad83;
+    border:2px solid #684c31;
+}
+
+.equipSlotLabel{
+    font-size:12px;
+    color:#5c4529;
+    font-weight:bold;
+}
+
+.equipSlotIcon{
+    margin:6px 0;
+    font-size:28px;
+}
+
+.equipSlotName{
+    font-size:13px;
+    min-height:18px;
+}
+
+.equipSlotEmpty{
+    color:#8a7457;
+    font-size:12px;
+}
+
+.detailEquipArea{
+    margin-top:15px;
+}
+
+.equipButton{
+    width:100%;
+    padding:12px;
+
+    border:2px solid #49311d;
+    background:#4c6e3a;
+    color:#f0ffe0;
+
+    font-family:inherit;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.equipButton.unequip{
+    background:#7a3d2c;
+    color:#fff0e0;
+}
+    
 /* 持ち物一覧 */
 
 .inventory{
