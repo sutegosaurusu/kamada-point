@@ -22,7 +22,7 @@ const locations = [
     baseSuccessRate:0.70,
     rewards:[
         { itemId:"leaf", weight:28 },
-        { itemId:"water", weight:15 },
+        { itemId:"water", weight:18 },
         { itemId:"acorn", weight:12 },
         { itemId:"moss", weight:10 },
         { itemId:"flower_petal", weight:10.2 },
@@ -31,8 +31,6 @@ const locations = [
         { itemId:"berry", weight:8 },
         { itemId:"smallbug", weight:6 },
         { itemId:"cicada_shell", weight:4 },
-        { itemId:"tree_sap", weight:2 },
-        { itemId:"honey", weight:1 },
         { itemId:"larva", weight:1 },
         { itemId:"snail_shell", weight:0.2919 },
         { itemId:"Beast", weight:0.0081 }
