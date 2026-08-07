@@ -234,7 +234,36 @@ const categoryInformation = {
         name:"装備",
         icon:"⚔️"
     },
-
+{
+    id:"round_stone",
+    name:"丸石",
+    category:"material",
+    price:25
+},
+{
+    id:"reed_stem",
+    name:"アシの茎",
+    category:"material",
+    price:40
+},
+{
+    id:"driftwood",
+    name:"流木",
+    category:"material",
+    price:60
+},
+{
+    id:"river_snail_shell",
+    name:"巻貝の殻",
+    category:"material",
+    price:80
+},
+{
+    id:"shrimp_shell",
+    name:"エビの殻",
+    category:"material",
+    price:200
+},
     material:{
         name:"素材",
         icon:"🪨"
