@@ -858,19 +858,17 @@ function updateRequirementDisplay(){
                 computeEffectiveSuccessRate(location) * 100
             ) + "%";
 
-    const expectedReward =
-        Math.max(
-            1,
-            Math.round(
-                location.rewardRate *
-                timeSettings[selectedHours].rewardMultiplier
-            )
-        );
+    const timeSetting =
+        timeSettings[selectedHours];
 
     document
         .getElementById("expectedReward")
         .textContent =
-        "約" + expectedReward + "個";
+        "約" +
+        timeSetting.minReward +
+        "〜" +
+        timeSetting.maxReward +
+        "個";
 
     const requiredWater =
         waterRequirements[selectedHours] || 0;
@@ -1565,46 +1563,37 @@ function createRewardCount(
     location
 ){
 
-    const multiplier =
-        timeSettings[expedition.hours].rewardMultiplier;
+    const timeSetting =
+        timeSettings[expedition.hours];
 
-   let rewardMultiplier = 1;
+    let rewardMultiplier = 1;
 
-getAllSelectedItemIds().forEach(itemId => {
+    getAllSelectedItemIds().forEach(itemId => {
 
-    const effect = itemEffects[itemId];
+        const effect = itemEffects[itemId];
 
-    if(effect && effect.rewardMultiplier){
+        if(effect && effect.rewardMultiplier){
 
-        rewardMultiplier *= effect.rewardMultiplier;
+            rewardMultiplier *= effect.rewardMultiplier;
 
-    }
+        }
 
-});
+    });
 
+    const min = timeSetting.minReward;
+    const max = timeSetting.maxReward;
 
-const basicCount =
-    Math.max(
-        1,
-        Math.round(
-            location.rewardRate *
-            multiplier *
-            rewardMultiplier
-        )
-    );
-
-    const randomMultiplier =
-        0.8 + Math.random() * 0.4;
+    const baseCount =
+        min + Math.floor(Math.random() * (max - min + 1));
 
     return Math.max(
         1,
         Math.round(
-            basicCount *
-            randomMultiplier
+            baseCount *
+            rewardMultiplier
         )
     );
 }
-
 /* =====================================================
    重み付き抽選で1つ報酬を選ぶ
 ===================================================== */
