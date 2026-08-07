@@ -76,7 +76,7 @@ const locations = [
     "水が豊富な田んぼ。食べ物や虫が多く見つかるが、鳥やカエルなどの天敵も多い。",
 
     rewardRate:1.55,
-    baseSuccessRate:0.50,
+    baseSuccessRate:0.40,
 
     rewards:[
         { itemId:"water", weight:18 },
