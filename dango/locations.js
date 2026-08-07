@@ -156,19 +156,27 @@ const locations = [
 const timeSettings = {
 
     1:{
-        rewardMultiplier:1
+        rewardMultiplier:1,
+        minReward:1,
+        maxReward:3
     },
 
     3:{
-        rewardMultiplier:2.5
+        rewardMultiplier:2.5,
+        minReward:3,
+        maxReward:5
     },
 
     6:{
-        rewardMultiplier:4.2
+        rewardMultiplier:4.2,
+        minReward:4,
+        maxReward:7
     },
 
     12:{
-        rewardMultiplier:10
+        rewardMultiplier:10,
+        minReward:8,
+        maxReward:13
     }
 
 };
