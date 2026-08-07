@@ -19,31 +19,20 @@ let selectedHours = 1;
 
 let countdownTimer = null;
 
-/*
-持っていくアイテムのスロット
-（食べ物3枠・水2枠・装備3枠）
-
-各枠は「1個」を表す。同じアイテムを複数の枠に
-入れてもよい（例：食べ物の枠すべてを同じ品で埋める）。
-ただし所持数を超える枠数には入れられない。
-埋まっていない枠があってもよい。
-*/
-
 const SLOT_COUNTS = {
-    food:3,
-    water:2,
-    equipment:3
+    food:3
 };
 
 let selectedSlots = {
-    food:[null,null,null],
-    water:[null,null],
-    equipment:[null,null,null]
+    food:[null,null,null]
 };
 
-/*
-現在開いているスロット選択モーダル
-*/
+const waterRequirements = {
+    1:0,
+    3:1,
+    6:2,
+    12:3
+};
 
 let openSlot = null;
 
@@ -69,8 +58,51 @@ auth.onAuthStateChanged(user => {
 
     watchInventory();
     watchExpedition();
+    watchEquipment(() => {
+        renderEquippedDisplay();
+        renderItemSelection();
+        updateRequirementDisplay();
+    });
 });
+function renderEquippedDisplay(){
 
+    const container =
+        document.getElementById("equippedDisplay");
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML = "";
+
+    ["head","weapon","shield"].forEach(slot => {
+
+        const itemId = equipmentData[slot];
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "equippedItem" + (itemId ? "" : " empty");
+
+        if(itemId){
+
+            const info = itemInformation[itemId];
+
+            div.textContent =
+                equipSlotLabels[slot] + "：" +
+                (info?.icon || "") + " " +
+                (info?.name || itemId);
+
+        }else{
+
+            div.textContent =
+                equipSlotLabels[slot] + "：未装備";
+        }
+
+        container.appendChild(div);
+    });
+}
 /* =====================================================
    場所を表示
 ===================================================== */
@@ -296,10 +328,14 @@ function getSlotItemIds(category){
 
 function getAllSelectedItemIds(){
 
+    const equippedIds =
+        ["head","weapon","shield"]
+        .map(slot => equipmentData[slot])
+        .filter(itemId => itemId !== null);
+
     return [
         ...getSlotItemIds("food"),
-        ...getSlotItemIds("water"),
-        ...getSlotItemIds("equipment")
+        ...equippedIds
     ];
 }
 
@@ -491,8 +527,6 @@ function renderItemSelection(){
     pruneSelectedSlots();
 
     renderSlotGrid("food","foodSlotList");
-    renderSlotGrid("water","waterSlotList");
-    renderSlotGrid("equipment","equipmentSlotList");
 
     updateSlotHeaders();
 }
@@ -507,26 +541,7 @@ function updateSlotHeaders(){
             "/" +
             SLOT_COUNTS.food +
             "）";
-
-    document
-        .getElementById("waterSelectHeader")
-        .textContent =
-            "💧 水（" +
-            getSlotItemIds("water").length +
-            "/" +
-            SLOT_COUNTS.water +
-            "）";
-
-    document
-        .getElementById("equipmentSelectHeader")
-        .textContent =
-            "🎒 装備（" +
-            getSlotItemIds("equipment").length +
-            "/" +
-            SLOT_COUNTS.equipment +
-            "）";
 }
-
 function renderSlotGrid(category,containerId){
 
     const container =
@@ -844,20 +859,19 @@ function updateRequirementDisplay(){
             ) + "%";
 
     const expectedReward =
-    Math.max(
-        1,
-        Math.round(
-            location.rewardRate *
-            timeSettings[selectedHours].rewardMultiplier
-        )
-    );
+        Math.max(
+            1,
+            Math.round(
+                location.rewardRate *
+                timeSettings[selectedHours].rewardMultiplier
+            )
+        );
 
-document
-    .getElementById("expectedReward")
-    .textContent =
-    "約" + expectedReward + "個";
+    document
+        .getElementById("expectedReward")
+        .textContent =
+        "約" + expectedReward + "個";
 }
-
 /* =====================================================
    インベントリ監視
 ===================================================== */
@@ -943,28 +957,33 @@ async function startExpedition(){
     const location =
         getSelectedLocation();
 
-   
-
     const selectedFoodIds =
         getSlotItemIds("food");
-
-    const selectedWaterIds =
-        getSlotItemIds("water");
-
-    const selectedEquipmentIds =
-        getSlotItemIds("equipment");
 
     if(selectedFoodIds.length === 0){
         showMessage("持っていく食べ物を選んでください");
         return;
     }
 
-    if(selectedWaterIds.length === 0){
-        showMessage("持っていく水を選んでください");
+    const requiredWater =
+        waterRequirements[selectedHours] || 0;
+
+    const totalWater =
+        Object.values(inventoryData)
+        .filter(item => item && item.category === "water")
+        .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+
+    if(totalWater < requiredWater){
+
+        showMessage(
+            "この時間の探検には水が" +
+            requiredWater +
+            "個必要です（現在" +
+            totalWater +
+            "個）"
+        );
         return;
     }
-
-   
 
     const successRate =
         computeEffectiveSuccessRate(location);
@@ -981,11 +1000,8 @@ async function startExpedition(){
         selectedFoodIds.length +
         "個\n" +
         "水：" +
-        selectedWaterIds.length +
-        "個\n" +
-        "装備：" +
-        selectedEquipmentIds.length +
-        "個\n" +
+        requiredWater +
+        "個消費\n" +
         "成功率：約" +
         Math.round(successRate * 100) +
         "%\n\n" +
@@ -1019,15 +1035,9 @@ async function startExpedition(){
             updates
         );
 
-        consumeSlotItems(
+        consumeWaterRequirement(
             latestInventory,
-            selectedWaterIds,
-            updates
-        );
-
-        consumeSlotItems(
-            latestInventory,
-            selectedEquipmentIds,
+            requiredWater,
             updates
         );
 
@@ -1048,7 +1058,6 @@ async function startExpedition(){
 
             hours:selectedHours,
 
-            
             successRate:successRate,
             rewardWeights:rewardWeights,
 
@@ -1066,9 +1075,7 @@ async function startExpedition(){
         await database.ref().update(updates);
 
         selectedSlots = {
-            food:[null,null,null],
-            water:[null,null],
-            equipment:[null,null,null]
+            food:[null,null,null]
         };
 
         showMessage("探検を開始しました");
@@ -1088,7 +1095,6 @@ async function startExpedition(){
         document.getElementById("startButton").disabled = false;
     }
 }
-
 /* =====================================================
    選んだ枠のアイテムを1個ずつ消費する
 
@@ -1148,7 +1154,64 @@ function consumeSlotItems(
         }
     }
 }
+function consumeWaterRequirement(
+    inventory,
+    requiredAmount,
+    updates
+){
 
+    if(requiredAmount <= 0){
+        return;
+    }
+
+    let remaining = requiredAmount;
+
+    for(const itemId in inventory){
+
+        if(remaining <= 0){
+            break;
+        }
+
+        const item = inventory[itemId];
+
+        if(!item || item.category !== "water"){
+            continue;
+        }
+
+        const have = Number(item.quantity || 0);
+
+        if(have <= 0){
+            continue;
+        }
+
+        const used = Math.min(have, remaining);
+        const newQuantity = have - used;
+
+        const path =
+            "inventories/" +
+            currentUser.uid +
+            "/" +
+            itemId;
+
+        if(newQuantity <= 0){
+
+            updates[path] = null;
+
+        }else{
+
+            updates[path + "/quantity"] = newQuantity;
+
+            updates[path + "/updatedAt"] =
+                firebase.database.ServerValue.TIMESTAMP;
+        }
+
+        remaining -= used;
+    }
+
+    if(remaining > 0){
+        throw new Error("物資が不足しています");
+    }
+}
 /* =====================================================
    探検状態を監視
 ===================================================== */
