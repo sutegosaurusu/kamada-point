@@ -103,7 +103,7 @@ const locations = [
     "透き通った小川。水辺ならではの素材や生き物が見つかるが、流れが速く探索は難しい。",
 
     rewardRate:2,
-    baseSuccessRate:0.55,
+    baseSuccessRate:0.25,
 
     rewards:[
         { itemId:"water", weight:20 },
