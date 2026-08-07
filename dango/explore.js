@@ -116,6 +116,10 @@ function renderLocations(){
                 基本成功率：
                 ${Math.round(location.baseSuccessRate * 100)}%
             </div>
+
+            <button class="rewardTableButton" type="button">
+                📊 取れるものを見る
+            </button>
         `;
 
         card.addEventListener("click", () => {
@@ -131,8 +135,96 @@ function renderLocations(){
             updateRequirementDisplay();
         });
 
+        const rewardTableButton =
+            card.querySelector(".rewardTableButton");
+
+        rewardTableButton.addEventListener("click", event => {
+
+            // カード自体のクリック（場所選択）が
+            // 一緒に発火しないようにする
+            event.stopPropagation();
+
+            openRewardTable(location);
+        });
+
         locationScroll.appendChild(card);
     });
+}
+
+/* =====================================================
+   確率表の表示
+===================================================== */
+
+function openRewardTable(location){
+
+    const totalWeight =
+        location.rewards.reduce(
+            (sum, reward) => sum + (reward.weight || 0),
+            0
+        );
+
+    // 確率が高い順に並び替え
+    const sortedRewards =
+        [...location.rewards].sort(
+            (a,b) => b.weight - a.weight
+        );
+
+    document
+        .getElementById("rewardTableTitle")
+        .textContent =
+            location.icon + " " + location.name + "で取れるもの";
+
+    const list =
+        document.getElementById("rewardTableList");
+
+    list.innerHTML = "";
+
+    sortedRewards.forEach(reward => {
+
+        const item =
+            getItemById(reward.itemId);
+
+        if(!item){
+            return;
+        }
+
+        const percent =
+            totalWeight > 0
+            ? (reward.weight / totalWeight) * 100
+            : 0;
+
+        const row =
+            document.createElement("div");
+
+        row.className = "rewardTableRow";
+
+        row.innerHTML = `
+            <div class="rewardTableIcon">
+                ${item.icon || getDefaultIcon(item.category)}
+            </div>
+
+            <div class="rewardTableName">
+                ${escapeHtml(item.name)}
+            </div>
+
+            <div class="rewardTablePercent">
+                ${percent.toFixed(percent < 1 ? 2 : 1)}%
+            </div>
+        `;
+
+        list.appendChild(row);
+    });
+
+    document
+        .getElementById("rewardTableOverlay")
+        .classList.add("show");
+}
+
+function closeRewardTable(){
+
+    document
+        .getElementById("rewardTableOverlay")
+        .classList.remove("show");
 }
 
 /* =====================================================
