@@ -201,7 +201,7 @@ function renderRecipeList(){
 
                 return `
                 <span>
-                ${materialInfo.icon || getDefaultIcon(materialInfo.category)}×${needQty}
+                ${escapeHtml(materialInfo.name || materialId)}×${needQty}
                 </span>
                 `;
             })
@@ -222,7 +222,7 @@ function renderRecipeList(){
 
                 return `
                 <span class="${enough ? "" : "short"}">
-                ${materialInfo.icon || getDefaultIcon(materialInfo.category)}
+                ${escapeHtml(materialInfo.name || materialId)}
                 ${owned}/${needQty}
                 </span>
                 `;
@@ -325,7 +325,7 @@ function renderMaterialSummary(){
 
             return `
             <span>
-            ${materialInfo.icon || getDefaultIcon(materialInfo.category)}
+            ${escapeHtml(materialInfo.name || materialId)}
             ${owned}
             </span>
             `;
