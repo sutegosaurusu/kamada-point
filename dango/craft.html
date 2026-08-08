@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>工房</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:16px;
+    min-height:100vh;
+
+    font-family:"Yu Mincho","Noto Serif JP",serif;
+    color:#302318;
+
+    background:
+        radial-gradient(
+            circle at 20% 10%,
+            rgba(255,255,255,.10),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 80% 70%,
+            rgba(50,30,10,.10),
+            transparent 45%
+        ),
+        #b69a70;
+}
+
+/* タイトル */
+
+header{
+    width:100%;
+    max-width:900px;
+    margin:0 auto 14px;
+    padding:16px;
+
+    background:#cbb58e;
+    border:3px solid #5c432b;
+    box-shadow:4px 4px 0 #725638;
+}
+
+header h1{
+    margin:0;
+    font-size:28px;
+    letter-spacing:2px;
+}
+
+header p{
+    margin:6px 0 0;
+    color:#665039;
+    font-size:14px;
+}
+
+/* 上部情報 */
+
+.topInfo{
+    width:100%;
+    max-width:900px;
+    margin:0 auto 14px;
+    padding:10px 12px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+
+    background:#d5c29e;
+    border:2px solid #60472e;
+}
+
+.pointDisplay{
+    font-size:20px;
+    font-weight:bold;
+    color:#715317;
+}
+
+.backButton{
+    padding:8px 12px;
+
+    border:2px solid #4c351f;
+    background:#765536;
+    color:#f5e7ca;
+
+    font-family:inherit;
+    cursor:pointer;
+}
+
+/* スロットタブ */
+
+.slotTabs{
+    width:100%;
+    max-width:900px;
+    margin:0 auto 14px;
+
+    display:flex;
+    gap:6px;
+}
+
+.slotTabs button{
+    flex:1;
+    padding:12px 4px;
+
+    border:2px solid #594026;
+    background:#d2bd96;
+    color:#382719;
+
+    font-family:inherit;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.slotTabs button.active{
+    background:#705036;
+    color:#fff0d0;
+}
+
+/* レシピ一覧 */
+
+.recipeList{
+    width:100%;
+    max-width:900px;
+    margin:0 auto;
+
+    display:grid;
+    grid-template-columns:repeat(
+        auto-fill,
+        minmax(260px,1fr)
+    );
+    gap:14px;
+}
+
+.recipeCard{
+    padding:15px;
+
+    background:#d7c4a1;
+    border:3px solid #5b422b;
+    box-shadow:4px 4px 0 #75593c;
+}
+
+.recipeHeader{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.recipeIcon{
+    width:52px;
+    height:52px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:#c6ad83;
+    border:2px solid #684c31;
+    border-radius:50%;
+
+    font-size:28px;
+}
+
+.recipeName{
+    font-size:19px;
+    font-weight:bold;
+}
+
+.materialList{
+    margin-bottom:10px;
+}
+
+.materialRow{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 8px;
+    margin-bottom:4px;
+
+    background:#e3d1ae;
+    border:1px solid #8a6a42;
+
+    font-size:13px;
+}
+
+.materialRow.short{
+    color:#7a2a1c;
+    border-color:#7a2a1c;
+    background:#e7c6bb;
+}
+
+.pointRow{
+    display:flex;
+    justify-content:space-between;
+    padding:8px;
+    margin-bottom:10px;
+
+    background:#e3d1ae;
+    border:1px solid #8a6a42;
+
+    font-size:13px;
+    font-weight:bold;
+}
+
+.pointRow.short{
+    color:#7a2a1c;
+    border-color:#7a2a1c;
+    background:#e7c6bb;
+}
+
+.craftButton{
+    width:100%;
+    padding:12px;
+
+    border:2px solid #402b19;
+    background:#69482c;
+    color:#fff0d0;
+
+    font-family:inherit;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.craftButton:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.empty{
+    grid-column:1 / -1;
+
+    padding:35px 15px;
+    text-align:center;
+
+    background:#d7c4a1;
+    border:3px solid #60472e;
+}
+
+/* メッセージ */
+
+.message{
+    position:fixed;
+    left:50%;
+    bottom:25px;
+    transform:translateX(-50%);
+
+    max-width:90%;
+    padding:12px 20px;
+
+    background:#332419;
+    color:#fff0d0;
+    border:2px solid #d2b77f;
+
+    opacity:0;
+    pointer-events:none;
+    transition:.2s;
+    z-index:1000;
+}
+
+.message.show{
+    opacity:1;
+}
+
+@media(max-width:600px){
+
+    body{
+        padding:10px;
+    }
+
+    header h1{
+        font-size:24px;
+    }
+
+    .topInfo{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🛠 工房</h1>
+    <p>素材とPointで装備を作る</p>
+</header>
+
+<div class="topInfo">
+
+    <div class="pointDisplay" id="point">
+        0 Pt
+    </div>
+
+    <div style="display:flex;gap:7px;">
+
+        <button
+            class="backButton"
+            onclick="location.href='inventory.html'"
+        >
+            🎒 持ち物
+        </button>
+
+        <button
+            class="backButton"
+            onclick="location.href='dango.html'"
+        >
+            村へ戻る
+        </button>
+
+    </div>
+
+</div>
+
+<div class="slotTabs">
+
+    <button class="active" data-slot="head">
+        🪖 頭
+    </button>
+
+    <button data-slot="weapon">
+        ⚔ 武器
+    </button>
+
+    <button data-slot="shield">
+        🛡 盾
+    </button>
+
+</div>
+
+<div class="recipeList" id="recipeList">
+
+    <div class="empty">
+        レシピを読み込んでいます
+    </div>
+
+</div>
+
+<div class="message" id="message"></div>
+
+<script src="firebase.js"></script>
+<script src="common.js"></script>
+<script src="items.js"></script>
+<script src="recipes.js"></script>
+<script src="craft.js"></script>
+</body>
+</html>
