@@ -38,12 +38,15 @@ body{
         #b69a70;
 }
 
+.panel{
+    width:100%;
+    max-width:520px;
+    margin:0 auto;
+}
+
 /* タイトル */
 
 header{
-    width:100%;
-    max-width:900px;
-    margin:0 auto 14px;
     padding:16px;
 
     background:#cbb58e;
@@ -53,8 +56,8 @@ header{
 
 header h1{
     margin:0;
-    font-size:28px;
-    letter-spacing:2px;
+    font-size:26px;
+    letter-spacing:1px;
 }
 
 header p{
@@ -66,9 +69,7 @@ header p{
 /* 上部情報 */
 
 .topInfo{
-    width:100%;
-    max-width:900px;
-    margin:0 auto 14px;
+    margin-top:12px;
     padding:10px 12px;
 
     display:flex;
@@ -81,68 +82,59 @@ header p{
 }
 
 .pointDisplay{
-    font-size:20px;
+    font-size:19px;
     font-weight:bold;
     color:#715317;
 }
 
+.backButtons{
+    display:flex;
+    gap:7px;
+}
+
 .backButton{
-    padding:8px 12px;
+    padding:8px 11px;
 
     border:2px solid #4c351f;
     background:#765536;
     color:#f5e7ca;
 
     font-family:inherit;
+    font-size:13px;
     cursor:pointer;
 }
 
-/* スロットタブ */
+/* 作れる装備数 */
 
-.slotTabs{
-    width:100%;
-    max-width:900px;
-    margin:0 auto 14px;
+.countBar{
+    margin-top:14px;
+    padding:10px 14px;
 
-    display:flex;
-    gap:6px;
-}
+    background:#e3d1ae;
+    border:2px solid #6d5135;
 
-.slotTabs button{
-    flex:1;
-    padding:12px 4px;
-
-    border:2px solid #594026;
-    background:#d2bd96;
-    color:#382719;
-
-    font-family:inherit;
     font-size:16px;
-    cursor:pointer;
+    font-weight:bold;
 }
 
-.slotTabs button.active{
-    background:#705036;
-    color:#fff0d0;
+/* 見出し */
+
+.sectionTitle{
+    margin:18px 0 8px;
+    font-size:17px;
+    font-weight:bold;
 }
 
-/* レシピ一覧 */
+/* レシピカード */
 
 .recipeList{
-    width:100%;
-    max-width:900px;
-    margin:0 auto;
-
-    display:grid;
-    grid-template-columns:repeat(
-        auto-fill,
-        minmax(260px,1fr)
-    );
-    gap:14px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
 }
 
 .recipeCard{
-    padding:15px;
+    padding:14px;
 
     background:#d7c4a1;
     border:3px solid #5b422b;
@@ -153,12 +145,12 @@ header p{
     display:flex;
     align-items:center;
     gap:10px;
-    margin-bottom:10px;
 }
 
 .recipeIcon{
-    width:52px;
-    height:52px;
+    width:44px;
+    height:44px;
+    flex-shrink:0;
 
     display:flex;
     align-items:center;
@@ -168,65 +160,68 @@ header p{
     border:2px solid #684c31;
     border-radius:50%;
 
-    font-size:28px;
+    font-size:24px;
 }
 
 .recipeName{
-    font-size:19px;
+    font-size:18px;
     font-weight:bold;
 }
 
-.materialList{
-    margin-bottom:10px;
+.recipeEffect{
+    margin-top:2px;
+    color:#4d6430;
+    font-size:13px;
+    font-weight:bold;
 }
 
-.materialRow{
-    display:flex;
-    justify-content:space-between;
-    padding:6px 8px;
-    margin-bottom:4px;
+.materialCosts{
+    margin-top:10px;
 
-    background:#e3d1ae;
-    border:1px solid #8a6a42;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+
+    font-size:15px;
+}
+
+.ownedRow{
+    margin-top:6px;
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
 
     font-size:13px;
+    color:#5c4529;
 }
 
-.materialRow.short{
+.ownedRow span.short{
     color:#7a2a1c;
-    border-color:#7a2a1c;
-    background:#e7c6bb;
+    font-weight:bold;
 }
 
 .pointRow{
-    display:flex;
-    justify-content:space-between;
-    padding:8px;
-    margin-bottom:10px;
-
-    background:#e3d1ae;
-    border:1px solid #8a6a42;
-
+    margin-top:8px;
     font-size:13px;
     font-weight:bold;
 }
 
 .pointRow.short{
     color:#7a2a1c;
-    border-color:#7a2a1c;
-    background:#e7c6bb;
 }
 
 .craftButton{
     width:100%;
-    padding:12px;
+    margin-top:12px;
+    padding:11px;
 
     border:2px solid #402b19;
     background:#69482c;
     color:#fff0d0;
 
     font-family:inherit;
-    font-size:16px;
+    font-size:15px;
     cursor:pointer;
 }
 
@@ -236,13 +231,52 @@ header p{
 }
 
 .empty{
-    grid-column:1 / -1;
-
-    padding:35px 15px;
+    padding:30px 15px;
     text-align:center;
 
     background:#d7c4a1;
     border:3px solid #60472e;
+}
+
+/* 所持素材 */
+
+.materialSummary{
+    margin-top:8px;
+    padding:12px 14px;
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+
+    background:#e3d1ae;
+    border:2px solid #6d5135;
+
+    font-size:16px;
+}
+
+/* レシピ図鑑 */
+
+.recipeIndex{
+    margin-top:8px;
+    padding:12px 14px;
+
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+
+    background:#e3d1ae;
+    border:2px solid #6d5135;
+
+    font-size:15px;
+}
+
+.recipeIndex .known{
+    color:#3a5a20;
+    font-weight:bold;
+}
+
+.recipeIndex .unknown{
+    color:#8a7457;
 }
 
 /* メッセージ */
@@ -269,79 +303,61 @@ header p{
 .message.show{
     opacity:1;
 }
-
-@media(max-width:600px){
-
-    body{
-        padding:10px;
-    }
-
-    header h1{
-        font-size:24px;
-    }
-
-    .topInfo{
-        align-items:flex-start;
-        flex-direction:column;
-    }
-}
 </style>
 </head>
 
 <body>
 
-<header>
-    <h1>🛠 工房</h1>
-    <p>素材とPointで装備を作る</p>
-</header>
+<div class="panel">
 
-<div class="topInfo">
+    <header>
+        <h1>🏛 ダンゴムシ工房</h1>
+        <p>素材から装備を作ろう</p>
+    </header>
 
-    <div class="pointDisplay" id="point">
-        0 Pt
+    <div class="topInfo">
+
+        <div class="pointDisplay" id="point">
+            0 Pt
+        </div>
+
+        <div class="backButtons">
+
+            <button
+                class="backButton"
+                onclick="location.href='inventory.html'"
+            >
+                🎒 持ち物
+            </button>
+
+            <button
+                class="backButton"
+                onclick="location.href='dango.html'"
+            >
+                村へ戻る
+            </button>
+
+        </div>
+
     </div>
 
-    <div style="display:flex;gap:7px;">
+    <div class="countBar" id="countBar">
+        ⭐ 作れる装備 0種類
+    </div>
 
-        <button
-            class="backButton"
-            onclick="location.href='inventory.html'"
-        >
-            🎒 持ち物
-        </button>
+    <div class="recipeList" id="recipeList">
 
-        <button
-            class="backButton"
-            onclick="location.href='dango.html'"
-        >
-            村へ戻る
-        </button>
+        <div class="empty">
+            レシピを読み込んでいます
+        </div>
 
     </div>
 
-</div>
+    <div class="sectionTitle">📦 所持素材</div>
+    <div class="materialSummary" id="materialSummary"></div>
 
-<div class="slotTabs">
-
-    <button class="active" data-slot="head">
-        🪖 頭
-    </button>
-
-    <button data-slot="weapon">
-        ⚔ 武器
-    </button>
-
-    <button data-slot="shield">
-        🛡 盾
-    </button>
-
-</div>
-
-<div class="recipeList" id="recipeList">
-
-    <div class="empty">
-        レシピを読み込んでいます
-    </div>
+    <div class="sectionTitle">📖 レシピ図鑑</div>
+    <div class="recipeIndex" id="recipeIndex"></div>
 
 </div>
 
@@ -350,6 +366,7 @@ header p{
 <script src="firebase.js"></script>
 <script src="common.js"></script>
 <script src="items.js"></script>
+<script src="itemEffects.js"></script>
 <script src="recipes.js"></script>
 <script src="craft.js"></script>
 </body>
