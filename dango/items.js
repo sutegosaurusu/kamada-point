@@ -166,7 +166,19 @@ const items = [
 // 素材
 // ======================
 
+/*
+    items.js の「素材」セクションの近くに、以下のアイテムを追加してください。
+    （id・name・category・price の書き方は既存アイテムと同じです）
+    price はどこにも売っていないので使いませんが、
+    他のアイテムと同じ形にするため 0 を入れています。
+*/
 
+{
+    id:"free_craft_ticket",
+    name:"装備合成 無料チケット",
+    category:"material",
+    price:0
+},
 
  {
     id:"cicada_shell",
