@@ -34,29 +34,16 @@ const recipes = {
         point:80
     },
 
-    snail_shell:{
-        materials:{
-            river_snail_shell:1,
-            small_stone:2
-        },
-        point:100
-    },
-
     bottle_cap:{
         materials:{
             driftwood:2,
             round_stone:2
         },
         point:100
-    },
-
-    feather:{
-        materials:{
-            reed_stem:2,
-            cicada_shell:1
-        },
-        point:100
     }
+
+    // snail_shell・featherは探検で拾えるため、工房レシピには含めていません。
+    // 工房限定の装備を増やす場合はここに追加してください。
 
 };
 
