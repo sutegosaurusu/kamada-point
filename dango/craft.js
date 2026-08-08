@@ -6,6 +6,8 @@ let inventoryData = {};
 let currentPoint = 0;
 let craftedRecipes = {};
 
+const FREE_CRAFT_TICKET_ITEM_ID = "free_craft_ticket";
+
 
 // ===============================
 // ログイン後開始
@@ -120,9 +122,17 @@ function getOwnedQuantity(itemId){
 // レシピが作成可能か判定
 // ===============================
 
+function hasFreeCraftTicket(){
+    return getOwnedQuantity(FREE_CRAFT_TICKET_ITEM_ID) > 0;
+}
+
 function canCraft(recipe){
 
-    if(currentPoint < recipe.point){
+    const pointOk =
+        hasFreeCraftTicket() ||
+        currentPoint >= recipe.point;
+
+    if(!pointOk){
         return false;
     }
 
@@ -230,6 +240,16 @@ function renderRecipeList(){
 
         const craftable = canCraft(recipe);
         const effectText = getEffectText(itemId);
+        const useTicket = hasFreeCraftTicket();
+
+        const pointRowHtml =
+            useTicket
+            ? `<div class="pointRow ticketRow">
+                🎟 無料チケット使用でPoint消費なし
+               </div>`
+            : `<div class="pointRow ${currentPoint >= recipe.point ? "" : "short"}">
+                💰 ${recipe.point.toLocaleString()} Pt（所持 ${currentPoint.toLocaleString()} Pt）
+               </div>`;
 
         const card =
             document.createElement("div");
@@ -257,9 +277,7 @@ function renderRecipeList(){
             所持 ${ownedRowHtml}
         </div>
 
-        <div class="pointRow ${currentPoint >= recipe.point ? "" : "short"}">
-            💰 ${recipe.point.toLocaleString()} Pt（所持 ${currentPoint.toLocaleString()} Pt）
-        </div>
+        ${pointRowHtml}
 
         <button
             class="craftButton"
@@ -404,6 +422,8 @@ async function craftItem(itemId, recipe){
     const basePath =
         "inventories/" + currentUser.uid + "/";
 
+    const useTicket = hasFreeCraftTicket();
+
     // 素材を消費
     Object.entries(recipe.materials)
     .forEach(([materialId, needQty]) => {
@@ -415,9 +435,27 @@ async function craftItem(itemId, recipe){
             newQty;
     });
 
-    // Pointを消費
-    updates["members/" + currentUser.uid + "/point"] =
-        currentPoint - recipe.point;
+    if(useTicket){
+
+        // 無料チケットを1枚消費（Pointは消費しない）
+        const ticketQty =
+            getOwnedQuantity(FREE_CRAFT_TICKET_ITEM_ID) - 1;
+
+        const ticketPath =
+            basePath + FREE_CRAFT_TICKET_ITEM_ID;
+
+        if(ticketQty <= 0){
+            updates[ticketPath] = null;
+        }else{
+            updates[ticketPath + "/quantity"] = ticketQty;
+        }
+
+    }else{
+
+        // Pointを消費
+        updates["members/" + currentUser.uid + "/point"] =
+            currentPoint - recipe.point;
+    }
 
     // 完成品を付与
     const existing = inventoryData[itemId];
@@ -443,7 +481,11 @@ async function craftItem(itemId, recipe){
 
         await database.ref().update(updates);
 
-        showMessage(info.name + "を作成しました！");
+        showMessage(
+            useTicket
+            ? info.name + "を無料チケットで作成しました！"
+            : info.name + "を作成しました！"
+        );
 
     }catch(error){
 
