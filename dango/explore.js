@@ -1481,11 +1481,18 @@ async function claimRewards(){
 
         if(!isSuccess){
 
+            const ticketGranted =
+                await grantDailyFreeTicketIfNeeded(updates);
+
             await database.ref().update(updates);
 
             showRewardResult([],false);
 
-            showMessage("探検は失敗に終わりました…");
+            showMessage(
+                ticketGranted
+                ? "探検は失敗に終わりました…（装備合成の無料チケットを1枚入手しました）"
+                : "探検は失敗に終わりました…"
+            );
 
             return;
         }
@@ -1552,6 +1559,81 @@ async function claimRewards(){
 
         claimButton.disabled = false;
     }
+}
+
+/* =====================================================
+   探検失敗時：1日1回だけ装備合成無料チケットを付与
+
+   ・0時（日付が変わったタイミング）でリセット
+   ・1日に何度失敗してもチケットは1枚のみ
+   ・チケット自体は何枚でも貯めておける
+===================================================== */
+
+const FREE_CRAFT_TICKET_ITEM_ID = "free_craft_ticket";
+
+function getTodayKey(){
+
+    const now = new Date();
+
+    return (
+        now.getFullYear() +
+        "-" +
+        String(now.getMonth() + 1).padStart(2,"0") +
+        "-" +
+        String(now.getDate()).padStart(2,"0")
+    );
+}
+
+async function grantDailyFreeTicketIfNeeded(updates){
+
+    const todayKey = getTodayKey();
+
+    const lastDateSnapshot =
+        await database
+            .ref(
+                "members/" +
+                currentUser.uid +
+                "/lastFreeTicketDate"
+            )
+            .once("value");
+
+    const lastDate =
+        lastDateSnapshot.val();
+
+    if(lastDate === todayKey){
+        // 今日はすでに受け取り済み
+        return false;
+    }
+
+    const ticketInfo =
+        itemInformation[FREE_CRAFT_TICKET_ITEM_ID];
+
+    const existingTicket =
+        inventoryData[FREE_CRAFT_TICKET_ITEM_ID];
+
+    const newQuantity =
+        (existingTicket
+            ? Number(existingTicket.quantity || 0)
+            : 0) + 1;
+
+    const ticketPath =
+        "inventories/" +
+        currentUser.uid +
+        "/" +
+        FREE_CRAFT_TICKET_ITEM_ID;
+
+    updates[ticketPath + "/quantity"] = newQuantity;
+    updates[ticketPath + "/category"] = "material";
+    updates[ticketPath + "/name"] =
+        ticketInfo ? ticketInfo.name : "装備合成 無料チケット";
+
+    updates[
+        "members/" +
+        currentUser.uid +
+        "/lastFreeTicketDate"
+    ] = todayKey;
+
+    return true;
 }
 
 /* =====================================================
@@ -1757,5 +1839,7 @@ function getDurationMilliseconds(hours){
         return hours * 60 * 1000;
     }
 
+    return hours * 60 * 60 * 1000;
+}
     return hours * 60 * 60 * 1000;
 }
