@@ -137,18 +137,18 @@ const locations = [
     rewards:[
         { itemId:"flower_petal", weight:20 },
         { itemId:"honey", weight:15 },
-        { itemId:"smallbug", weight:13 },
+        { itemId:"smallbug", weight:15 },
         { itemId:"larva", weight:10 },
         { itemId:"moss", weight:8 },
         { itemId:"berry", weight:7 },
         { itemId:"leaf", weight:6 },
         { itemId:"water", weight:6 },
         { itemId:"tree_sap", weight:4 },
-        { itemId:"feather", weight:2 },
-        { itemId:"snail_shell", weight:1 },
+        { itemId:"feather", weight:0.2 },
+        { itemId:"snail_shell", weight:0.1 },
         { itemId:"cicada_shell", weight:1 },
         { itemId:"Anteggs", weight:0.5 },
-        { itemId:"stag_beetle_jaw", weight:0.1 }
+        { itemId:"stag_beetle_jaw", weight:0.01 }
     ]
 },
 
