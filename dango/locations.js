@@ -122,23 +122,35 @@ const locations = [
     ]
 },
 
-    {
-        id:"ancient_ruins",
-        name:"崩れた古代遺跡",
-        icon:"🏛️",
-        difficulty:5,
-        description:
-            "古い石造建築の跡。危険だが貴重な品が眠っている。",
+   {
+    id:"flower_garden",
+    name:"花壇",
+    icon:"🌸",
+    difficulty:5,
 
-        rewardRate:2.6,
-        baseSuccessRate:0.55,
-        rewards:[
-            { itemId:"bronze_fragment", weight:35 },
-            { itemId:"ancient_coin", weight:25 },
-            { itemId:"old_pottery", weight:25 },
-            { itemId:"sacred_fig", weight:15 }
-        ]
-    },
+    description:
+    "色とりどりの花が咲く花壇。蜜や花びら、花に集まる小さな生き物が多く見つかる。",
+
+    rewardRate:2.6,
+    baseSuccessRate:0.50,
+
+    rewards:[
+        { itemId:"flower_petal", weight:20 },
+        { itemId:"honey", weight:15 },
+        { itemId:"smallbug", weight:13 },
+        { itemId:"larva", weight:10 },
+        { itemId:"moss", weight:8 },
+        { itemId:"berry", weight:7 },
+        { itemId:"leaf", weight:6 },
+        { itemId:"water", weight:6 },
+        { itemId:"tree_sap", weight:4 },
+        { itemId:"feather", weight:2 },
+        { itemId:"snail_shell", weight:1 },
+        { itemId:"cicada_shell", weight:1 },
+        { itemId:"Anteggs", weight:0.5 },
+        { itemId:"stag_beetle_jaw", weight:0.1 }
+    ]
+},
 
     {
         id:"deep_cave",
