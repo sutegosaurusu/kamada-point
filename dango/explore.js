@@ -140,8 +140,8 @@ function renderLocations(){
 
             <div class="difficulty">
                 難易度：
-                ${"★".repeat(location.difficulty)}
-                ${"☆".repeat(6 - location.difficulty)}
+               ${"★".repeat(location.difficulty)}
+${"☆".repeat(Math.max(0, 7 - location.difficulty))}
             </div>
 
             <div class="rewardHint">
