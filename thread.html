@@ -125,26 +125,51 @@ button:disabled{
 /* AA */
 
 .aaContent{
+    margin-top:8px;
+
+    /* 改行・半角スペースを完全維持 */
     white-space:pre;
+
+    /* 横に長いAAはスクロール */
     overflow-x:auto;
     overflow-y:hidden;
 
+    /* AA用の等幅フォント */
     font-family:
         "MS Gothic",
         "ＭＳ ゴシック",
-        "Consolas",
+        "MS PGothic",
+        "ＭＳ Ｐゴシック",
+        "Courier New",
         monospace;
 
-    font-size:14px;
-    line-height:1.3;
+    /* AAの幅を内容に合わせる */
+    width:100%;
+    min-width:0;
 
+    /* 文字サイズと行間を固定 */
+    font-size:14px;
+    line-height:1.0;
+
+    /* ブラウザによる文字間隔の調整を抑える */
+    letter-spacing:0;
+
+    /* 強制的な折り返しを禁止 */
+    word-break:normal;
+    overflow-wrap:normal;
+
+    /* 見た目 */
     background:#fafafa;
+    border:1px solid #eee;
     border-radius:8px;
 
-    padding:10px;
-    margin-top:8px;
+    padding:12px;
 
-    word-break:normal;
+    /* タップ時も横スクロールしやすくする */
+    -webkit-overflow-scrolling:touch;
+
+    /* AAの選択を許可 */
+    user-select:text;
 }
 
 /* 画像 */
@@ -1422,25 +1447,21 @@ onValue(
                     "aa"
                 ){
 
-                    const aa =
-                        document.createElement(
-                            "div"
-                        );
+                   const aa =
+    document.createElement(
+        "pre"
+    );
 
+aa.className =
+    "aaContent";
 
-                    aa.className =
-                        "aaContent";
+aa.textContent =
+    post.text ||
+    "";
 
-
-                    aa.textContent =
-                        post.text ||
-                        "";
-
-
-                    div.appendChild(
-                        aa
-                    );
-
+div.appendChild(
+    aa
+);
                 }
                 else{
 
