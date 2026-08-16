@@ -205,5 +205,3 @@ const timeSettings = {
     }
 
 };
-
-};
