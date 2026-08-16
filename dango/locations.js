@@ -193,15 +193,17 @@ const timeSettings = {
     },
 
     6:{
-        rewardMultiplier:4.2,
-        minReward:4,
-        maxReward:7
+        rewardMultiplier:4.5,
+        minReward:5,
+        maxReward:8
     },
 
     12:{
         rewardMultiplier:10,
-        minReward:8,
-        maxReward:13
+        minReward:9,
+        maxReward:14
     }
+
+};
 
 };
