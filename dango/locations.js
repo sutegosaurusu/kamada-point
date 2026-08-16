@@ -163,7 +163,7 @@ const locations = [
     rewardRate:4.0,
     baseSuccessRate:0.38,
     rewards:[
-        rewards:[
+        
     { itemId:"smallbug", weight:15 },        // 小さな虫
     { itemId:"tea_leaf", weight:10 },        // 茶葉
     { itemId:"thread", weight:10 },          // 糸
