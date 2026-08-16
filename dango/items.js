@@ -204,12 +204,7 @@ const items = [
     category:"material",
     price:10
 },
-{
-    id:"twig",
-    name:"小枝",
-    category:"material",
-    price:8
-},
+
 {
     id:"rubber_band",
     name:"輪ゴム",
