@@ -84,6 +84,12 @@ const items = [
     category:"food",
     price:80
 },
+　{
+    id:"tea_leaf",
+    name:"茶葉",
+    category:"food",
+    price:12
+},
     // ======================
     // 水
     // ======================
@@ -162,6 +168,12 @@ const items = [
     price:300,
     equipSlot:"weapon"
 },
+    {
+    id:"nail",
+    name:"釘",
+    category:"equipment",
+    price:30
+},
 // ======================
 // 素材
 // ======================
@@ -179,7 +191,49 @@ const items = [
     category:"material",
     price:0
 },
+{
+    id:"thread",
+    name:"糸",
+    category:"material",
+    price:15
+},
+{
+    id:"straw",
+    name:"藁",
+    category:"material",
+    price:10
+},
+{
+    id:"twig",
+    name:"小枝",
+    category:"material",
+    price:8
+},
+{
+    id:"rubber_band",
+    name:"輪ゴム",
+    category:"material",
+    price:20
+},
 
+{
+    id:"button",
+    name:"ボタン",
+    category:"material",
+    price:15
+},
+{
+    id:"glass_piece",
+    name:"ガラス片",
+    category:"material",
+    price:25
+},
+{
+    id:"pottery_piece",
+    name:"陶器片",
+    category:"material",
+    price:20
+}
  {
     id:"cicada_shell",
     name:"セミの抜け殻",
