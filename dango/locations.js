@@ -153,23 +153,29 @@ const locations = [
 },
 
     {
-        id:"deep_cave",
-        name:"海辺の深い洞窟",
-        icon:"🕳️",
-        difficulty:6,
-        description:
-            "暗く深い最難関の洞窟。十分な準備が必要。",
+    id:"vacant_house",
+    name:"空き家",
+    icon:"🏚️",
+    difficulty:7,
+    description:
+        "人の住まなくなった空き家。床下や台所、物置には、長い間残された食べ物や生活用品が眠っている。",
 
-        rewardRate:3.4,
-        baseSuccessRate:0.42,
+    rewardRate:4.0,
+    baseSuccessRate:0.38,
+    rewards:[
         rewards:[
-            { itemId:"silver_fragment", weight:25 },
-            { itemId:"rare_crystal", weight:20 },
-            { itemId:"cave_mushroom", weight:30 },
-            { itemId:"underground_water", weight:25 }
-        ]
-    }
-
+    { itemId:"smallbug", weight:15 },        // 小さな虫
+    { itemId:"tea_leaf", weight:10 },        // 茶葉
+    { itemId:"thread", weight:10 },          // 糸
+    { itemId:"straw", weight:10 },           // 藁
+    { itemId:"twig", weight:12 },            // 小枝
+    { itemId:"rubber_band", weight:10 },     // 輪ゴム
+    { itemId:"nail", weight:8 },             // 釘
+    { itemId:"button", weight:8 },           // ボタン
+    { itemId:"glass_piece", weight:4 },      // ガラス片
+    { itemId:"pottery_piece", weight:3 }     // 陶器片
+]
+}
 ];
 
 const timeSettings = {
