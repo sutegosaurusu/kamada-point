@@ -172,7 +172,7 @@ const items = [
     id:"nail",
     name:"釘",
     category:"equipment",
-    price:30
+    price:30,
     equipSlot:"weapon"
 },
 // ======================
