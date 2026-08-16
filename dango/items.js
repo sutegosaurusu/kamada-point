@@ -234,7 +234,7 @@ const items = [
     name:"陶器片",
     category:"material",
     price:20
-}
+},
  {
     id:"cicada_shell",
     name:"セミの抜け殻",
