@@ -93,6 +93,10 @@ const itemEffects = {
     rewardMultiplier:1.1,
     description:"探索成功率 +5%。獲得アイテム数 +10%"
 },
+   tea_leaf:{
+    successRate:0.03,
+    description:"探索成功率 +3%"
+},
     // ======================
     // 水
     // ======================
@@ -156,6 +160,10 @@ const itemEffects = {
  frog_skin:{
     rewardMultiplier:1.5,
     description:"獲得アイテム数 +50%"
+},
+   nail:{
+    successRate:0.06,
+    description:"探索成功率 +6%"
 },
 
     feather:{
