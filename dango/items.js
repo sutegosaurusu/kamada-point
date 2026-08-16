@@ -173,6 +173,7 @@ const items = [
     name:"釘",
     category:"equipment",
     price:30
+    equipSlot:"weapon"
 },
 // ======================
 // 素材
