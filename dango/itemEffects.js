@@ -37,13 +37,12 @@ const itemEffects = {
     },
 
     flower_petal:{
-        findBonus:{
-            smallbug:0.20,
-            honey:0.10
-        },
-        description:"小さな虫・蜜の発見率アップ"
+    boosts:{
+        smallbug:0.20,
+        honey:0.10
     },
-
+    description:"小さな虫の発見率 +20%。蜜の発見率 +10%"
+},
     moss:{
         successRate:0.03,
         description:"探索成功率 +3%"
