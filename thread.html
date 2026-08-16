@@ -48,7 +48,39 @@ textarea{
     resize:vertical;
     font-family:"Arial","Noto Sans JP",sans-serif;
 }
+#text.aaInput{
+    width:100%;
+    height:350px;
+    min-height:350px;
 
+    padding:12px;
+    box-sizing:border-box;
+
+    white-space:pre;
+    overflow-x:auto;
+    overflow-y:auto;
+
+    font-family:
+        "MS Gothic",
+        "ＭＳ ゴシック",
+        "MS PGothic",
+        "ＭＳ Ｐゴシック",
+        monospace;
+
+    font-size:14px;
+    line-height:1;
+    letter-spacing:0;
+
+    overflow-wrap:normal;
+    word-break:normal;
+
+    resize:vertical;
+
+    border:1px solid #ccc;
+    border-radius:10px;
+
+    background:white;
+}
 button{
     padding:10px 20px;
     border:none;
@@ -601,7 +633,7 @@ function setPostType(type){
 
         imageArea.style.display =
             "none";
-
+　　　　text.classList.remove("aaInput");
 
         text.placeholder =
             "コメントを書く";
@@ -609,27 +641,23 @@ function setPostType(type){
     }
 
 
-    if(type === "aa"){
+   if(type === "aa"){
 
-        document
-            .getElementById("typeAA")
-            .classList
-            .add("active");
+    document
+        .getElementById("typeAA")
+        .classList
+        .add("active");
 
+    textArea.style.display = "block";
 
-        textArea.style.display =
-            "block";
+    imageArea.style.display = "none";
 
+    text.classList.add("aaInput");
 
-        imageArea.style.display =
-            "none";
+    text.placeholder =
+        "AAを貼り付けてください";
 
-
-        text.placeholder =
-            "AAを書く\n\n空白や改行もそのまま保存されます";
-
-    }
-
+}
 
     if(type === "image"){
 
@@ -646,7 +674,7 @@ function setPostType(type){
         imageArea.style.display =
             "block";
 
-
+text.classList.remove("aaInput");
         text.placeholder =
             "画像についてのコメント（任意）";
 
