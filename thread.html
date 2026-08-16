@@ -11,90 +11,185 @@
 <style>
 
 body{
-
-font-family:"Arial","Noto Sans JP",sans-serif;
-padding:20px;
-background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
-
+    font-family:"Arial","Noto Sans JP",sans-serif;
+    padding:20px;
+    background:linear-gradient(135deg,#ffe6f2,#e6f7ff);
 }
-
 
 .card{
-
-background:white;
-padding:8px 12px;
-margin:6px 0;
-border-radius:10px;
-box-shadow:0 1px 4px #ddd;
-
+    background:white;
+    padding:8px 12px;
+    margin:6px 0;
+    border-radius:10px;
+    box-shadow:0 1px 4px #ddd;
 }
-
 
 input{
-
-width:80%;
-padding:12px;
-border-radius:10px;
-border:1px solid #ccc;
-
+    width:80%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ccc;
 }
 
+textarea{
+    width:100%;
+    min-height:100px;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    resize:vertical;
+    box-sizing:border-box;
+}
 
 button{
-
-padding:10px 20px;
-border:none;
-border-radius:20px;
-background:#ff8fcf;
-color:white;
-
+    padding:10px 20px;
+    border:none;
+    border-radius:20px;
+    background:#ff8fcf;
+    color:white;
+    cursor:pointer;
 }
 
+button:hover{
+    opacity:.85;
+}
+
+button:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
 
 .name{
     font-weight:bold;
     cursor:pointer;
-
     user-select:none;
     -webkit-user-select:none;
     -webkit-touch-callout:none;
-
     touch-action:manipulation;
 }
 
 .time{
-
-font-size:12px;
-color:#777;
-
+    font-size:12px;
+    color:#777;
 }
+
 .likeBtn{
-
-display:inline-block;
-cursor:pointer;
-color:#ff5ca8;
-font-size:14px;
-margin-top:4px;
-user-select:none;
-
+    display:inline-block;
+    cursor:pointer;
+    color:#ff5ca8;
+    font-size:14px;
+    margin-top:4px;
+    user-select:none;
 }
 
 .likeBtn:hover{
-
-opacity:.7;
-
+    opacity:.7;
 }
-  .reply{
 
+.reply{
     font-size:11px;
     color:#888;
     margin-bottom:4px;
     padding-left:6px;
     border-left:3px solid #ffd1e3;
-
 }
-</style>
 
+/* 投稿形式 */
+
+.postTypeButtons{
+    display:flex;
+    gap:8px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+}
+
+.postTypeBtn{
+    background:#ddd;
+    color:#555;
+}
+
+.postTypeBtn.active{
+    background:#ff8fcf;
+    color:white;
+}
+
+/* 通常投稿 */
+
+.textContent{
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+/* AA */
+
+.aaContent{
+    white-space:pre;
+    overflow-x:auto;
+    font-family:
+        "MS Gothic",
+        "ＭＳ ゴシック",
+        "Consolas",
+        monospace;
+    font-size:14px;
+    line-height:1.3;
+    background:#fafafa;
+    padding:10px;
+    border-radius:8px;
+}
+
+/* 画像 */
+
+.imagePreview{
+    max-width:100%;
+    max-height:500px;
+    display:block;
+    margin-top:10px;
+    border-radius:8px;
+}
+
+.imagePost{
+    max-width:100%;
+    max-height:600px;
+    display:block;
+    border-radius:8px;
+    margin-top:8px;
+}
+
+/* 画像入力 */
+
+#imageArea{
+    display:none;
+    margin-bottom:10px;
+}
+
+#imagePreviewBox{
+    display:none;
+    margin-top:10px;
+}
+
+#imagePreview{
+    max-width:100%;
+    max-height:300px;
+    border-radius:8px;
+}
+
+#uploadStatus{
+    margin-top:8px;
+    font-size:13px;
+    color:#777;
+}
+
+/* 返信 */
+
+#replyBox{
+    display:none;
+    margin-bottom:10px;
+    background:#fff3f8;
+    padding:8px 12px;
+    border-radius:10px;
+}
+
+</style>
 
 </head>
 
@@ -102,860 +197,1597 @@ opacity:.7;
 <body>
 
 
-
-
-
 <h1 id="title">
-
 読み込み中
-
 </h1>
 
 
-<div id="posts">
-
-</div>
-
+<div id="posts"></div>
 
 
 <hr>
 
 
 <h2>書き込み</h2>
-<div id="replyBox" style="display:none;margin-bottom:10px;background:#fff3f8;padding:8px 12px;border-radius:10px;">
+
+
+<div id="replyBox">
+
 ↩ <span id="replyName"></span> に返信中
-<button id="cancelReply" style="float:right;">×</button>
+
+<button id="cancelReply" style="float:right;">
+×
+</button>
+
 </div>
 
-<input id="text" placeholder="コメントを書く">
+
+<!-- 投稿形式 -->
+
+<div class="postTypeButtons">
+
+<button
+    id="typeText"
+    class="postTypeBtn active"
+>
+通常
+</button>
+
+<button
+    id="typeAA"
+    class="postTypeBtn"
+>
+AA
+</button>
+
+<button
+    id="typeImage"
+    class="postTypeBtn"
+>
+画像
+</button>
+
+</div>
+
+
+<!-- 通常・AA本文 -->
+
+<div id="textArea">
+
+<textarea
+    id="text"
+    placeholder="コメントを書く"
+></textarea>
+
+</div>
+
+
+<!-- 画像 -->
+
+<div id="imageArea">
+
+<input
+    type="file"
+    id="imageInput"
+    accept="image/png,image/jpeg,image/gif,image/webp"
+>
+
+<div id="imagePreviewBox">
+
+<img
+    id="imagePreview"
+    class="imagePreview"
+>
+
+</div>
+
+<div id="uploadStatus"></div>
+
+</div>
 
 
 <button id="send">
-
 投稿
-
 </button>
-  <hr>
+
+
+<hr>
+
+
 <button onclick="location.href='board.html'">
-
 ←掲示板へ戻る
-
 </button>
-
 
 
 <script type="module">
 
 
-import { initializeApp }
-
+import {
+    initializeApp
+}
 from
-
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 
 import {
-
-getDatabase,
-ref,
-onValue,
-push,
-set,
-get,
-update
-
+    getDatabase,
+    ref,
+    onValue,
+    push,
+    set,
+    get,
+    update
 }
 from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
 import {
-
-getAuth,
-onAuthStateChanged
-
+    getAuth,
+    onAuthStateChanged
 }
-
 from
-
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 
+import {
+    getStorage,
+    ref as storageRef,
+    uploadBytes,
+    getDownloadURL
+}
+from
+"https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
+
+// ========================================
 // Firebase設定
+// ========================================
 
 const firebaseConfig = {
 
-apiKey:"AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
+    apiKey:
+        "AIzaSyBgILQJKJOiQ6gIeZPKhbVjdybXS_vsD3Q",
 
-authDomain:"kamadapoint.firebaseapp.com",
+    authDomain:
+        "kamadapoint.firebaseapp.com",
 
-databaseURL:"https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
+    databaseURL:
+        "https://kamadapoint-default-rtdb.asia-southeast1.firebasedatabase.app",
 
-projectId:"kamadapoint",
+    projectId:
+        "kamadapoint",
 
-storageBucket:"kamadapoint.firebasestorage.app",
+    storageBucket:
+        "kamadapoint.firebasestorage.app",
 
-messagingSenderId:"601769416524",
+    messagingSenderId:
+        "601769416524",
 
-appId:"1:601769416524:web:0be49ce5a0baf87f75e1e9"
+    appId:
+        "1:601769416524:web:0be49ce5a0baf87f75e1e9"
 
 };
 
 
-
 const app =
-initializeApp(firebaseConfig);
-
-
+    initializeApp(firebaseConfig);
 
 
 const db =
-getDatabase(app);
+    getDatabase(app);
 
 
-// ↓ここから追加
-
-async function updateRank(uid){
-
-
-const memberRef =
-ref(db,"members/"+uid);
+const storage =
+    getStorage(app);
 
 
-const snap =
-await get(memberRef);
+const auth =
+    getAuth(app);
 
 
-if(!snap.exists()) return;
-
-
-const member =
-snap.val();
-
-
-
-let rank = member.rank || "新人";
-
-
-
-if(
-member.lastPostDate &&
-Date.now()-member.lastPostDate
-<
-259200000
-){
-
-rank="常連";
-
-}
-
-
-await update(memberRef,{
-
-rank:rank
-
-});
-
-
-}
-
-
-// 名人チェック
-
-async function checkMaster(uid,likes){
-
-if(likes < 20) return;
-
-
-
-const memberRef =
-ref(db,"members/"+uid);
-
-
-
-const snap =
-await get(memberRef);
-
-
-
-if(!snap.exists()) return;
-
-
-
-const member =
-snap.val();
-
-
-
-if(member.rank !== "名人"){
-
-
-await update(memberRef,{
-
-rank:"名人",
-
-badge:"🏆 名人"
-
-});
-
-
-alert("名人ランクになりました！");
-
-
-}
-
-
-}
-
-
-// ↑ここまで追加
-  const auth =
-getAuth(app);
-
+// ========================================
+// 状態
+// ========================================
 
 let currentUser = null;
 
 let userName = "名無し";
+
 let replyTo = null;
 
-onAuthStateChanged(auth,async(user)=>{
+let currentPostType = "text";
 
 
-if(!user){
-
-alert("ログインしてください");
-
-location.href="login.html";
-
-return;
-
-}
-
-
-currentUser=user;
-
-
-
-const userRef =
-ref(db,"members/"+user.uid);
-
-
-
-const snap =
-await get(userRef);
-
-
-
-if(snap.exists()){
-
-userName =
-snap.val().name;
-
-}
-
-
-});
-document.getElementById("cancelReply").onclick=()=>{
-
-replyTo=null;
-
-document.getElementById("replyBox").style.display="none";
-
-};
-
-
-// URLからスレID取得
+// ========================================
+// URLからスレID
+// ========================================
 
 const params =
-new URLSearchParams(location.search);
-
+    new URLSearchParams(location.search);
 
 const threadId =
-params.get("id");
+    params.get("id");
 
-
-
-// スレデータ
 
 const threadRef =
-ref(db,"board/threads/"+threadId);
-
+    ref(
+        db,
+        "board/threads/" + threadId
+    );
 
 
 const title =
-document.getElementById("title");
+    document.getElementById("title");
 
 
 const posts =
-document.getElementById("posts");
+    document.getElementById("posts");
 
 
+// ========================================
+// 投稿形式切り替え
+// ========================================
+
+const typeText =
+    document.getElementById("typeText");
+
+const typeAA =
+    document.getElementById("typeAA");
+
+const typeImage =
+    document.getElementById("typeImage");
+
+const textArea =
+    document.getElementById("textArea");
+
+const text =
+    document.getElementById("text");
+
+const imageArea =
+    document.getElementById("imageArea");
+
+const imageInput =
+    document.getElementById("imageInput");
+
+const imagePreviewBox =
+    document.getElementById("imagePreviewBox");
+
+const imagePreview =
+    document.getElementById("imagePreview");
+
+const uploadStatus =
+    document.getElementById("uploadStatus");
 
 
-// スレ読み込み
+function setPostType(type){
 
-onValue(threadRef,(snapshot)=>{
-
-
-const data =
-snapshot.val();
+    currentPostType = type;
 
 
-if(!data){
-
-title.innerHTML="スレがありません";
-
-return;
-
-}
+    typeText.classList.remove("active");
+    typeAA.classList.remove("active");
+    typeImage.classList.remove("active");
 
 
+    if(type === "text"){
 
-title.innerHTML=data.title;
+        typeText.classList.add("active");
 
+        textArea.style.display = "block";
 
+        imageArea.style.display = "none";
 
-posts.innerHTML="";
+        text.placeholder =
+            "コメントを書く";
 
-
-
-// レス表示
-
-if(data.posts){
-
-Object.entries(data.posts)
-.forEach(([postId,post])=>{
-
-const div =
-document.createElement("div");
+    }
 
 
-div.className="card";
+    if(type === "aa"){
+
+        typeAA.classList.add("active");
+
+        textArea.style.display = "block";
+
+        imageArea.style.display = "none";
+
+        text.placeholder =
+            "AAを書く\n\n空白や改行がそのまま保存されます";
+
+    }
 
 
-div.innerHTML=`
-<div class="reply"></div>
+    if(type === "image"){
 
+        typeImage.classList.add("active");
 
-<div class="name">
+        textArea.style.display = "block";
 
-${post.name}
+        imageArea.style.display = "block";
 
-<span id="rank-${postId}">
-</span>
+        text.placeholder =
+            "画像についてのコメント（任意）";
 
-</div>
-
-<p>
-
-${post.text}
-
-</p>
-
-
-<div class="time">
-
-${new Date(post.time)
-.toLocaleString()}
-
-</div>
-<p class="likeBtn">
-
-👍 ${post.likes || 0}
-
-</p>
-
-`;
-  if(post.replyTo && data.posts[post.replyTo]){
-
-    div.querySelector(".reply").textContent =
-    "↩ " + data.posts[post.replyTo].name + " に返信";
-
-}
-
-  const likeBtn =
-div.querySelector(".likeBtn");
-
-
-likeBtn.onclick=async(e)=>{
-
- e.stopPropagation();
-if(!currentUser){
-
-alert("ログインしてください");
-
-return;
+    }
 
 }
 
 
+typeText.onclick = () => {
 
-// 自分の投稿は禁止
-
-if(post.uid === currentUser.uid){
-
-alert("自分の投稿にはいいねできません");
-
-return;
-
-}
-
-
-
-const likeRef =
-ref(
-db,
-"board/threads/"
-+threadId+
-"/posts/"
-+postId+
-"/likedUsers/"
-+currentUser.uid
-);
-
-
-
-const likeSnap =
-await get(likeRef);
-
-
-
-if(likeSnap.exists()){
-
-alert("すでにいいねしています");
-
-return;
-
-}
-
-
-
-// いいね記録
-
-await set(likeRef,true);
-
-
-
-await update(
-ref(
-db,
-"board/threads/"
-+threadId+
-"/posts/"
-+postId
-),
-{
-
-likes:
-(post.likes || 0)+1
-
-}
-
-);
-  // いいね報酬
-
-const newLikes =
-(post.likes || 0)+1;
-
-
-
-const authorRef =
-ref(db,"members/"+post.uid);
-
-
-const authorSnap =
-await get(authorRef);
-
-
-
-if(authorSnap.exists()){
-
-
-const author =
-authorSnap.val();
-
-
-let addPoint = 1;
-
-
-
-// 10いいねボーナス
-
-if(
-newLikes >= 10 &&
-!post.likeReward10
-){
-
-addPoint += 20;
-
-
-await update(
-ref(
-db,
-"board/threads/"
-+threadId+
-"/posts/"
-+postId
-),
-{
-
-likeReward10:true
-
-}
-
-);
-
-}
-
-
-
-// 50いいねボーナス
-
-if(
-newLikes >= 50 &&
-!post.likeReward50
-){
-
-addPoint += 200;
-
-
-await update(
-ref(
-db,
-"board/threads/"
-+threadId+
-"/posts/"
-+postId
-),
-{
-
-likeReward50:true
-
-}
-
-);
-
-}
-
-
-
-// 投稿者へポイント追加
-
-await update(authorRef,{
-
-point:
-(author.point || 0)+addPoint
-
-});
-  // 通知作成
-
-const notificationRef =
-push(
-ref(db,"notifications/"+post.uid)
-);
-
-await set(notificationRef,{
-
-text:
-userName+"さんがあなたの投稿にいいねしました",
-
-point:addPoint,
-
-read:false,
-
-time:Date.now()
-
-});
-  await checkMaster(
-post.uid,
-newLikes
-);
-
-
-}
-
+    setPostType("text");
 
 };
-  const rankRef =
-ref(db,"members/"+post.uid);
-
-const nameDiv = div.querySelector(".name");
-get(rankRef)
-.then((snap)=>{
 
 
-if(snap.exists()){
+typeAA.onclick = () => {
 
+    setPostType("aa");
 
-const member =
-snap.val();
-
-
-const rank =
-member.rank || "新人";
-
-
-const badge =
-member.badge || "";
-
-
-
-document.getElementById(
-"rank-"+postId
-).innerHTML =
-
-" ["+rank+"] "+badge;
-
-
-}
-
-
-});
-
-
-nameDiv.onclick=()=>{
-
-    replyTo = postId;
-
-    document.getElementById("replyBox").style.display =
-    "block";
-
-    document.getElementById("replyName").textContent =
-    post.name;
-document.getElementById("text").focus();
 };
-posts.appendChild(div);
 
 
+typeImage.onclick = () => {
 
-});
+    setPostType("image");
 
+};
+
+
+// ========================================
+// 画像プレビュー
+// ========================================
+
+imageInput.addEventListener(
+    "change",
+    ()=>{
+
+        const file =
+            imageInput.files[0];
+
+        if(!file){
+
+            imagePreviewBox.style.display =
+                "none";
+
+            imagePreview.src = "";
+
+            return;
+
+        }
+
+
+        if(!file.type.startsWith("image/")){
+
+            alert(
+                "画像ファイルを選択してください"
+            );
+
+            imageInput.value = "";
+
+            return;
+
+        }
+
+
+        if(file.size > 5 * 1024 * 1024){
+
+            alert(
+                "画像は5MB以下にしてください"
+            );
+
+            imageInput.value = "";
+
+            return;
+
+        }
+
+
+        const reader =
+            new FileReader();
+
+
+        reader.onload = ()=>{
+
+            imagePreview.src =
+                reader.result;
+
+            imagePreviewBox.style.display =
+                "block";
+
+        };
+
+
+        reader.readAsDataURL(file);
+
+    }
+);
+
+
+// ========================================
+// ランク更新
+// ========================================
+
+async function updateRank(uid){
+
+    const memberRef =
+        ref(
+            db,
+            "members/" + uid
+        );
+
+
+    const snap =
+        await get(memberRef);
+
+
+    if(!snap.exists()) return;
+
+
+    const member =
+        snap.val();
+
+
+    let rank =
+        member.rank || "新人";
+
+
+    if(
+        member.lastPostDate &&
+        Date.now() - member.lastPostDate <
+        259200000
+    ){
+
+        rank = "常連";
+
+    }
+
+
+    await update(
+        memberRef,
+        {
+            rank:rank
+        }
+    );
 
 }
 
 
+// ========================================
+// 名人チェック
+// ========================================
 
-});
+async function checkMaster(uid,likes){
+
+    if(likes < 20) return;
 
 
+    const memberRef =
+        ref(
+            db,
+            "members/" + uid
+        );
 
-// 投稿
+
+    const snap =
+        await get(memberRef);
+
+
+    if(!snap.exists()) return;
+
+
+    const member =
+        snap.val();
+
+
+    if(member.rank !== "名人"){
+
+        await update(
+            memberRef,
+            {
+                rank:"名人",
+                badge:"🏆 名人"
+            }
+        );
+
+
+        alert(
+            "名人ランクになりました！"
+        );
+
+    }
+
+}
+
+
+// ========================================
+// ログイン
+// ========================================
+
+onAuthStateChanged(
+    auth,
+    async(user)=>{
+
+        if(!user){
+
+            alert(
+                "ログインしてください"
+            );
+
+            location.href =
+                "login.html";
+
+            return;
+
+        }
+
+
+        currentUser =
+            user;
+
+
+        const userRef =
+            ref(
+                db,
+                "members/" + user.uid
+            );
+
+
+        const snap =
+            await get(userRef);
+
+
+        if(snap.exists()){
+
+            userName =
+                snap.val().name || "名無し";
+
+        }
+
+    }
+);
+
+
+// ========================================
+// 返信キャンセル
+// ========================================
 
 document
-.getElementById("send")
-.onclick=async()=>{
+    .getElementById("cancelReply")
+    .onclick = ()=>{
 
-if(!currentUser){
+        replyTo = null;
 
-    alert("ログイン情報を読み込み中です");
+        document
+            .getElementById("replyBox")
+            .style.display = "none";
 
-    return;
-
-}
-const text =
-document.getElementById("text").value;
+    };
 
 
+// ========================================
+// スレ読み込み
+// ========================================
 
-if(text===""){
+onValue(
+    threadRef,
+    (snapshot)=>{
 
-alert("文字を入力してください");
-
-return;
-
-}
-
-
-
-// ユーザー
-
-const uid =
-currentUser.uid;
+        const data =
+            snapshot.val();
 
 
-const name =
-userName;
+        if(!data){
+
+            title.textContent =
+                "スレがありません";
+
+            return;
+
+        }
 
 
-// 投稿場所
+        title.textContent =
+            data.title || "無題";
 
-const postRef =
-push(
-ref(db,
-"board/threads/"+threadId+"/posts")
+
+        posts.innerHTML = "";
+
+
+        if(!data.posts) return;
+
+
+        Object.entries(data.posts)
+        .forEach(
+            ([postId,post])=>{
+
+                const div =
+                    document.createElement("div");
+
+
+                div.className =
+                    "card";
+
+
+                // =================================
+                // 返信
+                // =================================
+
+                const replyDiv =
+                    document.createElement("div");
+
+                replyDiv.className =
+                    "reply";
+
+
+                if(
+                    post.replyTo &&
+                    data.posts[post.replyTo]
+                ){
+
+                    replyDiv.textContent =
+                        "↩ " +
+                        data.posts[post.replyTo].name +
+                        " に返信";
+
+                }
+
+
+                div.appendChild(
+                    replyDiv
+                );
+
+
+                // =================================
+                // 名前・ランク
+                // =================================
+
+                const nameDiv =
+                    document.createElement("div");
+
+
+                nameDiv.className =
+                    "name";
+
+
+                nameDiv.textContent =
+                    post.name || "名無し";
+
+
+                const rankSpan =
+                    document.createElement("span");
+
+
+                rankSpan.id =
+                    "rank-" + postId;
+
+
+                nameDiv.appendChild(
+                    rankSpan
+                );
+
+
+                div.appendChild(
+                    nameDiv
+                );
+
+
+                // =================================
+                // 投稿内容
+                // =================================
+
+                if(post.type === "image"){
+
+                    // 画像
+
+                    if(post.imageUrl){
+
+                        const img =
+                            document.createElement("img");
+
+
+                        img.className =
+                            "imagePost";
+
+
+                        img.src =
+                            post.imageUrl;
+
+
+                        img.alt =
+                            "投稿画像";
+
+
+                        img.loading =
+                            "lazy";
+
+
+                        div.appendChild(img);
+
+                    }
+
+
+                    // コメント
+
+                    if(post.text){
+
+                        const comment =
+                            document.createElement("div");
+
+
+                        comment.className =
+                            "textContent";
+
+
+                        comment.style.marginTop =
+                            "8px";
+
+
+                        comment.textContent =
+                            post.text;
+
+
+                        div.appendChild(
+                            comment
+                        );
+
+                    }
+
+                }
+                else if(post.type === "aa"){
+
+                    const aa =
+                        document.createElement("div");
+
+
+                    aa.className =
+                        "aaContent";
+
+
+                    aa.textContent =
+                        post.text || "";
+
+
+                    div.appendChild(
+                        aa
+                    );
+
+                }
+                else{
+
+                    const textDiv =
+                        document.createElement("div");
+
+
+                    textDiv.className =
+                        "textContent";
+
+
+                    textDiv.textContent =
+                        post.text || "";
+
+
+                    div.appendChild(
+                        textDiv
+                    );
+
+                }
+
+
+                // =================================
+                // 投稿日時
+                // =================================
+
+                const timeDiv =
+                    document.createElement("div");
+
+
+                timeDiv.className =
+                    "time";
+
+
+                timeDiv.textContent =
+                    new Date(
+                        post.time
+                    ).toLocaleString();
+
+
+                div.appendChild(
+                    timeDiv
+                );
+
+
+                // =================================
+                // いいね
+                // =================================
+
+                const likeBtn =
+                    document.createElement("p");
+
+
+                likeBtn.className =
+                    "likeBtn";
+
+
+                likeBtn.textContent =
+                    "👍 " +
+                    (post.likes || 0);
+
+
+                div.appendChild(
+                    likeBtn
+                );
+
+
+                // =================================
+                // いいね処理
+                // =================================
+
+                likeBtn.onclick =
+                    async(e)=>{
+
+                        e.stopPropagation();
+
+
+                        if(!currentUser){
+
+                            alert(
+                                "ログインしてください"
+                            );
+
+                            return;
+
+                        }
+
+
+                        if(
+                            post.uid ===
+                            currentUser.uid
+                        ){
+
+                            alert(
+                                "自分の投稿にはいいねできません"
+                            );
+
+                            return;
+
+                        }
+
+
+                        const likeRef =
+                            ref(
+                                db,
+                                "board/threads/" +
+                                threadId +
+                                "/posts/" +
+                                postId +
+                                "/likedUsers/" +
+                                currentUser.uid
+                            );
+
+
+                        const likeSnap =
+                            await get(likeRef);
+
+
+                        if(likeSnap.exists()){
+
+                            alert(
+                                "すでにいいねしています"
+                            );
+
+                            return;
+
+                        }
+
+
+                        await set(
+                            likeRef,
+                            true
+                        );
+
+
+                        await update(
+                            ref(
+                                db,
+                                "board/threads/" +
+                                threadId +
+                                "/posts/" +
+                                postId
+                            ),
+                            {
+                                likes:
+                                    (post.likes || 0) + 1
+                            }
+                        );
+
+
+                        // -------------------------
+                        // いいね報酬
+                        // -------------------------
+
+                        const newLikes =
+                            (post.likes || 0) + 1;
+
+
+                        const authorRef =
+                            ref(
+                                db,
+                                "members/" +
+                                post.uid
+                            );
+
+
+                        const authorSnap =
+                            await get(authorRef);
+
+
+                        if(authorSnap.exists()){
+
+                            const author =
+                                authorSnap.val();
+
+
+                            let addPoint = 1;
+
+
+                            // 10いいね
+                            if(
+                                newLikes >= 10 &&
+                                !post.likeReward10
+                            ){
+
+                                addPoint += 20;
+
+
+                                await update(
+                                    ref(
+                                        db,
+                                        "board/threads/" +
+                                        threadId +
+                                        "/posts/" +
+                                        postId
+                                    ),
+                                    {
+                                        likeReward10:
+                                            true
+                                    }
+                                );
+
+                            }
+
+
+                            // 50いいね
+                            if(
+                                newLikes >= 50 &&
+                                !post.likeReward50
+                            ){
+
+                                addPoint += 200;
+
+
+                                await update(
+                                    ref(
+                                        db,
+                                        "board/threads/" +
+                                        threadId +
+                                        "/posts/" +
+                                        postId
+                                    ),
+                                    {
+                                        likeReward50:
+                                            true
+                                    }
+                                );
+
+                            }
+
+
+                            await update(
+                                authorRef,
+                                {
+                                    point:
+                                        (author.point || 0) +
+                                        addPoint
+                                }
+                            );
+
+
+                            // -------------------------
+                            // 通知
+                            // -------------------------
+
+                            const notificationRef =
+                                push(
+                                    ref(
+                                        db,
+                                        "notifications/" +
+                                        post.uid
+                                    )
+                                );
+
+
+                            await set(
+                                notificationRef,
+                                {
+                                    text:
+                                        userName +
+                                        "さんがあなたの投稿にいいねしました",
+
+                                    point:
+                                        addPoint,
+
+                                    read:false,
+
+                                    time:
+                                        Date.now()
+                                }
+                            );
+
+
+                            await checkMaster(
+                                post.uid,
+                                newLikes
+                            );
+
+                        }
+
+                    };
+
+
+                // =================================
+                // ランク表示
+                // =================================
+
+                const rankRef =
+                    ref(
+                        db,
+                        "members/" +
+                        post.uid
+                    );
+
+
+                get(rankRef)
+                .then(
+                    (snap)=>{
+
+                        if(
+                            !snap.exists()
+                        ) return;
+
+
+                        const member =
+                            snap.val();
+
+
+                        const rank =
+                            member.rank || "新人";
+
+
+                        const badge =
+                            member.badge || "";
+
+
+                        rankSpan.textContent =
+                            " [" +
+                            rank +
+                            "] " +
+                            badge;
+
+                    }
+                );
+
+
+                // =================================
+                // 名前クリックで返信
+                // =================================
+
+                nameDiv.onclick =
+                    ()=>{
+
+                        replyTo =
+                            postId;
+
+
+                        document
+                            .getElementById("replyBox")
+                            .style.display =
+                            "block";
+
+
+                        document
+                            .getElementById("replyName")
+                            .textContent =
+                            post.name;
+
+
+                        text.focus();
+
+                    };
+
+
+                posts.appendChild(
+                    div
+                );
+
+            }
+        );
+
+    }
 );
 
 
+// ========================================
+// 投稿
+// ========================================
 
-await set(postRef,{
+document
+    .getElementById("send")
+    .onclick =
+    async()=>{
 
-text:text,
+        if(!currentUser){
 
-uid:uid,
+            alert(
+                "ログイン情報を読み込み中です"
+            );
 
-name:name,
-  
-time:Date.now(),
+            return;
 
-replyTo:replyTo
-});
-    // 返信通知
-if(replyTo && replyTo !== ""){
+        }
 
-const parentPost =
-(await get(
-ref(
-db,
-"board/threads/"+threadId+"/posts/"+replyTo
-)
-)).val();
 
+        const uid =
+            currentUser.uid;
 
-if(
-parentPost &&
-parentPost.uid !== uid
-){
 
-const notificationRef =
-push(
-ref(db,"notifications/"+parentPost.uid)
-);
+        const name =
+            userName;
 
 
-await set(notificationRef,{
+        let textValue =
+            text.value;
 
-text:
-userName+"さんがあなたの投稿に返信しました",
 
-read:false,
+        const file =
+            imageInput.files[0];
 
-time:Date.now(),
 
-threadId:threadId,
+        // =================================
+        // 入力チェック
+        // =================================
 
-postId:postRef.key
+        if(currentPostType === "image"){
 
-});
+            if(!file){
 
+                alert(
+                    "画像を選択してください"
+                );
 
-}
+                return;
 
-}
-replyTo=null;
-document.getElementById("replyBox").style.display="none";
-  // 投稿活動記録
+            }
 
-await update(
-ref(db,"members/"+uid),
-{
 
-lastPostDate:Date.now()
+            if(!file.type.startsWith("image/")){
 
-}
-);
-  await updateRank(uid);
-  // ポイント報酬処理
+                alert(
+                    "画像ファイルを選択してください"
+                );
 
-const today =
-new Date().toLocaleDateString();
+                return;
 
+            }
 
-const memberRef =
-ref(db,"members/"+uid);
 
+            if(file.size > 5 * 1024 * 1024){
 
-const memberSnap =
-await get(memberRef);
+                alert(
+                    "画像は5MB以下にしてください"
+                );
 
+                return;
 
-if(memberSnap.exists()){
+            }
 
+        }
+        else{
 
-const member =
-memberSnap.val();
+            if(
+                textValue.trim() === ""
+            ){
 
+                alert(
+                    "文字を入力してください"
+                );
 
-let reward =
-member.boardRewardToday || 0;
+                return;
 
+            }
 
-let rewardDate =
-member.boardRewardDate || "";
+        }
 
 
+        // =================================
+        // 投稿ボタン無効化
+        // =================================
 
-// 日付が変わったらリセット
+        const sendButton =
+            document.getElementById("send");
 
-if(rewardDate !== today){
 
-reward = 0;
+        sendButton.disabled =
+            true;
 
-}
 
+        try{
 
+            // =================================
+            // 投稿先
+            // =================================
 
-// 上限チェック
+            const postRef =
+                push(
+                    ref(
+                        db,
+                        "board/threads/" +
+                        threadId +
+                        "/posts"
+                    )
+                );
 
-if(reward < 100){
 
+            let imageUrl = "";
 
-const addPoint =
-Math.min(5,100-reward);
 
+            // =================================
+            // 画像アップロード
+            // =================================
 
+            if(currentPostType === "image"){
 
-await update(memberRef,{
+                uploadStatus.textContent =
+                    "画像をアップロードしています……";
 
-point:
-(member.point || 0)+addPoint,
 
+                const extension =
+                    (
+                        file.type.split("/")[1] ||
+                        "jpg"
+                    )
+                    .replace(
+                        "jpeg",
+                        "jpg"
+                    );
 
-boardRewardDate:
-today,
 
+                const imagePath =
+                    "boardImages/" +
+                    threadId +
+                    "/" +
+                    uid +
+                    "/" +
+                    Date.now() +
+                    "_" +
+                    crypto.randomUUID() +
+                    "." +
+                    extension;
 
-boardRewardToday:
-reward+addPoint
 
+                const imageRef =
+                    storageRef(
+                        storage,
+                        imagePath
+                    );
 
-});
-await update(memberRef,{
 
-lastPostDate:Date.now()
+                await uploadBytes(
+                    imageRef,
+                    file,
+                    {
+                        contentType:
+                            file.type
+                    }
+                );
 
-});
 
+                imageUrl =
+                    await getDownloadURL(
+                        imageRef
+                    );
 
-await updateRank(uid);
 
-alert(
-"掲示板投稿報酬 +"+addPoint+"pt"
-);
+                uploadStatus.textContent =
+                    "アップロード完了";
 
+            }
 
-}else{
 
+            // =================================
+            // 投稿データ
+            // =================================
 
-alert(
-"今日の掲示板報酬上限に達しています"
-);
+            const postData = {
 
+                type:
+                    currentPostType,
 
-}
+                text:
+                    textValue,
 
+                uid:
+                    uid,
 
+                name:
+                    name,
 
-}
+                time:
+                    Date.now(),
 
+                replyTo:
+                    replyTo || ""
 
+            };
 
-document.getElementById("text").value="";
 
+            if(
+                currentPostType === "image"
+            ){
 
+                postData.imageUrl =
+                    imageUrl;
 
-};
+            }
 
+
+            await set(
+                postRef,
+                postData
+            );
+
+
+            // =================================
+            // 返信通知
+            // =================================
+
+            if(
+                replyTo &&
+                replyTo !== ""
+            ){
+
+                const parentPost =
+                    (
+                        await get(
+                            ref(
+                                db,
+                                "board/threads/" +
+                                threadId +
+                                "/posts/" +
+                                replyTo
+                            )
+                        )
+                    ).val();
+
+
+                if(
+                    parentPost &&
+                    parentPost.uid !== uid
+                ){
+
+                    const notificationRef =
+                        push(
+                            ref(
+                                db,
+                                "notifications/" +
+                                parentPost.uid
+                            )
+                        );
+
+
+                    await set(
+                        notificationRef,
+                        {
+
+                            text:
+                                userName +
+                                "さんがあなたの投稿に返信しました",
+
+                            read:false,
+
+                            time:
+                                Date.now(),
+
+                            threadId:
+                                threadId,
+
+                            postId:
+                                postRef.key
+
+                        }
+                    );
+
+                }
+
+            }
+
+
+            // =================================
+            // 返信状態解除
+            // =================================
+
+            replyTo = null;
+
+
+            document
+                .getElementById("replyBox")
+                .style.display =
+                "none";
+
+
+            // =================================
+            // 投稿活動記録
+            // =================================
+
+            await update(
+                ref(
+                    db,
+                    "members/" + uid
+                ),
+                {
+                    lastPostDate:
+                        Date.now()
+                }
+            );
+
+
+            await updateRank(uid);
+
+
+            // =================================
+            // ポイント報酬
+            // =================================
+
+            const today =
+                new Date()
+                    .toLocaleDateString();
+
+
+            const memberRef =
+                ref(
+                    db,
+                    "members/" + uid
+                );
+
+
+            const memberSnap =
+                await get(memberRef);
+
+
+            if(memberSnap.exists()){
+
+                const member =
+                    memberSnap.val();
+
+
+                let reward =
+                    member.boardRewardToday || 0;
+
+
+                let rewardDate =
+                    member.boardRewardDate || "";
+
+
+                if(
+                    rewardDate !== today
+                ){
+
+                    reward = 0;
+
+                }
+
+
+                if(reward < 100){
+
+                    const addPoint =
+                        Math.min(
+                            5,
+                            100 - reward
+                        );
+
+
+                    await update(
+                        memberRef,
+                        {
+
+                            point:
+                                (member.point || 0) +
+                                addPoint,
+
+                            boardRewardDate:
+                                today,
+
+                            boardRewardToday:
+                                reward + addPoint
+
+                        }
+                    );
+
+
+                    await update(
+                        memberRef,
+                        {
+                            lastPostDate:
+                                Date.now()
+                        }
+                    );
+
+
+                    await updateRank(uid);
+
+
+                    alert(
+                        "掲示板投稿報酬 +" +
+                        addPoint +
+                        "pt"
+                    );
+
+                }
+                else{
+
+                    alert(
+                        "今日の掲示板報酬上限に達しています"
+                    );
+
+                }
+
+            }
+
+
+            // =================================
+            // 入力欄リセット
+            // =================================
+
+            text.value = "";
+
+            imageInput.value = "";
+
+            imagePreview.src = "";
+
+            imagePreviewBox.style.display =
+                "none";
+
+            uploadStatus.textContent = "";
+
+
+            setPostType(
+                "text"
+            );
+
+        }
+        catch(error){
+
+            console.error(
+                "投稿エラー:",
+                error
+            );
+
+
+            alert(
+                "投稿に失敗しました\n" +
+                error.message
+            );
+
+        }
+        finally{
+
+            sendButton.disabled =
+                false;
+
+        }
+
+    };
 
 
 </script>
