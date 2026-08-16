@@ -175,6 +175,132 @@ const items = [
     price:30,
     equipSlot:"weapon"
 },
+  {
+    id:"stone_club",
+    name:"石のこん棒",
+    category:"equipment",
+    price:150,
+    equipSlot:"weapon"
+},
+{
+    id:"sling",
+    name:"投石紐（スリング）",
+    category:"equipment",
+    price:180,
+    equipSlot:"weapon"
+},
+{
+    id:"javelin",
+    name:"投げ槍",
+    category:"equipment",
+    price:220,
+    equipSlot:"weapon"
+},
+{
+    id:"stone_spear",
+    name:"石槍",
+    category:"equipment",
+    price:260,
+    equipSlot:"weapon"
+},
+{
+    id:"small_shield",
+    name:"小さな盾",
+    category:"equipment",
+    price:200,
+    equipSlot:"shield"
+},
+{
+    id:"reinforced_club",
+    name:"強化こん棒",
+    category:"equipment",
+    price:350,
+    equipSlot:"weapon"
+},
+{
+    id:"pottery_helmet",
+    name:"陶器の兜",
+    category:"equipment",
+    price:320,
+    equipSlot:"head"
+},
+{
+    id:"dory_spear",
+    name:"ドリュ（長柄槍）",
+    category:"equipment",
+    price:400,
+    equipSlot:"weapon"
+},
+{
+    id:"long_spear",
+    name:"長槍",
+    category:"equipment",
+    price:450,
+    equipSlot:"weapon"
+},
+{
+    id:"round_shield",
+    name:"丸盾",
+    category:"equipment",
+    price:420,
+    equipSlot:"shield"
+},
+{
+    id:"reinforced_helmet",
+    name:"強化兜",
+    category:"equipment",
+    price:480,
+    equipSlot:"head"
+},
+{
+    id:"heavy_club",
+    name:"重厚なこん棒",
+    category:"equipment",
+    price:550,
+    equipSlot:"weapon"
+},
+{
+    id:"claw_weapon",
+    name:"爪の武器",
+    category:"equipment",
+    price:600,
+    equipSlot:"weapon"
+},
+{
+    id:"heavy_dory",
+    name:"重厚なドリュ",
+    category:"equipment",
+    price:650,
+    equipSlot:"weapon"
+},
+{
+    id:"heavy_shield",
+    name:"重厚な盾",
+    category:"equipment",
+    price:620,
+    equipSlot:"shield"
+},
+{
+    id:"reinforced_breastplate",
+    name:"強化胸当て",
+    category:"equipment",
+    price:700,
+    equipSlot:"shield"
+},
+{
+    id:"elite_helmet",
+    name:"エリートの兜",
+    category:"equipment",
+    price:850,
+    equipSlot:"head"
+},
+{
+    id:"elite_spear",
+    name:"エリートの槍",
+    category:"equipment",
+    price:900,
+    equipSlot:"weapon"
+}  
 // ======================
 // 素材
 // ======================
