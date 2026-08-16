@@ -50,14 +50,19 @@ textarea{
 }
 #text.aaInput{
     width:100%;
-    height:350px;
-    min-height:350px;
+    height:400px;
+    min-height:250px;
+    max-height:70vh;
 
     padding:12px;
     box-sizing:border-box;
 
     white-space:pre;
+
+    /* 横にはみ出したAAは横スクロール */
     overflow-x:auto;
+
+    /* 縦もスクロール可能 */
     overflow-y:auto;
 
     font-family:
@@ -71,8 +76,8 @@ textarea{
     line-height:1;
     letter-spacing:0;
 
-    overflow-wrap:normal;
     word-break:normal;
+    overflow-wrap:normal;
 
     resize:vertical;
 
