@@ -300,7 +300,28 @@ button:disabled{
 #send{
     margin-top:4px;
 }
+#threadHeader{
+    position:relative;
+    padding-right:90px;
+}
 
+#viewerCount{
+    position:absolute;
+    top:0;
+    right:0;
+
+    background:white;
+    padding:6px 10px;
+
+    border-radius:15px;
+
+    box-shadow:0 1px 4px #ddd;
+
+    font-size:13px;
+    color:#666;
+
+    white-space:nowrap;
+}
 </style>
 
 </head>
@@ -309,10 +330,17 @@ button:disabled{
 <body>
 
 
-<h1 id="title">
-読み込み中
-</h1>
+<div id="threadHeader">
 
+    <h1 id="title">
+        読み込み中
+    </h1>
+
+    <div id="viewerCount">
+        👥 0人
+    </div>
+
+</div>
 
 <div id="posts">
 </div>
@@ -440,7 +468,8 @@ import {
     push,
     set,
     get,
-    update
+    update,
+    onDisconnect
 }
 from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -586,7 +615,8 @@ const replyBox =
 const replyName =
     document.getElementById("replyName");
 
-
+const viewerCount =
+    document.getElementById("viewerCount");
 // =====================================================
 // スレ参照
 // =====================================================
@@ -1241,11 +1271,73 @@ onAuthStateChanged(
                 "名無し";
 
         }
+// =================================================
+// スレ閲覧中として登録
+// =================================================
 
-    }
+const presenceRef =
+    ref(
+        db,
+        "threadPresence/" +
+        threadId +
+        "/" +
+        user.uid
+    );
+
+await set(
+    presenceRef,
+    true
 );
 
 
+// ブラウザを閉じたら自動削除
+import(
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+)
+.then(
+    async({ onDisconnect })=>{
+
+        await onDisconnect(
+            presenceRef
+        ).remove();
+
+    }
+);
+    }
+);
+
+// =====================================================
+// 閲覧人数監視
+// =====================================================
+
+if(threadId){
+
+    const presenceListRef =
+        ref(
+            db,
+            "threadPresence/" +
+            threadId
+        );
+
+    onValue(
+        presenceListRef,
+        (snapshot)=>{
+
+            const data =
+                snapshot.val() || {};
+
+            const count =
+                Object.keys(data).length;
+
+            viewerCount.textContent =
+                "👥 " +
+                count +
+                "人";
+
+        }
+    );
+
+}
 // =====================================================
 // 返信キャンセル
 // =====================================================
