@@ -451,26 +451,27 @@ function computeEffectiveRewardWeights(location){
 
             const effect = itemEffects[itemId];
 
-            if(effect && effect.boosts){
+            if(!effect || !effect.boosts){
+                return;
+            }
 
-                effect.boosts.forEach(boost => {
+            const bonus =
+                effect.boosts[reward.itemId];
 
-                    if(boost.itemId === reward.itemId){
+            if(bonus !== undefined){
 
-                        weight += boost.amount;
-
-                    }
-
-                });
+                weight *= (1 + bonus);
 
             }
 
         });
 
-        return { ...reward, weight };
+        return {
+            ...reward,
+            weight
+        };
     });
 }
-
 function findRewardName(itemId){
 
     const item =
