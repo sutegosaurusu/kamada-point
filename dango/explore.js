@@ -1649,25 +1649,34 @@ function createRewardCount(
     const timeSetting =
         timeSettings[expedition.hours];
 
-    let rewardMultiplier = 1;
+    let rewardMultiplier =
+        timeSetting.rewardMultiplier || 1;
 
     getAllSelectedItemIds().forEach(itemId => {
 
-        const effect = itemEffects[itemId];
+        const effect =
+            itemEffects[itemId];
 
         if(effect && effect.rewardMultiplier){
 
-            rewardMultiplier *= effect.rewardMultiplier;
-
+            rewardMultiplier *=
+                effect.rewardMultiplier;
         }
 
     });
 
-    const min = timeSetting.minReward;
-    const max = timeSetting.maxReward;
+    const min =
+        timeSetting.minReward;
+
+    const max =
+        timeSetting.maxReward;
 
     const baseCount =
-        min + Math.floor(Math.random() * (max - min + 1));
+        min +
+        Math.floor(
+            Math.random() *
+            (max - min + 1)
+        );
 
     return Math.max(
         1,
