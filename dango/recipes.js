@@ -1,34 +1,10 @@
 console.log("recipes.js開始");
 
-// ======================
-// 工房：装備レシピ
-// ======================
-// materials: { 素材のid: 必要個数 }
-// point: 必要ポイント
-// equipSlot は items.js 側の装備データと合わせてください（head / weapon / shield）
-//
-// ★ここの数値は仮です。ゲームバランスに合わせて自由に調整してください。
-
 const recipes = {
 
     // ==============================
     // この町で作れる初級装備
     // ==============================
-
-    toothpick:{
-        materials:{
-            twig:2
-        },
-        point:30
-    },
-
-    bou:{
-        materials:{
-            twig:3,
-            small_stone:2
-        },
-        point:100
-    },
 
     stone_club:{
         materials:{
@@ -46,24 +22,33 @@ const recipes = {
         point:70
     },
 
-    pull_tab:{
+    stone_spear:{
         materials:{
+            twig:2,
             small_stone:2,
-            round_stone:1
-        },
-        point:80
-    },
-
-    bottle_cap:{
-        materials:{
-            driftwood:2,
-            round_stone:2
+            thread:1
         },
         point:100
+    },
+
+    small_shield:{
+        materials:{
+            driftwood:1,
+            round_stone:1,
+            thread:2
+        },
+        point:130
+    },
+
+    pottery_helmet:{
+        materials:{
+            pottery_piece:2,
+            straw:2,
+            thread:2
+        },
+        point:180
     }
 
 };
-
-
 
 console.log("recipes.js読み込み完了");
