@@ -164,6 +164,115 @@ const itemEffects = {
     successRate:0.06,
     description:"探索成功率 +6%"
 },
+   // ==============================
+// 初級
+// ==============================
+
+stone_club:{
+    successRate:0.07,
+    description:"探索成功率 +7%"
+},
+
+sling:{
+    successRate:0.08,
+    description:"探索成功率 +8%"
+},
+
+// ==============================
+// 中級
+// ==============================
+
+javelin:{
+    successRate:0.10,
+    description:"探索成功率 +10%"
+},
+
+stone_spear:{
+    successRate:0.11,
+    description:"探索成功率 +11%"
+},
+
+small_shield:{
+    successRate:0.08,
+    description:"探索成功率 +8%"
+},
+
+reinforced_club:{
+    successRate:0.12,
+    description:"探索成功率 +12%"
+},
+
+pottery_helmet:{
+    successRate:0.10,
+    description:"探索成功率 +10%"
+},
+
+// ==============================
+// 上級
+// ==============================
+
+dory_spear:{
+    successRate:0.14,
+    description:"探索成功率 +14%"
+},
+
+long_spear:{
+    successRate:0.15,
+    description:"探索成功率 +15%"
+},
+
+round_shield:{
+    successRate:0.12,
+    description:"探索成功率 +12%"
+},
+
+reinforced_helmet:{
+    successRate:0.14,
+    description:"探索成功率 +14%"
+},
+
+heavy_club:{
+    successRate:0.16,
+    description:"探索成功率 +16%"
+},
+
+claw_weapon:{
+    successRate:0.17,
+    description:"探索成功率 +17%"
+},
+
+// ==============================
+// 最上級
+// ==============================
+
+heavy_dory:{
+    successRate:0.20,
+    description:"探索成功率 +20%"
+},
+
+heavy_shield:{
+    successRate:0.17,
+    rewardMultiplier:1.10,
+    description:"探索成功率 +17%。獲得アイテム数 +10%"
+},
+
+reinforced_breastplate:{
+    successRate:0.18,
+    rewardMultiplier:1.10,
+    description:"探索成功率 +18%。獲得アイテム数 +10%"
+},
+
+elite_helmet:{
+    successRate:0.20,
+    rewardMultiplier:1.15,
+    description:"探索成功率 +20%。獲得アイテム数 +15%"
+},
+
+elite_spear:{
+    successRate:0.23,
+    rewardMultiplier:1.20,
+    description:"探索成功率 +23%。獲得アイテム数 +20%"
+}
 
     feather:{
         rewardMultiplier:1.2,
