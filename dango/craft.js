@@ -287,11 +287,10 @@ function renderRecipeList(){
         </button>
         `;
 
-        card.querySelector(".craftButton")
+      card.querySelector(".craftButton")
         .addEventListener("click", () => {
-            craftItem(itemId, recipe);
+            showCraftConfirm(itemId, recipe);
         });
-
         list.appendChild(card);
 
     });
@@ -492,4 +491,159 @@ async function craftItem(itemId, recipe){
         console.error(error);
         showMessage("作成に失敗しました");
     }
+}
+// ===============================
+// 作成確認モーダル
+// ===============================
+
+function ensureCraftConfirmModal(){
+
+    if(document.getElementById("craftConfirmOverlay")){
+        return;
+    }
+
+    const overlay = document.createElement("div");
+    overlay.id = "craftConfirmOverlay";
+    overlay.style.cssText = `
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.5);
+        display:none;
+        align-items:center;
+        justify-content:center;
+        z-index:2000;
+    `;
+
+    overlay.innerHTML = `
+        <div id="craftConfirmBox" style="
+            width:90%;
+            max-width:420px;
+            padding:18px;
+            background:#e3d1ae;
+            border:3px solid #5b422b;
+            box-shadow:4px 4px 0 #75593c;
+            font-family:inherit;
+            color:#302318;
+        ">
+            <div id="craftConfirmTitle" style="
+                font-size:18px;
+                font-weight:bold;
+                margin-bottom:10px;
+            "></div>
+
+            <div id="craftConfirmMaterials" style="
+                font-size:14px;
+                margin-bottom:10px;
+                display:flex;
+                flex-direction:column;
+                gap:4px;
+            "></div>
+
+            <div id="craftConfirmPoint" style="
+                font-size:14px;
+                font-weight:bold;
+                margin-bottom:16px;
+            "></div>
+
+            <div style="display:flex; gap:10px;">
+                <button id="craftConfirmCancel" style="
+                    flex:1;
+                    padding:10px;
+                    border:2px solid #4c351f;
+                    background:#a99570;
+                    color:#302318;
+                    font-family:inherit;
+                    font-size:14px;
+                    cursor:pointer;
+                ">キャンセル</button>
+
+                <button id="craftConfirmOk" style="
+                    flex:1;
+                    padding:10px;
+                    border:2px solid #402b19;
+                    background:#69482c;
+                    color:#fff0d0;
+                    font-family:inherit;
+                    font-size:14px;
+                    cursor:pointer;
+                ">作る</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener("click", event => {
+        if(event.target === overlay){
+            hideCraftConfirm();
+        }
+    });
+
+    document
+        .getElementById("craftConfirmCancel")
+        .addEventListener("click", hideCraftConfirm);
+}
+
+function hideCraftConfirm(){
+
+    const overlay =
+        document.getElementById("craftConfirmOverlay");
+
+    if(overlay){
+        overlay.style.display = "none";
+    }
+}
+
+function showCraftConfirm(itemId, recipe){
+
+    ensureCraftConfirmModal();
+
+    const info = itemInformation[itemId];
+    const useTicket = hasFreeCraftTicket();
+
+    document.getElementById("craftConfirmTitle").textContent =
+        (info.icon || "") + " " + info.name + " を作りますか？";
+
+    const materialsHtml =
+        Object.entries(recipe.materials)
+        .map(([materialId, needQty]) => {
+
+            const materialInfo =
+                itemInformation[materialId] || {};
+
+            const owned =
+                getOwnedQuantity(materialId);
+
+            return `
+            <span>
+                ${escapeHtml(materialInfo.name || materialId)}
+                を ${needQty} 個使用
+                （所持 ${owned}）
+            </span>
+            `;
+        })
+        .join("");
+
+    document.getElementById("craftConfirmMaterials").innerHTML =
+        materialsHtml;
+
+    document.getElementById("craftConfirmPoint").textContent =
+        useTicket
+        ? "🎟 無料チケット使用（Point消費なし）"
+        : "💰 " + recipe.point.toLocaleString() + " Pt 消費します";
+
+    const okButton =
+        document.getElementById("craftConfirmOk");
+
+    // 前回のイベントを消してから付け直す
+    const newOkButton = okButton.cloneNode(true);
+    okButton.parentNode.replaceChild(newOkButton, okButton);
+
+    newOkButton.addEventListener("click", () => {
+        hideCraftConfirm();
+        craftItem(itemId, recipe);
+    });
+
+    document.getElementById("craftConfirmOverlay")
+        .style.display = "flex";
 }
