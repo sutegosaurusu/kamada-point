@@ -197,7 +197,7 @@ function renderRecipeList(){
 
     list.innerHTML = "";
 
-    craftableEntries.forEach(([itemId, recipe]) => {
+   recipeEntries.forEach(([itemId, recipe]) => {
 
         const info = itemInformation[itemId];
 
