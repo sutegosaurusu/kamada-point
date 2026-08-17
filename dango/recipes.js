@@ -11,7 +11,7 @@ const recipes = {
             twig:2,
             round_stone:1
         },
-        point:60
+        point:200
     },
 
     sling:{
@@ -19,7 +19,7 @@ const recipes = {
             thread:2,
             small_stone:2
         },
-        point:70
+        point:200
     },
 
     stone_spear:{
@@ -28,7 +28,7 @@ const recipes = {
             small_stone:2,
             thread:1
         },
-        point:100
+        point:300
     },
 
     small_shield:{
@@ -37,7 +37,7 @@ const recipes = {
             round_stone:1,
             thread:2
         },
-        point:130
+        point:300
     },
 
     pottery_helmet:{
@@ -46,7 +46,7 @@ const recipes = {
             straw:2,
             thread:2
         },
-        point:180
+        point:400
     }
 
 };
