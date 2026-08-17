@@ -200,14 +200,14 @@ const locations = [
         baseSuccessRate:0.45,
 
         rewards:[
-            { itemId:"nail", weight:60 },
-            { itemId:"smallbug", weight:8 },
-            { itemId:"tea_leaf", weight:5 },
-            { itemId:"thread", weight:5 },
-            { itemId:"straw", weight:3 },
+            { itemId:"nail", weight:10 },
+            { itemId:"smallbug", weight:18 },
+            { itemId:"tea_leaf", weight:15 },
+            { itemId:"thread", weight:15 },
+            { itemId:"straw", weight:13 },
             { itemId:"twig", weight:3 },
             { itemId:"rubber_band", weight:4 },
-            { itemId:"button", weight:3 },
+            { itemId:"button", weight:13 },
             { itemId:"glass_piece", weight:4 },
             { itemId:"pottery_piece", weight:5 }
         ]
