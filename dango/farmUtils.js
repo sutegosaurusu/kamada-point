@@ -183,6 +183,124 @@ function getFarmOwnerName(farm){
     return farm.ownerName ||
         "農園主";
 }
+// =====================================================
+// 農園共通ユーティリティ
+// =====================================================
 
+function isFarmReady(farm){
+
+    if(!farm){
+        return false;
+    }
+
+    if(!farm.harvestAt){
+        return false;
+    }
+
+    return Date.now() >=
+        Number(farm.harvestAt);
+}
+
+
+function getFarmRemainingTime(farm){
+
+    if(!farm || !farm.harvestAt){
+        return 0;
+    }
+
+    return Math.max(
+        0,
+        Number(farm.harvestAt) - Date.now()
+    );
+}
+
+
+function calculateFarmHarvest(
+    farmTypeId,
+    workerCount
+){
+
+    const farm =
+        farmTypes[farmTypeId];
+
+    if(!farm){
+        return 0;
+    }
+
+    const workers =
+        Math.max(
+            0,
+            Math.min(
+                Number(workerCount || 0),
+                farm.workerCapacity
+            )
+        );
+
+    return (
+        farm.baseHarvest +
+        workers *
+        farm.extraHarvestPerWorker
+    );
+}
+
+
+function getNextHarvestAt(){
+
+    return (
+        Date.now() +
+        FARM_GROWTH_TIME
+    );
+}
+
+
+function getFarmCrop(cropId){
+
+    return farmCrops[cropId] || null;
+}
+
+
+function getFarmType(farmTypeId){
+
+    return farmTypes[farmTypeId] || null;
+}
+
+
+function calculateFarmExpectedValue(
+    farmTypeId,
+    cropId,
+    workerCount
+){
+
+    const farm =
+        getFarmType(farmTypeId);
+
+    const crop =
+        getFarmCrop(cropId);
+
+    if(!farm || !crop){
+        return 0;
+    }
+
+    const harvest =
+        calculateFarmHarvest(
+            farmTypeId,
+            workerCount
+        );
+
+    return harvest * crop.value;
+}
+
+
+function getFarmOwnerName(farm){
+
+    if(!farm){
+        return "不明";
+    }
+
+    return farm.ownerName || "農園主";
+}
+
+
+console.log("farmUtils.js読み込み完了");
 
 console.log("farmUtils.js読み込み完了");
