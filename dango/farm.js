@@ -1348,16 +1348,29 @@ async function harvestFarm(farm){
 
 
         await database
-            .ref()
-            .update(updates);
+    .ref()
+    .update(updates);
 
 
-        showFarmMessage(
-            latestCrop.name +
-            "を" +
-            latestHarvestAmount +
-            "個収穫しました！"
-        );
+// 労働者への賃金支払い
+if(
+    typeof payFarmWorkers === "function"
+){
+
+    await payFarmWorkers(
+        farm.id,
+        latestFarm
+    );
+
+}
+
+
+showFarmMessage(
+    latestCrop.name +
+    "を" +
+    latestHarvestAmount +
+    "個収穫しました！"
+);
 
 
     }catch(error){
