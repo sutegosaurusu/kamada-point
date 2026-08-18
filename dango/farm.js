@@ -224,6 +224,17 @@ function createFarmCard(farm){
         Number(farm.workerCount || 0);
 
 
+    const workerCapacity =
+        Number(
+            farm.workerCapacity ||
+            farmType.workerCapacity
+        );
+
+
+    const salary =
+        Number(farm.salary || 0);
+
+
     const harvestAmount =
         crop
         ? calculateFarmHarvest(
@@ -244,12 +255,312 @@ function createFarmCard(farm){
         : 0;
 
 
+    const acceptingWorkers =
+        workerCount < workerCapacity;
+
+
     const card =
         document.createElement("div");
 
     card.className =
         "farmCard";
 
+
+    // =================================================
+    // 作物
+    // =================================================
+
+    let cropHtml = "";
+
+    if(!crop){
+
+        cropHtml = `
+            <div class="cropArea">
+
+                <div class="cropTitle">
+                    🌱 作物
+                </div>
+
+                <div class="cropName">
+                    まだ植えられていません
+                </div>
+
+                <div class="farmButtons">
+
+                    <button
+                        class="farmButton"
+                        data-action="plant">
+
+                        🌱 作物を選ぶ
+
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+    }else{
+
+        cropHtml = `
+            <div class="cropArea">
+
+                <div class="cropTitle">
+                    🌱 作物
+                </div>
+
+                <div class="cropName">
+                    ${crop.icon || "🌱"}
+                    ${escapeHtml(crop.name)}
+                </div>
+
+                <div class="cropStatus">
+
+                    ${
+                        ready
+                        ? "✅ 収穫できます"
+                        : "⏳ " + formatFarmTime(remaining)
+                    }
+
+                </div>
+
+                <div class="farmButtons">
+
+                    ${
+                        ready
+                        ? `
+                        <button
+                            class="farmButton"
+                            data-action="harvest">
+
+                            🌾 収穫する
+
+                        </button>
+                        `
+                        : ""
+                    }
+
+                    <button
+                        class="farmButton secondary"
+                        data-action="cropSelect">
+
+                        🌱 作物を変更
+
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+    }
+
+
+    // =================================================
+    // 求人表示
+    // =================================================
+
+    const recruitmentHtml = crop
+        ? `
+        <div class="workerArea">
+
+            <div class="workerTitle">
+                👨‍🌾 労働者募集
+            </div>
+
+            <div class="workerCount">
+                ${workerCount} / ${workerCapacity}人
+            </div>
+
+            ${
+                salary > 0
+                ? `
+                <div class="workerNotice">
+                    賃金：
+                    ${salary.toLocaleString()} Pt
+                </div>
+                `
+                : `
+                <div class="workerNotice">
+                    現在、求人を出していません
+                </div>
+                `
+            }
+
+            <div class="farmButtons">
+
+                ${
+                    acceptingWorkers
+                    ? `
+                    <button
+                        class="farmButton"
+                        data-action="recruit">
+
+                        👨‍🌾 求人を設定する
+
+                    </button>
+                    `
+                    : `
+                    <div class="workerNotice">
+                        ✅ 労働者が定員に達しています
+                    </div>
+                    `
+                }
+
+            </div>
+
+        </div>
+        `
+        : "";
+
+
+    // =================================================
+    // カードHTML
+    // =================================================
+
+    card.innerHTML = `
+
+        <div class="farmHeader">
+
+            <div>
+
+                <div class="farmName">
+                    ${farmType.icon}
+                    ${escapeHtml(farmType.name)}
+                </div>
+
+                <div class="farmType">
+                    12時間ごとに収穫
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="farmOwner">
+
+            所有者：
+            <strong>
+                ${escapeHtml(
+                    farm.ownerName || "自分"
+                )}
+            </strong>
+
+        </div>
+
+
+        <div class="farmInfo">
+
+            <div class="infoBox">
+
+                <div class="infoLabel">
+                    基本収穫
+                </div>
+
+                <div class="infoValue">
+                    ${farmType.baseHarvest}個
+                </div>
+
+            </div>
+
+
+            <div class="infoBox">
+
+                <div class="infoLabel">
+                    現在の予想収穫
+                </div>
+
+                <div class="infoValue">
+                    ${harvestAmount}個
+                </div>
+
+            </div>
+
+        </div>
+
+
+        ${recruitmentHtml}
+
+
+        ${cropHtml}
+
+
+        <div class="farmButtons">
+
+            ${
+                crop && acceptingWorkers
+                ? `
+                <button
+                    class="farmButton secondary"
+                    data-action="recruit">
+
+                    👨‍🌾 労働者を募集する
+
+                </button>
+                `
+                : ""
+            }
+
+        </div>
+    `;
+
+
+    // =================================================
+    // ボタンイベント
+    // =================================================
+
+    card
+        .querySelectorAll("[data-action]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const action =
+                        button.dataset.action;
+
+
+                    if(action === "plant"){
+
+                        openCropSelection(farm);
+
+                    }
+
+
+                    if(action === "cropSelect"){
+
+                        openCropSelection(farm);
+
+                    }
+
+
+                    if(action === "recruit"){
+
+                        await openFarmRecruitment({
+                            ...farm,
+                            id:farm.id
+                        });
+
+                    }
+
+
+                    if(action === "harvest"){
+
+                        await harvestFarm(farm);
+
+                    }
+
+                }
+            );
+
+        });
+
+
+    return card;
+
+}
 
     // -----------------------------------------
     // 作物表示
