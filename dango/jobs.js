@@ -512,7 +512,14 @@ function watchMyJob(){
             }
 
         });
+setInterval(
+    () => {
 
+        completeMyFarmJob();
+
+    },
+    10000
+);
 }
 // =====================================================
 // 自分の農園の求人ボタン
@@ -873,29 +880,41 @@ async function joinFarmJob(
         const updates = {};
 
 
-        updates[
-            workerPath
-        ] = {
+       const workStartAt = Date.now();
 
-            farmId:farmId,
+const workEndAt =
+    workStartAt +
+    12 * 60 * 60 * 1000;
 
-            farmOwnerId:
-                latestFarm.ownerId,
 
-            farmOwnerName:
-                latestFarm.ownerName ||
-                "農園主",
+updates[
+    workerPath
+] = {
 
-            joinedAt:
-                firebase.database
-                    .ServerValue.TIMESTAMP,
+    farmId:farmId,
 
-            salary:
-                Number(
-                    latestFarm.salary || 0
-                )
+    farmOwnerId:
+        latestFarm.ownerId,
 
-        };
+    farmOwnerName:
+        latestFarm.ownerName ||
+        "農園主",
+
+    joinedAt:
+        workStartAt,
+
+    workEndAt:
+        workEndAt,
+
+    salary:
+        Number(
+            latestFarm.salary || 0
+        ),
+
+    status:"working",
+
+    paid:false
+};
 
 
         updates[
@@ -1149,7 +1168,128 @@ async function payFarmWorkers(
         .update(updates);
 
 }
+// =====================================================
+// 12時間アルバイトの完了処理
+// =====================================================
 
+async function completeMyFarmJob(){
+
+    if(!currentJobsUser){
+        return;
+    }
+
+    const workerRef =
+        database.ref(
+            "farmWorkers/" +
+            currentJobsUser.uid
+        );
+
+    const snapshot =
+        await workerRef.once("value");
+
+    const job =
+        snapshot.val();
+
+    if(!job){
+        return;
+    }
+
+    if(job.status !== "working"){
+        return;
+    }
+
+    const workEndAt =
+        Number(job.workEndAt || 0);
+
+    if(
+        !workEndAt ||
+        Date.now() < workEndAt
+    ){
+        return;
+    }
+
+    if(job.paid === true){
+        return;
+    }
+
+    const salary =
+        Number(job.salary || 0);
+
+    if(salary <= 0){
+        return;
+    }
+
+    try{
+
+        // -----------------------------------------
+        // 賃金支払い
+        // -----------------------------------------
+
+        const pointRef =
+            database.ref(
+                "members/" +
+                currentJobsUser.uid +
+                "/point"
+            );
+
+        const transactionResult =
+            await pointRef.transaction(
+                point => {
+
+                    return (
+                        Number(point || 0) +
+                        salary
+                    );
+
+                }
+            );
+
+        if(!transactionResult.committed){
+            return;
+        }
+
+        // -----------------------------------------
+        // 仕事終了
+        // -----------------------------------------
+
+        await workerRef.update({
+
+            status:"completed",
+
+            paid:true,
+
+            completedAt:Date.now()
+
+        });
+
+        // -----------------------------------------
+        // 12時間アルバイト終了
+        // -----------------------------------------
+
+        showFarmJobMessage(
+            salary.toLocaleString() +
+            " Ptの給料を受け取りました。"
+        );
+
+        setTimeout(
+            async () => {
+
+                await workerRef.remove();
+
+            },
+            1500
+        );
+
+    }catch(error){
+
+        console.error(
+            "アルバイト完了エラー:",
+            error
+        );
+
+    }
+
+}
 
 // =====================================================
 // メッセージ
