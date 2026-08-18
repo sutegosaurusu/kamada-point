@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>アグロポリス農園</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:"Yu Mincho","Noto Serif JP",serif;
+    background:#b79d74;
+    background-image:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(255,255,255,.08),
+            transparent 40%
+        ),
+        radial-gradient(
+            circle at 80% 60%,
+            rgba(0,0,0,.08),
+            transparent 50%
+        );
+    color:#2d2116;
+    min-height:100vh;
+}
+
+/* ==============================
+   ヘッダー
+============================== */
+
+header{
+    background:#cbb38a;
+    border-bottom:6px solid #5b442b;
+    padding:22px;
+    text-align:center;
+    box-shadow:0 4px 8px rgba(0,0,0,.25);
+}
+
+header h1{
+    font-size:32px;
+    letter-spacing:2px;
+    color:#3b2b1b;
+}
+
+header p{
+    margin-top:8px;
+    color:#6b5538;
+    font-style:italic;
+}
+
+/* ==============================
+   ポイント
+============================== */
+
+.pointCard{
+    width:90%;
+    max-width:650px;
+    margin:20px auto;
+    background:#d9ccb2;
+    border:3px solid #5b442b;
+    border-radius:6px;
+    padding:15px;
+    text-align:center;
+    box-shadow:4px 4px 0 #7d6443;
+}
+
+.pointLabel{
+    font-size:16px;
+    color:#6b5538;
+}
+
+.point{
+    margin-top:6px;
+    font-size:34px;
+    font-weight:bold;
+    color:#715317;
+}
+
+/* ==============================
+   農地一覧
+============================== */
+
+.farmSection{
+    width:90%;
+    max-width:650px;
+    margin:24px auto;
+}
+
+.sectionTitle{
+    margin-bottom:12px;
+    font-size:22px;
+    color:#3b2b1b;
+}
+
+/* ==============================
+   農園カード
+============================== */
+
+.farmCard{
+    background:#d9ccb2;
+    border:3px solid #5b442b;
+    border-radius:8px;
+    padding:18px;
+    margin-bottom:18px;
+    box-shadow:4px 4px 0 #7d6443;
+}
+
+.farmHeader{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border-bottom:2px solid #9b825e;
+    padding-bottom:12px;
+}
+
+.farmName{
+    font-size:22px;
+    font-weight:bold;
+}
+
+.farmType{
+    font-size:14px;
+    color:#6b5538;
+    margin-top:4px;
+}
+
+.farmOwner{
+    margin-top:12px;
+    font-size:15px;
+}
+
+.farmOwner strong{
+    color:#4b351f;
+}
+
+/* ==============================
+   農園情報
+============================== */
+
+.farmInfo{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.infoBox{
+    background:#c9b58d;
+    border:2px solid #8a704b;
+    border-radius:5px;
+    padding:9px;
+}
+
+.infoLabel{
+    font-size:12px;
+    color:#6b5538;
+}
+
+.infoValue{
+    margin-top:3px;
+    font-size:16px;
+    font-weight:bold;
+}
+
+/* ==============================
+   作物
+============================== */
+
+.cropArea{
+    margin-top:16px;
+    padding:14px;
+    background:#c8b181;
+    border:2px solid #806541;
+    border-radius:6px;
+}
+
+.cropTitle{
+    font-size:16px;
+    font-weight:bold;
+}
+
+.cropName{
+    margin-top:7px;
+    font-size:21px;
+}
+
+.cropStatus{
+    margin-top:7px;
+    font-size:14px;
+    color:#5f4a30;
+}
+
+/* ==============================
+   労働者
+============================== */
+
+.workerArea{
+    margin-top:15px;
+    padding:14px;
+    background:#d0be99;
+    border:2px solid #88704e;
+    border-radius:6px;
+}
+
+.workerTitle{
+    font-weight:bold;
+    font-size:16px;
+}
+
+.workerCount{
+    margin-top:7px;
+    font-size:18px;
+}
+
+.workerNotice{
+    margin-top:6px;
+    font-size:13px;
+    color:#6b5538;
+}
+
+/* ==============================
+   ボタン
+============================== */
+
+.farmButtons{
+    margin-top:16px;
+    display:grid;
+    gap:10px;
+}
+
+.farmButton{
+    width:100%;
+    padding:13px;
+
+    background:#8a6842;
+    color:#f5ebd5;
+
+    border:3px solid #4d351f;
+    border-radius:6px;
+
+    font-size:17px;
+    font-family:inherit;
+
+    cursor:pointer;
+
+    box-shadow:3px 3px 0 #3d2917;
+    transition:.15s;
+}
+
+.farmButton:hover{
+    background:#765332;
+}
+
+.farmButton:active{
+    transform:translateY(3px);
+    box-shadow:none;
+}
+
+.farmButton.secondary{
+    background:#a18257;
+}
+
+.farmButton.danger{
+    background:#79533a;
+}
+
+/* ==============================
+   空き農地
+============================== */
+
+.emptyFarm{
+    text-align:center;
+    padding:28px 18px;
+    background:#d9ccb2;
+    border:3px dashed #806541;
+    border-radius:8px;
+    color:#6b5538;
+}
+
+.emptyFarmTitle{
+    font-size:22px;
+    margin-bottom:8px;
+}
+
+.emptyFarmText{
+    font-size:14px;
+}
+
+/* ==============================
+   農地購入
+============================== */
+
+.buySection{
+    margin-top:20px;
+    background:#d9ccb2;
+    border:3px solid #5b442b;
+    border-radius:8px;
+    padding:18px;
+    box-shadow:4px 4px 0 #7d6443;
+}
+
+.buyDescription{
+    color:#5f4a30;
+    font-size:14px;
+    line-height:1.6;
+    margin-bottom:14px;
+}
+
+.buyGrid{
+    display:grid;
+    gap:10px;
+}
+
+.buyCard{
+    background:#c9b58d;
+    border:2px solid #806541;
+    border-radius:6px;
+    padding:13px;
+}
+
+.buyCardTitle{
+    font-size:18px;
+    font-weight:bold;
+}
+
+.buyCardInfo{
+    margin-top:5px;
+    font-size:13px;
+    color:#5f4a30;
+}
+
+.buyButton{
+    margin-top:10px;
+    width:100%;
+    padding:11px;
+
+    background:#715337;
+    color:#f5ebd5;
+
+    border:2px solid #4d351f;
+    border-radius:5px;
+
+    font-family:inherit;
+    font-size:15px;
+
+    cursor:pointer;
+}
+
+.buyButton:active{
+    transform:translateY(2px);
+}
+
+/* ==============================
+   メッセージ
+============================== */
+
+.message{
+    width:90%;
+    max-width:650px;
+    margin:20px auto;
+    padding:12px 15px;
+
+    background:#d9ccb2;
+    border:2px solid #6b5538;
+    border-radius:6px;
+
+    text-align:center;
+    font-size:14px;
+}
+
+/* ==============================
+   戻る
+============================== */
+
+.backArea{
+    width:90%;
+    max-width:650px;
+    margin:30px auto;
+    text-align:center;
+}
+
+.backButton{
+    display:inline-block;
+    padding:12px 24px;
+
+    background:#6d5235;
+    color:#f5ebd5;
+
+    border:3px solid #4d351f;
+    border-radius:6px;
+
+    font-size:17px;
+    font-family:inherit;
+
+    cursor:pointer;
+    text-decoration:none;
+
+    box-shadow:3px 3px 0 #3d2917;
+}
+
+.backButton:active{
+    transform:translateY(3px);
+    box-shadow:none;
+}
+
+/* ==============================
+   フッター
+============================== */
+
+footer{
+    margin:40px 0 20px;
+    text-align:center;
+    color:#5e4932;
+    font-size:14px;
+}
+</style>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<!-- 共通 -->
+<script src="firebase.js"></script>
+<script src="common.js"></script>
+
+<!-- 農園 -->
+<script src="farmData.js"></script>
+<script src="farmUtils.js"></script>
+<script src="farm.js"></script>
+<script src="jobs.js"></script>
+
+</head>
+
+<body>
+
+<header>
+    <h1>🌾 アグロポリス農園</h1>
+    <p>Agora of Agropolis</p>
+</header>
+
+<!-- ポイント -->
+<div class="pointCard">
+
+    <div class="pointLabel">
+        所持ポイント
+    </div>
+
+    <div class="point" id="point">
+        0 Pt
+    </div>
+
+</div>
+
+
+<!-- 自分の農園 -->
+<section class="farmSection">
+
+    <div class="sectionTitle">
+        🌾 自分の農園
+    </div>
+
+    <div id="myFarms">
+
+        <div class="emptyFarm">
+
+            <div class="emptyFarmTitle">
+                農園を所有していません
+            </div>
+
+            <div class="emptyFarmText">
+                下から農地を購入できます。
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- 農地購入 -->
+<section class="farmSection">
+
+    <div class="buySection">
+
+        <div class="sectionTitle">
+            🏺 農地を購入
+        </div>
+
+        <div class="buyDescription">
+            アグロポリスの農地を購入して、
+            自分の農園を経営できます。
+            農園を購入すると、その土地で作物を育てられます。
+        </div>
+
+        <div class="buyGrid">
+
+            <div class="buyCard">
+
+                <div class="buyCardTitle">
+                    🌱 小さな農地
+                </div>
+
+                <div class="buyCardInfo">
+                    価格：300,000 Pt<br>
+                    基本収穫：1個 / 12時間<br>
+                    労働者：1人
+                </div>
+
+                <button
+                    class="buyButton"
+                    data-farm-type="small">
+                    購入する
+                </button>
+
+            </div>
+
+
+            <div class="buyCard">
+
+                <div class="buyCardTitle">
+                    🌾 農地
+                </div>
+
+                <div class="buyCardInfo">
+                    価格：600,000 Pt<br>
+                    基本収穫：3個 / 12時間<br>
+                    労働者：3人
+                </div>
+
+                <button
+                    class="buyButton"
+                    data-farm-type="normal">
+                    購入する
+                </button>
+
+            </div>
+
+
+            <div class="buyCard">
+
+                <div class="buyCardTitle">
+                    🌳 大きな農地
+                </div>
+
+                <div class="buyCardInfo">
+                    価格：1,200,000 Pt<br>
+                    基本収穫：6個 / 12時間<br>
+                    労働者：6人
+                </div>
+
+                <button
+                    class="buyButton"
+                    data-farm-type="large">
+                    購入する
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- 他プレイヤーの求人 -->
+<section class="farmSection">
+
+    <div class="sectionTitle">
+        👨‍🌾 農園の仕事
+    </div>
+
+    <div id="jobList">
+
+        <div class="emptyFarm">
+
+            <div class="emptyFarmTitle">
+                求人を読み込んでいます
+            </div>
+
+            <div class="emptyFarmText">
+                他の農園主が募集している仕事が表示されます。
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- メッセージ -->
+<div
+    id="message"
+    class="message"
+    style="display:none;">
+</div>
+
+
+<!-- 戻る -->
+<div class="backArea">
+
+    <a
+        class="backButton"
+        href="adventure.html">
+
+        ← 探検所へ戻る
+
+    </a>
+
+</div>
+
+
+<footer>
+    アグロポリスの農民たち
+</footer>
+
+</body>
+</html>
