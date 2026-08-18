@@ -19,6 +19,7 @@ auth.onAuthStateChanged(user => {
     currentJobsUser = user;
 
     watchFarmJobs();
+    watchMyJob();
 
 });
 
@@ -315,7 +316,204 @@ function createJobCard(
 
 }
 
+// =====================================================
+// 自分の現在の仕事をリアルタイム表示
+// =====================================================
 
+function watchMyJob(){
+
+    if(!currentJobsUser){
+        return;
+    }
+
+    database
+        .ref(
+            "farmWorkers/" +
+            currentJobsUser.uid
+        )
+        .on("value", async snapshot => {
+
+            const job =
+                snapshot.val();
+
+            const container =
+                document.getElementById("myJobArea");
+
+            if(!container){
+                return;
+            }
+
+            if(!job){
+
+                container.innerHTML = `
+                    <div class="emptyFarm">
+
+                        <div class="emptyFarmTitle">
+                            仕事をしていません
+                        </div>
+
+                        <div class="emptyFarmText">
+                            農園の求人から仕事に参加できます。
+                        </div>
+
+                    </div>
+                `;
+
+                return;
+            }
+
+            const farmSnapshot =
+                await database
+                    .ref(
+                        "farms/" +
+                        job.farmId
+                    )
+                    .once("value");
+
+            const farm =
+                farmSnapshot.val();
+
+            if(!farm){
+
+                container.innerHTML = `
+                    <div class="emptyFarm">
+
+                        <div class="emptyFarmTitle">
+                            農園情報が見つかりません
+                        </div>
+
+                    </div>
+                `;
+
+                return;
+            }
+
+            const farmType =
+                farmTypes[farm.farmType];
+
+            const crop =
+                farmCrops[farm.cropId];
+
+            const salary =
+                Number(
+                    job.salary ||
+                    farm.salary ||
+                    0
+                );
+
+            const workerCount =
+                Number(
+                    farm.workerCount || 0
+                );
+
+            const workerCapacity =
+                Number(
+                    farm.workerCapacity ||
+                    farmType?.workerCapacity ||
+                    0
+                );
+
+            container.innerHTML = `
+
+                <div class="farmCard">
+
+                    <div class="farmHeader">
+
+                        <div>
+
+                            <div class="farmName">
+                                ${farmType?.icon || "🌾"}
+                                ${escapeHtml(
+                                    farmType?.name || "農園"
+                                )}
+                            </div>
+
+                            <div class="farmType">
+                                所有者：
+                                ${escapeHtml(
+                                    farm.ownerName || "農園主"
+                                )}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="cropArea">
+
+                        <div class="cropTitle">
+                            🌱 作物
+                        </div>
+
+                        <div class="cropName">
+                            ${crop?.icon || "🌱"}
+                            ${escapeHtml(
+                                crop?.name || "未設定"
+                            )}
+                        </div>
+
+                    </div>
+
+                    <div class="workerArea">
+
+                        <div class="workerTitle">
+                            👨‍🌾 労働者
+                        </div>
+
+                        <div class="workerCount">
+                            ${workerCount} / ${workerCapacity}人
+                        </div>
+
+                    </div>
+
+                    <div class="workerArea">
+
+                        <div class="workerTitle">
+                            💰 労働賃金
+                        </div>
+
+                        <div class="workerCount">
+                            ${salary.toLocaleString()} Pt
+                        </div>
+
+                    </div>
+
+                    <div class="farmButtons">
+
+                        <button
+                            class="farmButton danger"
+                            id="leaveFarmButton">
+
+                            🚪 この仕事を辞める
+
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+            const leaveButton =
+                document.getElementById(
+                    "leaveFarmButton"
+                );
+
+            if(leaveButton){
+
+                leaveButton.addEventListener(
+                    "click",
+                    async () => {
+
+                        await leaveFarmJob();
+
+                    }
+                );
+
+            }
+
+        });
+
+}
 // =====================================================
 // 自分の農園の求人ボタン
 // =====================================================
