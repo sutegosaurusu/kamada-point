@@ -562,7 +562,6 @@ function createFarmCard(farm){
 
 }
 
-   
 
 // =====================================================
 // 農地購入
@@ -1096,29 +1095,29 @@ async function harvestFarm(farm){
 
 
         await database
-    .ref()
-    .update(updates);
+            .ref()
+            .update(updates);
 
 
-// 労働者への賃金支払い
-if(
-    typeof payFarmWorkers === "function"
-){
+        // 労働者への賃金支払い
+        if(
+            typeof payFarmWorkers === "function"
+        ){
 
-    await payFarmWorkers(
-        farm.id,
-        latestFarm
-    );
+            await payFarmWorkers(
+                farm.id,
+                latestFarm
+            );
 
-}
+        }
 
 
-showFarmMessage(
-    latestCrop.name +
-    "を" +
-    latestHarvestAmount +
-    "個収穫しました！"
-);
+        showFarmMessage(
+            latestCrop.name +
+            "を" +
+            latestHarvestAmount +
+            "個収穫しました！"
+        );
 
 
     }catch(error){
