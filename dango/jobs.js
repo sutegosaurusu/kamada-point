@@ -5,6 +5,8 @@
 let farmJobsData = {};
 let currentJobsUser = null;
 
+let myJobTimer = null;
+
 
 // =====================================================
 // ログイン
@@ -97,7 +99,12 @@ function renderFarmJobs(){
                     farmType.workerCapacity
                 );
 
-            // 募集枠が満員なら表示しない
+            // 求人を出していない
+            if(Number(farm.salary || 0) <= 0){
+                return false;
+            }
+
+            // 満員
             return workers < capacity;
 
         });
@@ -227,7 +234,7 @@ function createJobCard(
             </div>
 
             <div class="workerNotice">
-                労働者が増えるほど地主の収穫量が増えます。
+                12時間のアルバイトです。
             </div>
 
         </div>
@@ -268,13 +275,13 @@ function createJobCard(
         </div>
 
 
-        <div class="pointCard" style="margin:15px 0 0; width:100%;">
+        <div class="workerArea">
 
-            <div class="pointLabel">
-                労働賃金
+            <div class="workerTitle">
+                💰 12時間の賃金
             </div>
 
-            <div class="point" style="font-size:26px;">
+            <div class="workerCount">
                 ${salary.toLocaleString()} Pt
             </div>
 
@@ -316,6 +323,7 @@ function createJobCard(
 
 }
 
+
 // =====================================================
 // 自分の現在の仕事をリアルタイム表示
 // =====================================================
@@ -333,203 +341,324 @@ function watchMyJob(){
         )
         .on("value", async snapshot => {
 
-            const job =
-                snapshot.val();
+            await renderMyJob(
+                snapshot.val()
+            );
 
-            const container =
-                document.getElementById("myJobArea");
+        });
 
-            if(!container){
-                return;
-            }
 
-            if(!job){
+    // タイマーは1つだけ
+    if(!myJobTimer){
 
-                container.innerHTML = `
-                    <div class="emptyFarm">
+        myJobTimer =
+            setInterval(
+                async () => {
 
-                        <div class="emptyFarmTitle">
-                            仕事をしていません
-                        </div>
+                    await completeMyFarmJob();
 
-                        <div class="emptyFarmText">
-                            農園の求人から仕事に参加できます。
-                        </div>
+                    const snapshot =
+                        await database
+                            .ref(
+                                "farmWorkers/" +
+                                currentJobsUser.uid
+                            )
+                            .once("value");
+
+                    await renderMyJob(
+                        snapshot.val()
+                    );
+
+                },
+                1000
+            );
+
+    }
+
+}
+
+
+// =====================================================
+// 現在の仕事を表示
+// =====================================================
+
+async function renderMyJob(job){
+
+    const container =
+        document.getElementById(
+            "myJobArea"
+        );
+
+    if(!container){
+        return;
+    }
+
+
+    // -------------------------------------------------
+    // 仕事をしていない
+    // -------------------------------------------------
+
+    if(!job){
+
+        container.innerHTML = `
+            <div class="emptyFarm">
+
+                <div class="emptyFarmTitle">
+                    仕事をしていません
+                </div>
+
+                <div class="emptyFarmText">
+                    農園の求人から仕事に参加できます。
+                </div>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    // -------------------------------------------------
+    // 仕事が完了済みなら表示しない
+    // -------------------------------------------------
+
+    if(job.status === "completed"){
+
+        container.innerHTML = `
+            <div class="emptyFarm">
+
+                <div class="emptyFarmTitle">
+                    アルバイト終了
+                </div>
+
+                <div class="emptyFarmText">
+                    給料を受け取りました。
+                </div>
+
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    // -------------------------------------------------
+    // 農園情報
+    // -------------------------------------------------
+
+    const farmSnapshot =
+        await database
+            .ref(
+                "farms/" +
+                job.farmId
+            )
+            .once("value");
+
+
+    const farm =
+        farmSnapshot.val();
+
+
+    if(!farm){
+
+        container.innerHTML = `
+            <div class="emptyFarm">
+
+                <div class="emptyFarmTitle">
+                    農園情報が見つかりません
+                </div>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const farmType =
+        farmTypes[farm.farmType];
+
+    const crop =
+        farmCrops[farm.cropId];
+
+
+    const salary =
+        Number(
+            job.salary ||
+            farm.salary ||
+            0
+        );
+
+
+    const workerCount =
+        Number(
+            farm.workerCount || 0
+        );
+
+
+    const workerCapacity =
+        Number(
+            farm.workerCapacity ||
+            farmType?.workerCapacity ||
+            0
+        );
+
+
+    const remaining =
+        Math.max(
+            0,
+            Number(job.workEndAt || 0) -
+            Date.now()
+        );
+
+
+    container.innerHTML = `
+
+        <div class="farmCard">
+
+            <div class="farmHeader">
+
+                <div>
+
+                    <div class="farmName">
+
+                        ${farmType?.icon || "🌾"}
+
+                        ${escapeHtml(
+                            farmType?.name ||
+                            "農園"
+                        )}
 
                     </div>
-                `;
 
-                return;
-            }
+                    <div class="farmType">
 
-            const farmSnapshot =
-                await database
-                    .ref(
-                        "farms/" +
-                        job.farmId
-                    )
-                    .once("value");
-
-            const farm =
-                farmSnapshot.val();
-
-            if(!farm){
-
-                container.innerHTML = `
-                    <div class="emptyFarm">
-
-                        <div class="emptyFarmTitle">
-                            農園情報が見つかりません
-                        </div>
-
-                    </div>
-                `;
-
-                return;
-            }
-
-            const farmType =
-                farmTypes[farm.farmType];
-
-            const crop =
-                farmCrops[farm.cropId];
-
-            const salary =
-                Number(
-                    job.salary ||
-                    farm.salary ||
-                    0
-                );
-
-            const workerCount =
-                Number(
-                    farm.workerCount || 0
-                );
-
-            const workerCapacity =
-                Number(
-                    farm.workerCapacity ||
-                    farmType?.workerCapacity ||
-                    0
-                );
-
-            container.innerHTML = `
-
-                <div class="farmCard">
-
-                    <div class="farmHeader">
-
-                        <div>
-
-                            <div class="farmName">
-                                ${farmType?.icon || "🌾"}
-                                ${escapeHtml(
-                                    farmType?.name || "農園"
-                                )}
-                            </div>
-
-                            <div class="farmType">
-                                所有者：
-                                ${escapeHtml(
-                                    farm.ownerName || "農園主"
-                                )}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="cropArea">
-
-                        <div class="cropTitle">
-                            🌱 作物
-                        </div>
-
-                        <div class="cropName">
-                            ${crop?.icon || "🌱"}
-                            ${escapeHtml(
-                                crop?.name || "未設定"
-                            )}
-                        </div>
-
-                    </div>
-
-                    <div class="workerArea">
-
-                        <div class="workerTitle">
-                            👨‍🌾 労働者
-                        </div>
-
-                        <div class="workerCount">
-                            ${workerCount} / ${workerCapacity}人
-                        </div>
-
-                    </div>
-
-                    <div class="workerArea">
-
-                        <div class="workerTitle">
-                            💰 労働賃金
-                        </div>
-
-                        <div class="workerCount">
-                            ${salary.toLocaleString()} Pt
-                        </div>
-
-                    </div>
-
-                    <div class="farmButtons">
-
-                        <button
-                            class="farmButton danger"
-                            id="leaveFarmButton">
-
-                            🚪 この仕事を辞める
-
-                        </button>
+                        所有者：
+                        ${escapeHtml(
+                            farm.ownerName ||
+                            "農園主"
+                        )}
 
                     </div>
 
                 </div>
-            `;
 
-            const leaveButton =
-                document.getElementById(
-                    "leaveFarmButton"
-                );
+            </div>
 
-            if(leaveButton){
 
-                leaveButton.addEventListener(
-                    "click",
-                    async () => {
+            <div class="cropArea">
 
-                        await leaveFarmJob();
+                <div class="cropTitle">
+                    🌱 作物
+                </div>
 
-                    }
-                );
+                <div class="cropName">
+
+                    ${crop?.icon || "🌱"}
+
+                    ${escapeHtml(
+                        crop?.name ||
+                        "未設定"
+                    )}
+
+                </div>
+
+            </div>
+
+
+            <div class="workerArea">
+
+                <div class="workerTitle">
+                    👨‍🌾 労働者
+                </div>
+
+                <div class="workerCount">
+
+                    ${workerCount}
+                    /
+                    ${workerCapacity}人
+
+                </div>
+
+            </div>
+
+
+            <div class="workerArea">
+
+                <div class="workerTitle">
+                    💰 12時間の賃金
+                </div>
+
+                <div class="workerCount">
+
+                    ${salary.toLocaleString()} Pt
+
+                </div>
+
+            </div>
+
+
+            <div class="workerArea">
+
+                <div class="workerTitle">
+                    ⏳ アルバイト残り時間
+                </div>
+
+                <div class="workerCount">
+
+                    ${formatFarmTime(remaining)}
+
+                </div>
+
+            </div>
+
+
+            <div class="farmButtons">
+
+                <button
+                    class="farmButton danger"
+                    id="leaveFarmButton">
+
+                    🚪 アルバイトを辞める
+
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+
+    const leaveButton =
+        document.getElementById(
+            "leaveFarmButton"
+        );
+
+
+    if(leaveButton){
+
+        leaveButton.addEventListener(
+            "click",
+            async () => {
+
+                await leaveFarmJob();
 
             }
-setInterval(
-    () => {
+        );
 
-        completeMyFarmJob();
-
-    },
-    10000
-);
-        });
+    }
 
 }
+
+
 // =====================================================
 // 自分の農園の求人ボタン
 // =====================================================
 
 function renderMyFarmJobButtons(){
 
-    // 自分の農園カードを描画している
-    // farm.js側に求人ボタンを追加するための関数。
-    // farm.jsとの結合部分は後述。
+    // 求人ボタンはfarm.js側で表示します。
 
 }
 
@@ -544,6 +673,7 @@ async function openFarmRecruitment(farm){
         return;
     }
 
+
     if(
         !currentJobsUser ||
         farm.ownerId !== currentJobsUser.uid
@@ -554,7 +684,6 @@ async function openFarmRecruitment(farm){
         );
 
         return;
-
     }
 
 
@@ -571,6 +700,7 @@ async function openFarmRecruitment(farm){
             farm.workerCount || 0
         );
 
+
     const capacity =
         Number(
             farm.workerCapacity ||
@@ -585,7 +715,6 @@ async function openFarmRecruitment(farm){
         );
 
         return;
-
     }
 
 
@@ -597,7 +726,7 @@ async function openFarmRecruitment(farm){
 
     const input =
         prompt(
-            "労働者1人あたりの賃金を設定してください。\n\n" +
+            "12時間アルバイトの賃金を設定してください。\n\n" +
             "現在の賃金：" +
             currentSalary +
             " Pt"
@@ -623,20 +752,16 @@ async function openFarmRecruitment(farm){
         );
 
         return;
-
     }
 
 
-    if(
-        !Number.isInteger(salary)
-    ){
+    if(!Number.isInteger(salary)){
 
         showFarmJobMessage(
             "賃金は整数で入力してください。"
         );
 
         return;
-
     }
 
 
@@ -653,7 +778,7 @@ async function openFarmRecruitment(farm){
 
         showFarmJobMessage(
             salary.toLocaleString() +
-            " Ptで求人を設定しました。"
+            " Ptの12時間アルバイトを募集しました。"
         );
 
 
@@ -698,7 +823,6 @@ async function joinFarmJob(
         );
 
         return;
-
     }
 
 
@@ -712,7 +836,6 @@ async function joinFarmJob(
         );
 
         return;
-
     }
 
 
@@ -720,6 +843,7 @@ async function joinFarmJob(
         Number(
             farm.workerCount || 0
         );
+
 
     const capacity =
         Number(
@@ -735,7 +859,6 @@ async function joinFarmJob(
         );
 
         return;
-
     }
 
 
@@ -752,12 +875,11 @@ async function joinFarmJob(
         );
 
         return;
-
     }
 
 
     // -------------------------------------------------
-    // すでにどこかの農園で働いていないか確認
+    // すでに別の農園で働いていないか
     // -------------------------------------------------
 
     const workerSnapshot =
@@ -780,13 +902,12 @@ async function joinFarmJob(
         );
 
         return;
-
     }
 
 
     const confirmed =
         confirm(
-            "この農園で働きますか？\n\n" +
+            "この農園で12時間働きますか？\n\n" +
             "農園：" +
             farmType.name +
             "\n" +
@@ -799,7 +920,8 @@ async function joinFarmJob(
             "\n" +
             "賃金：" +
             salary.toLocaleString() +
-            " Pt"
+            " Pt\n\n" +
+            "12時間終了すると給料が支払われます。"
         );
 
 
@@ -818,9 +940,9 @@ async function joinFarmJob(
                 );
 
 
-        // ---------------------------------------------
-        // 農園を最新状態で取得
-        // ---------------------------------------------
+        // -------------------------------------------------
+        // 最新データ取得
+        // -------------------------------------------------
 
         const latestSnapshot =
             await farmRef.once("value");
@@ -837,7 +959,6 @@ async function joinFarmJob(
             );
 
             return;
-
         }
 
 
@@ -864,13 +985,36 @@ async function joinFarmJob(
             );
 
             return;
-
         }
 
 
-        // ---------------------------------------------
-        // 労働者登録
-        // ---------------------------------------------
+        const latestSalary =
+            Number(
+                latestFarm.salary || 0
+            );
+
+
+        if(latestSalary <= 0){
+
+            showFarmJobMessage(
+                "この求人は終了しました。"
+            );
+
+            return;
+        }
+
+
+        // -------------------------------------------------
+        // 12時間アルバイト開始
+        // -------------------------------------------------
+
+        const workStartAt =
+            Date.now();
+
+        const workEndAt =
+            workStartAt +
+            12 * 60 * 60 * 1000;
+
 
         const workerPath =
             "farmWorkers/" +
@@ -880,41 +1024,33 @@ async function joinFarmJob(
         const updates = {};
 
 
-       const workStartAt = Date.now();
+        updates[
+            workerPath
+        ] = {
 
-const workEndAt =
-    workStartAt +
-    12 * 60 * 60 * 1000;
+            farmId:farmId,
 
+            farmOwnerId:
+                latestFarm.ownerId,
 
-updates[
-    workerPath
-] = {
+            farmOwnerName:
+                latestFarm.ownerName ||
+                "農園主",
 
-    farmId:farmId,
+            joinedAt:
+                workStartAt,
 
-    farmOwnerId:
-        latestFarm.ownerId,
+            workEndAt:
+                workEndAt,
 
-    farmOwnerName:
-        latestFarm.ownerName ||
-        "農園主",
+            salary:
+                latestSalary,
 
-    joinedAt:
-        workStartAt,
+            status:"working",
 
-    workEndAt:
-        workEndAt,
+            paid:false
 
-    salary:
-        Number(
-            latestFarm.salary || 0
-        ),
-
-    status:"working",
-
-    paid:false
-};
+        };
 
 
         updates[
@@ -931,7 +1067,13 @@ updates[
 
 
         showFarmJobMessage(
-            "農園の仕事に参加しました。"
+            "12時間アルバイトを開始しました。"
+        );
+
+
+        // すぐ表示更新
+        await renderMyJob(
+            updates[workerPath]
         );
 
 
@@ -953,7 +1095,7 @@ updates[
 
 
 // =====================================================
-// 農園を辞める
+// アルバイトを辞める
 // =====================================================
 
 async function leaveFarmJob(){
@@ -986,7 +1128,18 @@ async function leaveFarmJob(){
         );
 
         return;
+    }
 
+
+    const confirmed =
+        confirm(
+            "12時間のアルバイトを途中で辞めますか？\n\n" +
+            "途中で辞めた場合、給料は支払われません。"
+        );
+
+
+    if(!confirmed){
+        return;
     }
 
 
@@ -1048,7 +1201,7 @@ async function leaveFarmJob(){
 
 
         showFarmJobMessage(
-            "農園の仕事を辞めました。"
+            "アルバイトを辞めました。"
         );
 
 
@@ -1070,106 +1223,7 @@ async function leaveFarmJob(){
 
 
 // =====================================================
-// 労働者の賃金を支払う
-// =====================================================
-//
-// 今回は「農園で働いた結果、収穫時に賃金を支払う」
-// 方式にします。
-// farm.js の収穫処理から呼び出せます。
-// =====================================================
-
-async function payFarmWorkers(
-    farmId,
-    farm
-){
-
-    if(!farm){
-        return;
-    }
-
-
-    const workersSnapshot =
-        await database
-            .ref(
-                "farmWorkers"
-            )
-            .once("value");
-
-
-    const allWorkers =
-        workersSnapshot.val() || {};
-
-
-    const workerEntries =
-        Object.entries(allWorkers)
-        .filter(
-            ([uid, worker]) =>
-                worker &&
-                worker.farmId === farmId
-        );
-
-
-    if(
-        workerEntries.length === 0
-    ){
-
-        return;
-
-    }
-
-
-    const salary =
-        Number(
-            farm.salary || 0
-        );
-
-
-    if(salary <= 0){
-        return;
-    }
-
-
-    const updates = {};
-
-
-    for(
-        const [uid, worker]
-        of workerEntries
-    ){
-
-        const pointSnapshot =
-            await database
-                .ref(
-                    "members/" +
-                    uid +
-                    "/point"
-                )
-                .once("value");
-
-
-        const current =
-            Number(
-                pointSnapshot.val() || 0
-            );
-
-
-        updates[
-            "members/" +
-            uid +
-            "/point"
-        ] =
-            current + salary;
-
-    }
-
-
-    await database
-        .ref()
-        .update(updates);
-
-}
-// =====================================================
-// 12時間アルバイトの完了処理
+// 12時間アルバイト完了
 // =====================================================
 
 async function completeMyFarmJob(){
@@ -1178,59 +1232,79 @@ async function completeMyFarmJob(){
         return;
     }
 
+
     const workerRef =
-        database.ref(
-            "farmWorkers/" +
-            currentJobsUser.uid
-        );
+        database
+            .ref(
+                "farmWorkers/" +
+                currentJobsUser.uid
+            );
+
 
     const snapshot =
         await workerRef.once("value");
 
+
     const job =
         snapshot.val();
+
 
     if(!job){
         return;
     }
 
+
     if(job.status !== "working"){
         return;
     }
 
+
     const workEndAt =
-        Number(job.workEndAt || 0);
+        Number(
+            job.workEndAt || 0
+        );
+
 
     if(
         !workEndAt ||
         Date.now() < workEndAt
     ){
+
         return;
     }
+
 
     if(job.paid === true){
         return;
     }
 
+
     const salary =
-        Number(job.salary || 0);
+        Number(
+            job.salary || 0
+        );
+
 
     if(salary <= 0){
+
         return;
     }
 
+
     try{
 
-        // -----------------------------------------
-        // 賃金支払い
-        // -----------------------------------------
+        // -------------------------------------------------
+        // 給料を1回だけ支払う
+        // -------------------------------------------------
 
         const pointRef =
-            database.ref(
-                "members/" +
-                currentJobsUser.uid +
-                "/point"
-            );
+            database
+                .ref(
+                    "members/" +
+                    currentJobsUser.uid +
+                    "/point"
+                );
+
 
         const transactionResult =
             await pointRef.transaction(
@@ -1244,13 +1318,40 @@ async function completeMyFarmJob(){
                 }
             );
 
+
         if(!transactionResult.committed){
             return;
         }
 
-        // -----------------------------------------
-        // 仕事終了
-        // -----------------------------------------
+
+        // -------------------------------------------------
+        // 農園の労働者数を1人減らす
+        // -------------------------------------------------
+
+        const farmRef =
+            database
+                .ref(
+                    "farms/" +
+                    job.farmId +
+                    "/workerCount"
+                );
+
+
+        await farmRef.transaction(
+            count => {
+
+                return Math.max(
+                    0,
+                    Number(count || 0) - 1
+                );
+
+            }
+        );
+
+
+        // -------------------------------------------------
+        // 仕事データを完了状態にする
+        // -------------------------------------------------
 
         await workerRef.update({
 
@@ -1258,27 +1359,42 @@ async function completeMyFarmJob(){
 
             paid:true,
 
-            completedAt:Date.now()
+            completedAt:
+                Date.now()
 
         });
 
-        // -----------------------------------------
-        // 12時間アルバイト終了
-        // -----------------------------------------
 
         showFarmJobMessage(
             salary.toLocaleString() +
             " Ptの給料を受け取りました。"
         );
 
+
+        // -------------------------------------------------
+        // 少し表示してから仕事データ削除
+        // -------------------------------------------------
+
         setTimeout(
             async () => {
 
-                await workerRef.remove();
+                try{
+
+                    await workerRef.remove();
+
+                }catch(error){
+
+                    console.error(
+                        "仕事データ削除エラー:",
+                        error
+                    );
+
+                }
 
             },
             1500
         );
+
 
     }catch(error){
 
@@ -1290,6 +1406,21 @@ async function completeMyFarmJob(){
     }
 
 }
+
+
+// =====================================================
+// 古い収穫時の一括賃金支払いは使用しない
+// =====================================================
+
+async function payFarmWorkers(){
+
+    // 12時間アルバイト方式に変更したため、
+    // farm.jsから呼び出されても何もしません。
+
+    return;
+
+}
+
 
 // =====================================================
 // メッセージ
@@ -1308,6 +1439,7 @@ function showFarmJobMessage(
     if(!element){
 
         alert(message);
+
         return;
 
     }
@@ -1315,6 +1447,7 @@ function showFarmJobMessage(
 
     element.textContent =
         message;
+
 
     element.style.display =
         "block";
