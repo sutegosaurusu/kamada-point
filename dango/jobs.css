@@ -561,3 +561,30 @@ footer{
     font-family:inherit;
     font-size:15px;
 }
+/* =========================================
+   求人ページのセクション配置
+========================================= */
+
+.jobSection{
+    width:100%;
+    max-width:1000px;
+
+    margin:0 auto 16px;
+
+    display:block;
+
+    box-sizing:border-box;
+}
+
+.sectionTitle{
+    width:100%;
+    max-width:1000px;
+
+    margin:20px auto 9px;
+
+    display:block;
+
+    font-size:21px;
+
+    box-sizing:border-box;
+}
