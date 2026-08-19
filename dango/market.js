@@ -3,6 +3,7 @@
 let currentCategory = "food";
 let listingData = {};
 let merchantData = {};
+let farmListingsData = {};
 
 const REGEN_ITEMS = {
     leaf: 30,
@@ -52,6 +53,19 @@ function watchListings(){
             }
 
             await checkMerchantRestock();
+
+            renderMarket();
+        });
+
+    /*
+    不動産（農地の転売）出品
+    */
+
+    database
+        .ref("farmListings")
+        .on("value", snapshot => {
+
+            farmListingsData = snapshot.val() || {};
 
             renderMarket();
         });
@@ -154,10 +168,73 @@ document.querySelectorAll(".categoryTabs button")
 
         currentCategory = button.dataset.category;
 
+        updateSellAreaVisibility();
+
         renderMarket();
         renderSellItems();
     });
 });
+
+/*
+不動産カテゴリーでは、通常の「持ち物を出品」フォームは使わない
+（農地の出品・取り下げは農園ページから行う）
+*/
+
+function updateSellAreaVisibility(){
+
+    const isRealEstate =
+        currentCategory === "realestate";
+
+    const sellArea =
+        document.querySelector(".sellArea");
+
+    const myListings =
+        document.querySelector(".myListings");
+
+    if(sellArea){
+        sellArea.style.display =
+            isRealEstate ? "none" : "flex";
+    }
+
+    if(myListings){
+        myListings.style.display =
+            isRealEstate ? "none" : "block";
+    }
+
+    let note =
+        document.getElementById("realEstateNote");
+
+    if(isRealEstate){
+
+        if(!note){
+
+            note = document.createElement("div");
+            note.id = "realEstateNote";
+            note.className = "empty";
+            note.style.margin = "20px auto";
+            note.style.maxWidth = "850px";
+
+            const market =
+                document.getElementById("market");
+
+            market.parentNode.insertBefore(
+                note,
+                market.nextSibling
+            );
+        }
+
+        note.textContent =
+            "農地の出品・取り下げは🌾農園ページから行えます。";
+
+        note.style.display = "block";
+
+    }else if(note){
+
+        note.style.display = "none";
+
+    }
+
+}
 
 const searchInput = document.getElementById("searchInput");
 
@@ -174,6 +251,11 @@ document
 ===================================================== */
 
 function renderMarket(){
+
+    if(currentCategory === "realestate"){
+        renderRealEstateMarket();
+        return;
+    }
 
     const market = document.getElementById("market");
 
@@ -462,6 +544,260 @@ function renderMarket(){
 
         market.appendChild(card);
     });
+}
+
+/* =====================================================
+   不動産市場表示（農地の転売）
+===================================================== */
+
+function renderRealEstateMarket(){
+
+    const market = document.getElementById("market");
+
+    if(!currentUser){
+        return;
+    }
+
+    const searchWord = document
+        .getElementById("searchInput")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const sortType =
+        document.getElementById("sortSelect").value;
+
+    let listings =
+        Object.entries(farmListingsData)
+        .filter(([farmId, listing]) => !!listing)
+        .map(([farmId, listing]) => ({
+            farmId,
+            ...listing
+        }));
+
+    if(searchWord){
+
+        listings = listings.filter(listing =>
+            String(listing.farmTypeName || "")
+                .toLowerCase()
+                .includes(searchWord)
+        );
+    }
+
+    listings.sort((a,b) => {
+
+        if(sortType === "new"){
+
+            return Number(b.createdAt || 0) -
+                   Number(a.createdAt || 0);
+        }
+
+        return Number(a.price) - Number(b.price);
+    });
+
+    if(listings.length === 0){
+
+        market.innerHTML =
+            '<div class="empty">出品されている農地はありません</div>';
+
+        return;
+    }
+
+    market.innerHTML = "";
+
+    const card = document.createElement("div");
+    card.className = "itemCard";
+
+    const header = document.createElement("div");
+    header.className = "itemHeader";
+    header.textContent = "🏠 不動産（農地）";
+
+    card.appendChild(header);
+
+    listings.forEach(listing => {
+
+        const row = document.createElement("div");
+        row.className = "offerRow";
+
+        const isOwnListing =
+            listing.sellerId === currentUser.uid;
+
+        row.innerHTML = `
+            <div class="seller">
+                ${listing.farmTypeIcon || "🏠"}
+                ${escapeHtml(listing.farmTypeName || "農地")}
+                　${escapeHtml(listing.sellerName || "名無し")}
+            </div>
+
+            <div class="price">
+                ${Number(listing.price).toLocaleString()} Pt
+            </div>
+
+            <div class="stock">
+                1区画
+            </div>
+
+            <div class="buyArea">
+                <button
+                    class="buyButton"
+                    ${isOwnListing ? "disabled" : ""}
+                >
+                    ${isOwnListing ? "自分の出品" : "購入する"}
+                </button>
+            </div>
+        `;
+
+        const buyButton =
+            row.querySelector(".buyButton");
+
+        if(buyButton && !isOwnListing){
+
+            buyButton.addEventListener("click", () => {
+                buyFarmListing(listing);
+            });
+        }
+
+        card.appendChild(row);
+    });
+
+    market.appendChild(card);
+}
+
+/* =====================================================
+   農地の購入（不動産）
+===================================================== */
+
+async function buyFarmListing(listing){
+
+    if(listing.sellerId === currentUser.uid){
+        showMessage("自分の出品は購入できません");
+        return;
+    }
+
+    const confirmed = confirm(
+        (listing.farmTypeName || "農地") +
+        "を" +
+        Number(listing.price).toLocaleString() +
+        "Ptで購入しますか？"
+    );
+
+    if(!confirmed){
+        return;
+    }
+
+    const buyerPointRef =
+        database.ref(
+            "members/" +
+            currentUser.uid +
+            "/point"
+        );
+
+    let pointDeducted = false;
+
+    try{
+
+        /*
+        購入者からポイントを引く
+        */
+
+        const pointResult =
+            await buyerPointRef.transaction(currentPoint => {
+
+                const point = Number(currentPoint || 0);
+
+                if(point < listing.price){
+                    return;
+                }
+
+                return point - Number(listing.price);
+            });
+
+        if(!pointResult.committed){
+
+            showMessage("ポイントが足りません");
+            return;
+        }
+
+        pointDeducted = true;
+
+        /*
+        農地の所有権を自分に移す
+        （出品がまだ有効な場合のみ成立する）
+        */
+
+        const farmRef =
+            database.ref("farms/" + listing.farmId);
+
+        const farmResult =
+            await farmRef.transaction(currentFarm => {
+
+                if(!currentFarm){
+                    return;
+                }
+
+                if(currentFarm.ownerId !== listing.sellerId){
+                    // すでに転売済みなど
+                    return;
+                }
+
+                currentFarm.ownerId = currentUser.uid;
+
+                currentFarm.ownerName =
+                    currentMember?.name ||
+                    currentUser.displayName ||
+                    "農園主";
+
+                currentFarm.workerCount = 0;
+                currentFarm.salary = 0;
+
+                return currentFarm;
+            });
+
+        if(!farmResult.committed){
+
+            await refundPoints(listing.price);
+
+            showMessage("この農地はすでに売却済みです");
+            return;
+        }
+
+        /*
+        出品者へ代金を支払う
+        */
+
+        await database
+            .ref(
+                "members/" +
+                listing.sellerId +
+                "/point"
+            )
+            .transaction(point =>
+                Number(point || 0) + Number(listing.price)
+            );
+
+        /*
+        出品を取り下げる
+        */
+
+        await database
+            .ref("farmListings/" + listing.farmId)
+            .remove();
+
+        showMessage(
+            (listing.farmTypeName || "農地") +
+            "を購入しました"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        if(pointDeducted){
+            await refundPoints(listing.price);
+        }
+
+        showMessage("購入処理に失敗しました");
+    }
 }
 
 /* =====================================================
@@ -807,6 +1143,10 @@ function renderSellItems(){
 
     const select =
         document.getElementById("sellItem");
+
+    if(!select){
+        return;
+    }
 
     select.innerHTML =
         '<option value="">出品する品物を選ぶ</option>';
