@@ -3,16 +3,15 @@
 // =====================================================
 // farm.js の役割
 //
-// ① 自分の農園を表示
-// ② 作物を選ぶ
-// ③ 作物を植える
-// ④ 12時間の成長を管理
-// ⑤ 収穫する
-// ⑥ 地主がアルバイト求人を設定する
+// ・自分の農園を表示
+// ・作物を選ぶ
+// ・作物を植える
+// ・作物の成長時間を表示
+// ・収穫する
+// ・地主が求人を設定する
 //
-// ※ 農地購入 → shop.js
-// ※ 農地売却 → shop.js
-// ※ アルバイト参加・12時間労働 → jobs.js
+// 農地の購入・売却・出品・購入は shop.js が担当
+// アルバイトへの参加・12時間労働は jobs.js が担当
 // =====================================================
 
 
@@ -21,9 +20,7 @@
 // =====================================================
 
 let currentPoint = 0;
-
 let farmData = {};
-
 let farmListenersStarted = false;
 
 
@@ -36,12 +33,10 @@ auth.onAuthStateChanged(user => {
     if(!user){
 
         location.href = "../index.html";
-
         return;
 
     }
 
-    // common.js 側の currentUser を使用
     currentUser = user;
 
     startFarmListeners();
@@ -56,16 +51,14 @@ auth.onAuthStateChanged(user => {
 function startFarmListeners(){
 
     if(farmListenersStarted){
-
         return;
-
     }
 
     farmListenersStarted = true;
 
 
     // =================================================
-    // 自分のポイント
+    // 所持ポイント
     // =================================================
 
     database
@@ -83,12 +76,10 @@ function startFarmListeners(){
                         snapshot.val() || 0
                     );
 
-
                 const pointElement =
                     document.getElementById(
                         "point"
                     );
-
 
                 if(pointElement){
 
@@ -114,7 +105,6 @@ function startFarmListeners(){
 
                 const allFarms =
                     snapshot.val() || {};
-
 
                 farmData = {};
 
@@ -175,11 +165,8 @@ function renderMyFarms(){
             "myFarms"
         );
 
-
     if(!container){
-
         return;
-
     }
 
 
@@ -188,10 +175,6 @@ function renderMyFarms(){
             farmData
         );
 
-
-    // -----------------------------------------------
-    // 農園を持っていない
-    // -----------------------------------------------
 
     if(farms.length === 0){
 
@@ -215,13 +198,8 @@ function renderMyFarms(){
         `;
 
         return;
-
     }
 
-
-    // -----------------------------------------------
-    // 農園カード表示
-    // -----------------------------------------------
 
     container.innerHTML = "";
 
@@ -230,13 +208,9 @@ function renderMyFarms(){
         farm => {
 
             const card =
-                createFarmCard(
-                    farm
-                );
+                createFarmCard(farm);
 
-            container.appendChild(
-                card
-            );
+            container.appendChild(card);
 
         }
     );
@@ -256,10 +230,6 @@ function createFarmCard(farm){
         ];
 
 
-    // -----------------------------------------------
-    // 農園種類が不明
-    // -----------------------------------------------
-
     if(!farmType){
 
         const errorCard =
@@ -267,10 +237,8 @@ function createFarmCard(farm){
                 "div"
             );
 
-
         errorCard.className =
             "farmCard";
-
 
         errorCard.innerHTML = `
 
@@ -280,25 +248,16 @@ function createFarmCard(farm){
 
         `;
 
-
         return errorCard;
 
     }
 
-
-    // -----------------------------------------------
-    // 作物
-    // -----------------------------------------------
 
     const crop =
         farm.cropId
         ? farmCrops[farm.cropId]
         : null;
 
-
-    // -----------------------------------------------
-    // 労働者
-    // -----------------------------------------------
 
     const workerCount =
         Number(
@@ -314,19 +273,11 @@ function createFarmCard(farm){
         );
 
 
-    // -----------------------------------------------
-    // 求人賃金
-    // -----------------------------------------------
-
     const salary =
         Number(
             farm.salary || 0
         );
 
-
-    // -----------------------------------------------
-    // 収穫量
-    // -----------------------------------------------
 
     const harvestAmount =
         crop
@@ -336,10 +287,6 @@ function createFarmCard(farm){
         )
         : 0;
 
-
-    // -----------------------------------------------
-    // 成長状態
-    // -----------------------------------------------
 
     const ready =
         crop &&
@@ -352,18 +299,10 @@ function createFarmCard(farm){
         : 0;
 
 
-    // -----------------------------------------------
-    // 労働者受付状態
-    // -----------------------------------------------
-
     const acceptingWorkers =
         workerCount <
         workerCapacity;
 
-
-    // -----------------------------------------------
-    // カード
-    // -----------------------------------------------
 
     const card =
         document.createElement(
@@ -376,15 +315,11 @@ function createFarmCard(farm){
 
 
     // =================================================
-    // 作物表示
+    // 作物
     // =================================================
 
     let cropHtml = "";
 
-
-    // -------------------------------------------------
-    // 作物なし
-    // -------------------------------------------------
 
     if(!crop){
 
@@ -417,13 +352,7 @@ function createFarmCard(farm){
 
         `;
 
-    }
-
-    // -------------------------------------------------
-    // 作物あり
-    // -------------------------------------------------
-
-    else{
+    }else{
 
         cropHtml = `
 
@@ -436,13 +365,9 @@ function createFarmCard(farm){
                 <div class="cropName">
 
                     ${crop.icon || "🌱"}
-
-                    ${escapeHtml(
-                        crop.name
-                    )}
+                    ${escapeHtml(crop.name)}
 
                 </div>
-
 
                 <div class="cropStatus">
 
@@ -457,26 +382,24 @@ function createFarmCard(farm){
 
                 </div>
 
-
                 <div class="farmButtons">
 
                     ${
                         ready
                         ? `
 
-                        <button
-                            class="farmButton"
-                            data-action="harvest"
-                        >
+                            <button
+                                class="farmButton"
+                                data-action="harvest"
+                            >
 
-                            🌾 収穫する
+                                🌾 収穫する
 
-                        </button>
+                            </button>
 
                         `
                         : ""
                     }
-
 
                     <button
                         class="farmButton secondary"
@@ -497,7 +420,7 @@ function createFarmCard(farm){
 
 
     // =================================================
-    // 求人表示
+    // 求人
     // =================================================
 
     let recruitmentHtml = "";
@@ -513,7 +436,6 @@ function createFarmCard(farm){
                     👨‍🌾 労働者募集
                 </div>
 
-
                 <div class="workerCount">
 
                     ${workerCount}
@@ -525,18 +447,19 @@ function createFarmCard(farm){
 
                 ${
                     salary > 0
+
                     ? `
 
                         <div class="workerNotice">
 
                             賃金：
                             ${salary.toLocaleString()}
-                            Pt
-                            / 12時間
+                            Pt / 12時間
 
                         </div>
 
                     `
+
                     : `
 
                         <div class="workerNotice">
@@ -553,6 +476,7 @@ function createFarmCard(farm){
 
                     ${
                         acceptingWorkers
+
                         ? `
 
                             <button
@@ -565,6 +489,7 @@ function createFarmCard(farm){
                             </button>
 
                         `
+
                         : `
 
                             <div class="workerNotice">
@@ -586,7 +511,7 @@ function createFarmCard(farm){
 
 
     // =================================================
-    // カードHTML
+    // カード
     // =================================================
 
     card.innerHTML = `
@@ -604,7 +529,6 @@ function createFarmCard(farm){
                     )}
 
                 </div>
-
 
                 <div class="farmType">
 
@@ -669,14 +593,13 @@ function createFarmCard(farm){
 
         ${cropHtml}
 
-
         ${recruitmentHtml}
 
     `;
 
 
     // =================================================
-    // ボタンイベント
+    // ボタン
     // =================================================
 
     card
@@ -694,10 +617,6 @@ function createFarmCard(farm){
                             button.dataset.action;
 
 
-                        // -----------------------------
-                        // 作物を選ぶ
-                        // -----------------------------
-
                         if(
                             action ===
                             "plant"
@@ -711,10 +630,6 @@ function createFarmCard(farm){
 
                         }
 
-
-                        // -----------------------------
-                        // 作物変更
-                        // -----------------------------
 
                         if(
                             action ===
@@ -730,20 +645,13 @@ function createFarmCard(farm){
                         }
 
 
-                        // -----------------------------
-                        // 求人設定
-                        // -----------------------------
-
                         if(
                             action ===
-                            "recruit"
+                            "harvest"
                         ){
 
-                            await openFarmRecruitment(
-                                {
-                                    ...farm,
-                                    id:farm.id
-                                }
+                            await harvestFarm(
+                                farm
                             );
 
                             return;
@@ -751,16 +659,12 @@ function createFarmCard(farm){
                         }
 
 
-                        // -----------------------------
-                        // 収穫
-                        // -----------------------------
-
                         if(
                             action ===
-                            "harvest"
+                            "recruit"
                         ){
 
-                            await harvestFarm(
+                            await openFarmRecruitment(
                                 farm
                             );
 
@@ -815,7 +719,6 @@ function openCropSelection(
         (crop, index) => {
 
             message +=
-
                 (index + 1) +
                 ". " +
                 crop.name +
@@ -828,17 +731,11 @@ function openCropSelection(
 
 
     const answer =
-        prompt(
-            message
-        );
+        prompt(message);
 
 
-    if(
-        answer === null
-    ){
-
+    if(answer === null){
         return;
-
     }
 
 
@@ -877,17 +774,8 @@ async function plantCrop(
     cropId
 ){
 
-    if(!currentUser){
-
-        return;
-
-    }
-
-
     const crop =
-        farmCrops[
-            cropId
-        ];
+        farmCrops[cropId];
 
 
     if(!crop){
@@ -897,34 +785,6 @@ async function plantCrop(
         );
 
         return;
-
-    }
-
-
-    // -------------------------------------------------
-    // すでに作物が育っている場合
-    // -------------------------------------------------
-
-    if(
-        farm.cropId &&
-        farm.harvestAt &&
-        Date.now() <
-        Number(farm.harvestAt)
-    ){
-
-        const confirmed =
-            confirm(
-                "現在の作物はまだ成長中です。\n" +
-                "変更すると現在の作物をやめて、新しい作物を植えます。\n\n" +
-                "続行しますか？"
-            );
-
-
-        if(!confirmed){
-
-            return;
-
-        }
 
     }
 
@@ -940,9 +800,7 @@ async function plantCrop(
 
 
     if(!confirmed){
-
         return;
-
     }
 
 
@@ -954,8 +812,7 @@ async function plantCrop(
 
         const updates = {
 
-            cropId:
-                cropId,
+            cropId:cropId,
 
             plantedAt:
                 now,
@@ -1008,27 +865,12 @@ async function harvestFarm(
     farm
 ){
 
-    if(!currentUser){
-
-        return;
-
-    }
-
-
     if(!farm){
-
         return;
-
     }
 
 
-    // -------------------------------------------------
-    // 収穫可能か確認
-    // -------------------------------------------------
-
-    if(
-        !isFarmReady(farm)
-    ){
+    if(!isFarmReady(farm)){
 
         showFarmMessage(
             "まだ収穫できません。"
@@ -1039,11 +881,11 @@ async function harvestFarm(
     }
 
 
-    // -------------------------------------------------
-    // 最新農園データを取得
-    // -------------------------------------------------
-
     try{
+
+        // ---------------------------------------------
+        // 最新の農園データ
+        // ---------------------------------------------
 
         const farmRef =
             database.ref(
@@ -1072,10 +914,6 @@ async function harvestFarm(
 
         }
 
-
-        // -------------------------------------------------
-        // もう一度、収穫可能か確認
-        // -------------------------------------------------
 
         if(
             !latestFarm.harvestAt ||
@@ -1120,20 +958,11 @@ async function harvestFarm(
         }
 
 
-        // -------------------------------------------------
-        // 労働者数
-        // -------------------------------------------------
-
         const workerCount =
             Number(
-                latestFarm.workerCount ||
-                0
+                latestFarm.workerCount || 0
             );
 
-
-        // -------------------------------------------------
-        // 最新収穫量
-        // -------------------------------------------------
 
         const harvestAmount =
             calculateFarmHarvest(
@@ -1142,9 +971,9 @@ async function harvestFarm(
             );
 
 
-        // -------------------------------------------------
-        // インベントリを取得
-        // -------------------------------------------------
+        // ---------------------------------------------
+        // インベントリ取得
+        // ---------------------------------------------
 
         const inventoryRef =
             database
@@ -1168,19 +997,17 @@ async function harvestFarm(
 
         const currentQuantity =
             Number(
-                currentItem?.quantity ||
-                0
+                currentItem?.quantity || 0
             );
 
 
-        // -------------------------------------------------
-        // 更新データ
-        // -------------------------------------------------
+        // ---------------------------------------------
+        // 更新
+        // ---------------------------------------------
 
         const updates = {};
 
 
-        // 収穫物
         updates[
             "inventories/" +
             currentUser.uid +
@@ -1209,10 +1036,6 @@ async function harvestFarm(
         };
 
 
-        // -------------------------------------------------
-        // 次の12時間栽培
-        // -------------------------------------------------
-
         const nextStart =
             Date.now();
 
@@ -1233,10 +1056,6 @@ async function harvestFarm(
             nextStart +
             crop.growthTime;
 
-
-        // -------------------------------------------------
-        // まとめて保存
-        // -------------------------------------------------
 
         await database
             .ref()
@@ -1281,9 +1100,7 @@ async function openFarmRecruitment(
 ){
 
     if(!farm){
-
         return;
-
     }
 
 
@@ -1309,20 +1126,13 @@ async function openFarmRecruitment(
 
 
     if(!farmType){
-
-        showFarmMessage(
-            "農園情報が見つかりません。"
-        );
-
         return;
-
     }
 
 
-    const currentWorkers =
+    const workerCount =
         Number(
-            farm.workerCount ||
-            0
+            farm.workerCount || 0
         );
 
 
@@ -1335,8 +1145,7 @@ async function openFarmRecruitment(
 
 
     if(
-        currentWorkers >=
-        capacity
+        workerCount >= capacity
     ){
 
         showFarmMessage(
@@ -1350,8 +1159,7 @@ async function openFarmRecruitment(
 
     const currentSalary =
         Number(
-            farm.salary ||
-            0
+            farm.salary || 0
         );
 
 
@@ -1366,43 +1174,23 @@ async function openFarmRecruitment(
         );
 
 
-    if(
-        input === null
-    ){
-
+    if(input === null){
         return;
-
     }
 
 
     const salary =
-        Number(
-            input
-        );
+        Number(input);
 
 
     if(
         !Number.isFinite(salary) ||
-        salary <= 0
+        salary <= 0 ||
+        !Number.isInteger(salary)
     ){
 
         showFarmMessage(
-            "正しい賃金を入力してください。"
-        );
-
-        return;
-
-    }
-
-
-    if(
-        !Number.isInteger(
-            salary
-        )
-    ){
-
-        showFarmMessage(
-            "賃金は整数で入力してください。"
+            "正しい整数の賃金を入力してください。"
         );
 
         return;
@@ -1464,9 +1252,7 @@ function showFarmMessage(
 
     if(!element){
 
-        alert(
-            message
-        );
+        alert(message);
 
         return;
 
@@ -1501,7 +1287,7 @@ function showFarmMessage(
 
 
 // =====================================================
-// 農園表示更新
+// 成長時間表示更新
 // =====================================================
 
 setInterval(
@@ -1517,10 +1303,6 @@ setInterval(
     1000
 );
 
-
-// =====================================================
-// 読み込み完了
-// =====================================================
 
 console.log(
     "farm.js読み込み完了"
