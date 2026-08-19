@@ -523,3 +523,41 @@ footer{
     font-size:14px;
 
 }
+/* =========================================
+   探検画面と同じ上部情報
+========================================= */
+
+.topInfo{
+    width:100%;
+    max-width:1000px;
+    margin:0 auto 14px;
+    padding:10px 12px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+
+    background:#d5c29e;
+    border:2px solid #60472e;
+}
+
+.pointInfo{
+    display:flex;
+    align-items:center;
+
+    font-size:16px;
+    font-weight:bold;
+}
+
+.backButton{
+    padding:8px 12px;
+
+    border:2px solid #4c351f;
+    background:#765536;
+    color:#f5e7ca;
+
+    cursor:pointer;
+    font-family:inherit;
+    font-size:15px;
+}
