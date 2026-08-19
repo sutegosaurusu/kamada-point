@@ -1,11 +1,18 @@
 // =====================================================
 // 農園システム
 // =====================================================
-// 購入・作物選択・成長・収穫
+// 購入・作物選択・成長・収穫・売却（不動産）
 
 let currentPoint = 0;
 let farmData = {};
 let farmListenersStarted = false;
+
+// 農地の総数上限（これを超えたら新規販売は行わず、転売のみになる）
+const FARM_LAND_LIMIT = 30;
+let totalFarmsCreated = 0;
+
+// 市場（不動産）に出ている農地の出品状況（farmIdごと）
+let farmListingsData = {};
 
 // =====================================================
 // ログイン
@@ -101,6 +108,38 @@ function startFarmListeners(){
 
 
     // -----------------------------------------
+    // 農地の総数（上限30）
+    // -----------------------------------------
+
+    database
+        .ref("farmMeta/totalFarms")
+        .on("value", snapshot => {
+
+            totalFarmsCreated =
+                Number(snapshot.val() || 0);
+
+            updateBuySectionVisibility();
+
+        });
+
+
+    // -----------------------------------------
+    // 農地の出品状況（不動産）
+    // -----------------------------------------
+
+    database
+        .ref("farmListings")
+        .on("value", snapshot => {
+
+            farmListingsData =
+                snapshot.val() || {};
+
+            renderFarmPage();
+
+        });
+
+
+    // -----------------------------------------
     // 購入ボタン
     // -----------------------------------------
 
@@ -132,6 +171,70 @@ function startFarmListeners(){
 function renderFarmPage(){
 
     renderMyFarms();
+
+}
+
+
+// =====================================================
+// 農地在庫（上限30）の表示切り替え
+// =====================================================
+
+function updateBuySectionVisibility(){
+
+    const buyGrid =
+        document.querySelector(".buyGrid");
+
+    if(!buyGrid){
+        return;
+    }
+
+    const soldOut =
+        totalFarmsCreated >= FARM_LAND_LIMIT;
+
+    buyGrid.style.display =
+        soldOut ? "none" : "grid";
+
+    let notice =
+        document.getElementById("farmSoldOutNotice");
+
+    if(soldOut){
+
+        if(!notice){
+
+            notice =
+                document.createElement("div");
+
+            notice.id =
+                "farmSoldOutNotice";
+
+            notice.className =
+                "emptyFarm";
+
+            notice.innerHTML = `
+                <div class="emptyFarmTitle">
+                    農地はすべて割り当て済みです
+                </div>
+                <div class="emptyFarmText">
+                    新規の農地はもう販売されません。<br>
+                    市場の「🏠 不動産」で、
+                    他の農園主が手放した農地が出ていないか確認してください。
+                </div>
+            `;
+
+            buyGrid.parentNode.insertBefore(
+                notice,
+                buyGrid
+            );
+
+        }
+
+        notice.style.display = "block";
+
+    }else if(notice){
+
+        notice.style.display = "none";
+
+    }
 
 }
 
@@ -255,6 +358,10 @@ function createFarmCard(farm){
 
     const acceptingWorkers =
         workerCount < workerCapacity;
+
+
+    const listing =
+        farmListingsData[farm.id];
 
 
     const card =
@@ -413,6 +520,43 @@ function createFarmCard(farm){
 
 
     // =================================================
+    // 売却（不動産）
+    // =================================================
+
+    const forSaleHtml = listing
+        ? `
+        <div class="workerArea">
+
+            <div class="workerTitle">
+                🏠 市場に出品中
+            </div>
+
+            <div class="workerCount">
+                ${Number(listing.price).toLocaleString()} Pt
+            </div>
+
+            <div class="workerNotice">
+                市場の「不動産」カテゴリーに出品しています。
+            </div>
+
+            <div class="farmButtons">
+
+                <button
+                    class="farmButton danger"
+                    data-action="cancelSale">
+
+                    出品を取り消す
+
+                </button>
+
+            </div>
+
+        </div>
+        `
+        : "";
+
+
+    // =================================================
     // カードHTML
     // =================================================
 
@@ -481,6 +625,9 @@ function createFarmCard(farm){
         ${recruitmentHtml}
 
 
+        ${forSaleHtml}
+
+
         ${cropHtml}
 
 
@@ -494,6 +641,20 @@ function createFarmCard(farm){
                     data-action="recruit">
 
                     👨‍🌾 労働者を募集する
+
+                </button>
+                `
+                : ""
+            }
+
+            ${
+                !listing
+                ? `
+                <button
+                    class="farmButton secondary"
+                    data-action="sell">
+
+                    🏠 この農地を売却する
 
                 </button>
                 `
@@ -550,6 +711,26 @@ function createFarmCard(farm){
 
                     }
 
+
+                    if(action === "sell"){
+
+                        await listFarmForSale({
+                            ...farm,
+                            id:farm.id
+                        });
+
+                    }
+
+
+                    if(action === "cancelSale"){
+
+                        await cancelFarmListing({
+                            ...farm,
+                            id:farm.id
+                        });
+
+                    }
+
                 }
             );
 
@@ -587,6 +768,17 @@ async function buyFarm(farmTypeId){
     }
 
 
+    if(totalFarmsCreated >= FARM_LAND_LIMIT){
+
+        showFarmMessage(
+            "農地はすべて割り当て済みです。市場の「不動産」から購入してください。"
+        );
+
+        return;
+
+    }
+
+
     if(currentPoint < farmType.price){
 
         showFarmMessage(
@@ -612,15 +804,59 @@ async function buyFarm(farmTypeId){
     }
 
 
+    const totalRef =
+        database.ref("farmMeta/totalFarms");
+
+    const pointRef =
+        database.ref(
+            "members/" +
+            currentUser.uid +
+            "/point"
+        );
+
+    let slotReserved = false;
+    let pointDeducted = false;
+
+
     try{
 
-        const pointRef =
-            database.ref(
-                "members/" +
-                currentUser.uid +
-                "/point"
+        // -----------------------------------------
+        // 農地の枠を確保（先着30個まで）
+        // -----------------------------------------
+
+        const slotResult =
+            await totalRef.transaction(current => {
+
+                const total =
+                    Number(current || 0);
+
+                if(total >= FARM_LAND_LIMIT){
+
+                    return;
+
+                }
+
+                return total + 1;
+
+            });
+
+
+        if(!slotResult.committed){
+
+            showFarmMessage(
+                "農地はすべて割り当て済みです。市場の「不動産」から購入してください。"
             );
 
+            return;
+
+        }
+
+        slotReserved = true;
+
+
+        // -----------------------------------------
+        // ポイントを支払う
+        // -----------------------------------------
 
         const transactionResult =
             await pointRef.transaction(
@@ -651,6 +887,8 @@ async function buyFarm(farmTypeId){
             return;
 
         }
+
+        pointDeducted = true;
 
 
         const farmRef =
@@ -713,6 +951,21 @@ async function buyFarm(farmTypeId){
             error
         );
 
+        if(pointDeducted){
+
+            await pointRef.transaction(point =>
+                Number(point || 0) + farmType.price
+            );
+
+        }
+
+        if(slotReserved){
+
+            await totalRef.transaction(current =>
+                Math.max(0, Number(current || 0) - 1)
+            );
+
+        }
 
         showFarmMessage(
             "農園を購入できませんでした。"
@@ -1135,69 +1388,6 @@ async function harvestFarm(farm){
 }
 
 
-
-
-// =====================================================
-// メッセージ
-// =====================================================
-
-function showFarmMessage(message){
-
-    const element =
-        document.getElementById("message");
-
-
-    if(!element){
-
-        alert(message);
-        return;
-
-    }
-
-
-    element.textContent =
-        message;
-
-    element.style.display =
-        "block";
-
-
-    clearTimeout(
-        showFarmMessage.timer
-    );
-
-
-    showFarmMessage.timer =
-        setTimeout(
-            () => {
-
-                element.style.display =
-                    "none";
-
-            },
-            3000
-        );
-
-}
-
-
-// =====================================================
-// 12時間タイマー
-// =====================================================
-
-setInterval(
-    () => {
-
-        if(currentUser){
-
-            renderMyFarms();
-
-        }
-
-    },
-    1000
-);
-
 // =====================================================
 // 地主が求人を出す
 // =====================================================
@@ -1317,6 +1507,249 @@ async function openFarmRecruitment(farm){
     }
 
 }
+
+
+// =====================================================
+// 農地を市場（不動産）に出品する
+// =====================================================
+
+async function listFarmForSale(farm){
+
+    if(
+        !currentUser ||
+        farm.ownerId !== currentUser.uid
+    ){
+
+        showFarmMessage(
+            "この農地を管理する権限がありません。"
+        );
+
+        return;
+    }
+
+    if(farmListingsData[farm.id]){
+
+        showFarmMessage(
+            "すでに出品中です。"
+        );
+
+        return;
+    }
+
+    const farmType =
+        farmTypes[farm.farmType];
+
+    if(!farmType){
+        return;
+    }
+
+    const input =
+        prompt(
+            farmType.name +
+            "の売却価格（Pt）を入力してください。"
+        );
+
+    if(input === null){
+        return;
+    }
+
+    const price =
+        Number(input);
+
+    if(
+        !Number.isInteger(price) ||
+        price <= 0
+    ){
+
+        showFarmMessage(
+            "正しい価格を入力してください。"
+        );
+
+        return;
+    }
+
+    const confirmed =
+        confirm(
+            farmType.name +
+            "を" +
+            price.toLocaleString() +
+            " Ptで市場に出品しますか？\n\n" +
+            "※出品中も収穫や作物の管理は引き続き行えます。"
+        );
+
+    if(!confirmed){
+        return;
+    }
+
+    try{
+
+        await database
+            .ref("farmListings/" + farm.id)
+            .set({
+
+                sellerId:
+                    currentUser.uid,
+
+                sellerName:
+                    currentUser.displayName ||
+                    "農園主",
+
+                farmType:
+                    farm.farmType,
+
+                farmTypeName:
+                    farmType.name,
+
+                farmTypeIcon:
+                    farmType.icon || "",
+
+                price:
+                    price,
+
+                createdAt:
+                    firebase.database
+                        .ServerValue.TIMESTAMP
+
+            });
+
+        showFarmMessage(
+            "市場の「不動産」に出品しました。"
+        );
+
+    }catch(error){
+
+        console.error(
+            "農地出品エラー:",
+            error
+        );
+
+        showFarmMessage(
+            "出品できませんでした。"
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// 農地の出品を取り消す
+// =====================================================
+
+async function cancelFarmListing(farm){
+
+    const listing =
+        farmListingsData[farm.id];
+
+    if(
+        !listing ||
+        listing.sellerId !== currentUser.uid
+    ){
+
+        showFarmMessage(
+            "取り消せる出品がありません。"
+        );
+
+        return;
+    }
+
+    const confirmed =
+        confirm(
+            "出品を取り消しますか？"
+        );
+
+    if(!confirmed){
+        return;
+    }
+
+    try{
+
+        await database
+            .ref("farmListings/" + farm.id)
+            .remove();
+
+        showFarmMessage(
+            "出品を取り消しました。"
+        );
+
+    }catch(error){
+
+        console.error(
+            "出品取り消しエラー:",
+            error
+        );
+
+        showFarmMessage(
+            "取り消せませんでした。"
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// メッセージ
+// =====================================================
+
+function showFarmMessage(message){
+
+    const element =
+        document.getElementById("message");
+
+
+    if(!element){
+
+        alert(message);
+        return;
+
+    }
+
+
+    element.textContent =
+        message;
+
+    element.style.display =
+        "block";
+
+
+    clearTimeout(
+        showFarmMessage.timer
+    );
+
+
+    showFarmMessage.timer =
+        setTimeout(
+            () => {
+
+                element.style.display =
+                    "none";
+
+            },
+            3000
+        );
+
+}
+
+
+// =====================================================
+// 12時間タイマー
+// =====================================================
+
+setInterval(
+    () => {
+
+        if(currentUser){
+
+            renderMyFarms();
+
+        }
+
+    },
+    1000
+);
+
+
 console.log(
     "farm.js読み込み完了"
 );
