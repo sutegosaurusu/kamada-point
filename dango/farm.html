@@ -456,6 +456,64 @@ footer{
     font-family:inherit;
     font-size:15px;
 }
+    /* =========================================
+   農園ページの配置
+========================================= */
+
+.farmSection{
+    width:100%;
+    max-width:1000px;
+
+    margin:0 auto 16px;
+
+    display:block;
+
+    box-sizing:border-box;
+}
+
+.sectionTitle{
+    width:100%;
+    max-width:1000px;
+
+    margin:20px auto 9px;
+
+    display:block;
+
+    font-size:21px;
+
+    box-sizing:border-box;
+}
+
+
+/* 中身も右に寄らないよう固定 */
+.farmSection > *,
+.farmSection > div{
+    position:relative;
+
+    left:auto;
+    right:auto;
+
+    float:none;
+
+    margin-left:auto;
+    margin-right:auto;
+}
+
+
+/* 農園一覧 */
+#myFarms{
+    width:100%;
+    max-width:1000px;
+}
+
+
+/* 農園カード */
+.farmCard{
+    width:100%;
+    max-width:1000px;
+
+    margin:0 auto 16px;
+}
 </style>
 
 <!-- Firebase -->
