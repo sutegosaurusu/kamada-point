@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>アグロポリス求人所</title>
+
+<link rel="stylesheet" href="jobs.css">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script src="firebase.js"></script>
+<script src="common.js"></script>
+
+<script src="farmData.js"></script>
+<script src="farmUtils.js"></script>
+<script src="jobs.js"></script>
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>👨‍🌾 アグロポリス求人所</h1>
+
+    <p>
+        町で働いてポイントを稼ぐ
+    </p>
+
+</header>
+
+
+<!-- =========================================
+     所持ポイント
+========================================= -->
+
+<div class="pointCard">
+
+    <div class="pointLabel">
+        所持ポイント
+    </div>
+
+    <div
+        id="point"
+        class="point"
+    >
+        0 Pt
+    </div>
+
+</div>
+
+
+<!-- =========================================
+     現在の仕事
+========================================= -->
+
+<section class="jobSection">
+
+    <div class="sectionTitle">
+        ⚒ 現在の仕事
+    </div>
+
+    <div id="activeJob">
+
+        <div class="emptyJob">
+
+            <div class="emptyJobTitle">
+                現在仕事をしていません
+            </div>
+
+            <div class="emptyJobText">
+                下の求人から仕事を選べます。
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     求人一覧
+========================================= -->
+
+<section class="jobSection">
+
+    <div class="sectionTitle">
+        📜 募集中の仕事
+    </div>
+
+    <div id="jobList">
+
+        <div class="emptyJob">
+
+            求人を読み込んでいます。
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     結果
+========================================= -->
+
+<section
+    id="resultSection"
+    class="jobSection"
+    style="display:none;"
+>
+
+    <div class="sectionTitle">
+        🏆 仕事の結果
+    </div>
+
+    <div id="jobResult"></div>
+
+</section>
+
+
+<!-- =========================================
+     メッセージ
+========================================= -->
+
+<div
+    id="message"
+    class="message"
+    style="display:none;"
+></div>
+
+
+<!-- =========================================
+     戻る
+========================================= -->
+
+<div class="backArea">
+
+    <a
+        href="farm.html"
+        class="backButton"
+    >
+        ← 農園へ戻る
+    </a>
+
+</div>
+
+
+<footer>
+
+    アグロポリス求人所
+
+</footer>
+
+</body>
+
+</html>
