@@ -22,6 +22,8 @@ let merchantData = {};
 
 let farmListingsData = {};
 
+let myFarmsData = [];
+
 let currentPoint = 0;
 
 
@@ -230,7 +232,7 @@ async function watchListings(){
 
 
     watchMyFarmsForShop();
-　　 await initializeLandlordStock();
+    await initializeLandlordStock();
     watchLandlordStock();
 
 }
@@ -252,7 +254,7 @@ function watchMyFarmsForShop(){
                     snapshot.val() || {};
 
 
-                const myFarms = [];
+                myFarmsData = [];
 
 
                 Object.entries(
@@ -267,7 +269,7 @@ function watchMyFarmsForShop(){
                             currentUser.uid
                         ){
 
-                            myFarms.push({
+                            myFarmsData.push({
 
                                 id:farmId,
 
@@ -281,9 +283,7 @@ function watchMyFarmsForShop(){
                 );
 
 
-                renderMyFarmSales(
-                    myFarms
-                );
+                renderMyFarmSales();
 
             }
         );
@@ -295,9 +295,11 @@ function watchMyFarmsForShop(){
 // 所有農地を表示
 // =====================================================
 
-function renderMyFarmSales(
-    farms
-){
+function renderMyFarmSales(){
+
+    const farms =
+        myFarmsData;
+
 
     const container =
         document.getElementById(
