@@ -1198,7 +1198,125 @@ setInterval(
     1000
 );
 
+// =====================================================
+// 地主が求人を出す
+// =====================================================
 
+async function openFarmRecruitment(farm){
+
+    if(!farm){
+        return;
+    }
+
+    if(
+        !currentUser ||
+        farm.ownerId !== currentUser.uid
+    ){
+
+        showFarmMessage(
+            "この農園を管理する権限がありません。"
+        );
+
+        return;
+    }
+
+    const farmType =
+        farmTypes[farm.farmType];
+
+    if(!farmType){
+        return;
+    }
+
+    const currentWorkers =
+        Number(
+            farm.workerCount || 0
+        );
+
+    const capacity =
+        Number(
+            farm.workerCapacity ||
+            farmType.workerCapacity
+        );
+
+    if(currentWorkers >= capacity){
+
+        showFarmMessage(
+            "この農園はすでに満員です。"
+        );
+
+        return;
+    }
+
+    const currentSalary =
+        Number(
+            farm.salary || 0
+        );
+
+    const input =
+        prompt(
+            "12時間アルバイトの賃金を設定してください。\n\n" +
+            "現在の賃金：" +
+            currentSalary +
+            " Pt"
+        );
+
+    if(input === null){
+        return;
+    }
+
+    const salary =
+        Number(input);
+
+    if(
+        !Number.isFinite(salary) ||
+        salary <= 0
+    ){
+
+        showFarmMessage(
+            "正しい賃金を入力してください。"
+        );
+
+        return;
+    }
+
+    if(!Number.isInteger(salary)){
+
+        showFarmMessage(
+            "賃金は整数で入力してください。"
+        );
+
+        return;
+    }
+
+    try{
+
+        await database
+            .ref(
+                "farms/" +
+                farm.id +
+                "/salary"
+            )
+            .set(salary);
+
+        showFarmMessage(
+            salary.toLocaleString() +
+            " Ptの12時間アルバイトを募集しました。"
+        );
+
+    }catch(error){
+
+        console.error(
+            "求人設定エラー:",
+            error
+        );
+
+        showFarmMessage(
+            "求人を設定できませんでした。"
+        );
+
+    }
+
+}
 console.log(
     "farm.js読み込み完了"
 );
