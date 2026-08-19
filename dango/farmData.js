@@ -17,13 +17,11 @@ const farmTypes = {
         icon:"🌱",
 
         price:300000,
+        sellPrice:240000,
 
         workerCapacity:1,
 
-        // 労働者0人でも最低1個は収穫
         baseHarvest:1,
-
-        // 労働者1人につき追加1個
         extraHarvestPerWorker:1,
 
         description:
@@ -36,11 +34,11 @@ const farmTypes = {
         icon:"🌾",
 
         price:600000,
+        sellPrice:480000,
 
         workerCapacity:3,
 
         baseHarvest:3,
-
         extraHarvestPerWorker:1,
 
         description:
@@ -53,11 +51,11 @@ const farmTypes = {
         icon:"🌳",
 
         price:1200000,
+        sellPrice:960000,
 
         workerCapacity:6,
 
         baseHarvest:6,
-
         extraHarvestPerWorker:1,
 
         description:
@@ -65,7 +63,6 @@ const farmTypes = {
     }
 
 };
-
 
 // =====================================================
 // 作物
