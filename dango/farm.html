@@ -442,30 +442,56 @@ footer{
 <body>
 
 <header>
+
     <h1>🌾 アグロポリス農園</h1>
+
     <p>Agora of Agropolis</p>
+
 </header>
 
-<!-- ポイント -->
-<div class="pointCard">
 
-    <div class="pointLabel">
-        所持ポイント
+<!-- =========================================
+     上部情報
+========================================= -->
+
+<div class="topInfo">
+
+    <div>
+
+        所持ポイント：
+        <span
+            class="point"
+            id="point"
+        >
+            0
+        </span>
+        Pt
+
     </div>
 
-    <div class="point" id="point">
-        0 Pt
-    </div>
+
+    <button
+        class="backButton"
+        onclick="location.href='dango.html'"
+    >
+
+        村へ戻る
+
+    </button>
 
 </div>
 
 
-<!-- 自分の農園 -->
-<section class="farmSection">
+<!-- =========================================
+     自分の農園
+========================================= -->
 
-    <div class="sectionTitle">
-        🌾 自分の農園
-    </div>
+<h2 class="sectionTitle">
+    🌾 自分の農園
+</h2>
+
+
+<section class="farmSection">
 
     <div id="myFarms">
 
@@ -476,7 +502,8 @@ footer{
             </div>
 
             <div class="emptyFarmText">
-                下から農地を購入できます。
+                店で農地を購入すると、
+                ここで農園を経営できます。
             </div>
 
         </div>
@@ -486,109 +513,28 @@ footer{
 </section>
 
 
-<!-- 農地購入 -->
-<section class="farmSection">
+<!-- =========================================
+     メッセージ
+========================================= -->
 
-    <div class="buySection">
-
-        <div class="sectionTitle">
-            🏺 農地を購入
-        </div>
-
-        <div class="buyDescription">
-            アグロポリスの農地を購入して、
-            自分の農園を経営できます。
-            農園を購入すると、その土地で作物を育てられます。
-        </div>
-
-        <div class="buyGrid">
-
-            <div class="buyCard">
-
-                <div class="buyCardTitle">
-                    🌱 小さな農地
-                </div>
-
-                <div class="buyCardInfo">
-                    価格：300,000 Pt<br>
-                    基本収穫：1個 / 12時間<br>
-                    労働者：1人
-                </div>
-
-                <button
-                    class="buyButton"
-                    data-farm-type="small">
-                    購入する
-                </button>
-
-            </div>
-
-
-            <div class="buyCard">
-
-                <div class="buyCardTitle">
-                    🌾 農地
-                </div>
-
-                <div class="buyCardInfo">
-                    価格：600,000 Pt<br>
-                    基本収穫：3個 / 12時間<br>
-                    労働者：3人
-                </div>
-
-                <button
-                    class="buyButton"
-                    data-farm-type="normal">
-                    購入する
-                </button>
-
-            </div>
-
-
-            <div class="buyCard">
-
-                <div class="buyCardTitle">
-                    🌳 大きな農地
-                </div>
-
-                <div class="buyCardInfo">
-                    価格：1,200,000 Pt<br>
-                    基本収穫：6個 / 12時間<br>
-                    労働者：6人
-                </div>
-
-                <button
-                    class="buyButton"
-                    data-farm-type="large">
-                    購入する
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-
-
-
-<!-- メッセージ -->
 <div
     id="message"
     class="message"
-    style="display:none;">
+    style="display:none;"
+>
 </div>
 
 
-<!-- 戻る -->
+<!-- =========================================
+     戻る
+========================================= -->
+
 <div class="backArea">
 
     <a
         class="backButton"
-        href="dango.html">
+        href="dango.html"
+    >
 
         ← 村へ戻る
 
@@ -598,8 +544,11 @@ footer{
 
 
 <footer>
+
     アグロポリスの農民たち
+
 </footer>
+
 
 </body>
 </html>
