@@ -8,43 +8,43 @@ const recipes = {
 
     stone_club:{
         materials:{
-            twig:2,
-            round_stone:1
+            twig:20,
+            round_stone:10
         },
         point:200
     },
 
     sling:{
         materials:{
-            thread:2,
-            small_stone:2
+            thread:20,
+            small_stone:20
         },
         point:200
     },
 
     stone_spear:{
         materials:{
-            twig:2,
-            small_stone:2,
-            thread:1
+            twig:20,
+            small_stone:20,
+            thread:10
         },
         point:300
     },
 
     small_shield:{
         materials:{
-            driftwood:1,
-            round_stone:1,
-            thread:2
+            driftwood:10,
+            round_stone:10,
+            thread:20
         },
         point:300
     },
 
     pottery_helmet:{
         materials:{
-            pottery_piece:2,
-            straw:2,
-            thread:2
+            pottery_piece:20,
+            straw:20,
+            thread:20
         },
         point:400
     }
