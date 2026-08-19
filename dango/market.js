@@ -124,7 +124,7 @@ function watchPoint(){
 // 市場監視
 // =====================================================
 
-function watchListings(){
+async function watchListings(){
 
     database
         .ref("marketListings")
@@ -230,6 +230,8 @@ function watchListings(){
 
 
     watchMyFarmsForShop();
+　　 await initializeLandlordStock();
+    watchLandlordStock();
 
 }
 
@@ -1431,6 +1433,7 @@ function renderMarket(){
 
 // =====================================================
 // 不動産市場
+// NPC地主 + プレイヤー出品
 // =====================================================
 
 function renderRealEstateMarket(){
@@ -1441,13 +1444,8 @@ function renderRealEstateMarket(){
         );
 
 
-    if(
-        !market ||
-        !currentUser
-    ){
-
+    if(!market || !currentUser){
         return;
-
     }
 
 
@@ -1477,59 +1475,188 @@ function renderRealEstateMarket(){
         : "price";
 
 
-    let listings =
-        Object.entries(
-            farmListingsData
-        )
-        .filter(
-            ([farmId, listing]) =>
-                !!listing
-        )
-        .map(
-            ([farmId, listing]) => ({
-                farmId,
-                ...listing
-            })
-        );
+    const offers = [];
+
+
+    // =================================================
+    // NPC地主の土地
+    // =================================================
+
+    Object.entries(
+        landlordStockData
+    )
+    .forEach(
+        ([stockId, stock]) => {
+
+            if(!stock){
+                return;
+            }
+
+
+            const quantity =
+                Number(
+                    stock.quantity || 0
+                );
+
+
+            if(quantity <= 0){
+                return;
+            }
+
+
+            const landlord =
+                getLandlord(
+                    stock.landlordId
+                );
+
+
+            const farmType =
+                farmTypes[
+                    stock.farmType
+                ];
+
+
+            if(
+                !landlord ||
+                !farmType
+            ){
+
+                return;
+
+            }
+
+
+            offers.push({
+
+                type:
+                    "landlord",
+
+                id:
+                    stockId,
+
+                landlordId:
+                    stock.landlordId,
+
+                farmType:
+                    stock.farmType,
+
+                farmTypeName:
+                    farmType.name,
+
+                farmTypeIcon:
+                    farmType.icon,
+
+                sellerName:
+                    landlord.name,
+
+                price:
+                    Number(
+                        farmType.price || 0
+                    ),
+
+                quantity:
+                    quantity
+
+            });
+
+        }
+    );
+
+
+    // =================================================
+    // プレイヤーの中古農地
+    // =================================================
+
+    Object.entries(
+        farmListingsData
+    )
+    .forEach(
+        ([farmId, listing]) => {
+
+            if(!listing){
+                return;
+            }
+
+
+            offers.push({
+
+                type:
+                    "player",
+
+                id:
+                    farmId,
+
+                farmId:
+                    farmId,
+
+                sellerId:
+                    listing.sellerId,
+
+                sellerName:
+                    listing.sellerName,
+
+                farmType:
+                    listing.farmType,
+
+                farmTypeName:
+                    listing.farmTypeName,
+
+                farmTypeIcon:
+                    listing.farmTypeIcon,
+
+                price:
+                    Number(
+                        listing.price || 0
+                    ),
+
+                quantity:
+                    1
+
+            });
+
+        }
+    );
+
+
+    // =================================================
+    // 検索
+    // =================================================
+
+    let filteredOffers =
+        offers;
 
 
     if(searchWord){
 
-        listings =
-            listings.filter(
-                listing =>
+        filteredOffers =
+            offers.filter(
+                offer => {
 
-                    String(
-                        listing.farmTypeName ||
-                        ""
-                    )
-                    .toLowerCase()
-                    .includes(
+                    const text =
+                        (
+                            offer.farmTypeName +
+                            " " +
+                            offer.sellerName
+                        )
+                        .toLowerCase();
+
+
+                    return text.includes(
                         searchWord
-                    )
+                    );
+
+                }
             );
 
     }
 
 
-    listings.sort(
+    // =================================================
+    // 並び順
+    // =================================================
+
+    filteredOffers.sort(
         (a,b) => {
-
-            if(
-                sortType === "new"
-            ){
-
-                return (
-                    Number(
-                        b.createdAt || 0
-                    ) -
-                    Number(
-                        a.createdAt || 0
-                    )
-                );
-
-            }
-
 
             return (
                 Number(a.price || 0) -
@@ -1540,15 +1667,19 @@ function renderRealEstateMarket(){
     );
 
 
+    // =================================================
+    // 出品なし
+    // =================================================
+
     if(
-        listings.length === 0
+        filteredOffers.length === 0
     ){
 
         market.innerHTML = `
 
             <div class="empty">
 
-                出品されている農地はありません
+                現在、購入できる農地はありません。
 
             </div>
 
@@ -1558,6 +1689,10 @@ function renderRealEstateMarket(){
 
     }
 
+
+    // =================================================
+    // 表示
+    // =================================================
 
     const card =
         document.createElement(
@@ -1588,8 +1723,8 @@ function renderRealEstateMarket(){
     );
 
 
-    listings.forEach(
-        listing => {
+    filteredOffers.forEach(
+        offer => {
 
             const row =
                 document.createElement(
@@ -1601,33 +1736,26 @@ function renderRealEstateMarket(){
                 "offerRow";
 
 
-            const isOwnListing =
-                listing.sellerId ===
-                currentUser.uid;
-
-
             row.innerHTML = `
 
                 <div class="seller">
 
                     ${escapeHtml(
-                        listing.farmTypeIcon ||
+                        offer.farmTypeIcon ||
                         "🏠"
                     )}
 
                     ${escapeHtml(
-                        listing.farmTypeName ||
-                        "農地"
+                        offer.farmTypeName
                     )}
 
                     <br>
 
                     <small>
 
-                        地主：
+                        所有者：
                         ${escapeHtml(
-                            listing.sellerName ||
-                            "名無し"
+                            offer.sellerName
                         )}
 
                     </small>
@@ -1638,7 +1766,7 @@ function renderRealEstateMarket(){
                 <div class="price">
 
                     ${Number(
-                        listing.price || 0
+                        offer.price
                     ).toLocaleString()}
                     Pt
 
@@ -1647,79 +1775,62 @@ function renderRealEstateMarket(){
 
                 <div class="stock">
 
-                    1区画
+                    ${
+                        offer.type ===
+                        "landlord"
+
+                        ? "残り " +
+                          offer.quantity +
+                          "区画"
+
+                        : "中古 1区画"
+                    }
 
                 </div>
 
 
                 <div class="buyArea">
 
-                    ${
-                        isOwnListing
+                    <button
+                        class="buyButton"
+                    >
 
-                        ? `
+                        購入する
 
-                            <button
-                                class="cancelButton">
-
-                                取り下げ
-
-                            </button>
-
-                        `
-
-                        : `
-
-                            <button
-                                class="buyButton">
-
-                                購入する
-
-                            </button>
-
-                        `
-                    }
+                    </button>
 
                 </div>
 
             `;
 
 
-            if(isOwnListing){
+            row
+                .querySelector(
+                    ".buyButton"
+                )
+                .addEventListener(
+                    "click",
+                    () => {
 
-                row
-                    .querySelector(
-                        ".cancelButton"
-                    )
-                    .addEventListener(
-                        "click",
-                        () => {
+                        if(
+                            offer.type ===
+                            "landlord"
+                        ){
 
-                            cancelFarmListing(
-                                listing
+                            buyLandlordFarm(
+                                offer
                             );
 
-                        }
-                    );
-
-            }else{
-
-                row
-                    .querySelector(
-                        ".buyButton"
-                    )
-                    .addEventListener(
-                        "click",
-                        () => {
+                        }else{
 
                             buyFarmListing(
-                                listing
+                                offer
                             );
 
                         }
-                    );
 
-            }
+                    }
+                );
 
 
             card.appendChild(
@@ -1730,13 +1841,286 @@ function renderRealEstateMarket(){
     );
 
 
+    market.innerHTML = "";
+
     market.appendChild(
         card
     );
 
 }
 
+// =====================================================
+// NPC地主から農地購入
+// =====================================================
 
+async function buyLandlordFarm(
+    offer
+){
+
+    const farmType =
+        farmTypes[
+            offer.farmType
+        ];
+
+
+    if(!farmType){
+
+        showMessage(
+            "農地情報が見つかりません"
+        );
+
+        return;
+
+    }
+
+
+    const price =
+        Number(
+            offer.price || 0
+        );
+
+
+    if(
+        currentPoint <
+        price
+    ){
+
+        showMessage(
+            "ポイントが足りません"
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+
+            offer.sellerName +
+            "から" +
+            farmType.name +
+            "を購入しますか？\n\n" +
+
+            "価格：" +
+            price.toLocaleString() +
+            " Pt"
+
+        );
+
+
+    if(!confirmed){
+        return;
+    }
+
+
+    try{
+
+        // -----------------------------------------
+        // 地主在庫を1つ減らす
+        // -----------------------------------------
+
+        const stockRef =
+            database.ref(
+                "landlordStock/" +
+                offer.id
+            );
+
+
+        const stockResult =
+            await stockRef.transaction(
+                stock => {
+
+                    if(!stock){
+                        return;
+                    }
+
+
+                    const quantity =
+                        Number(
+                            stock.quantity ||
+                            0
+                        );
+
+
+                    if(
+                        quantity <= 0
+                    ){
+
+                        return;
+
+                    }
+
+
+                    stock.quantity =
+                        quantity - 1;
+
+
+                    return stock;
+
+                }
+            );
+
+
+        if(
+            !stockResult.committed
+        ){
+
+            showMessage(
+                "この農地は売り切れました"
+            );
+
+            return;
+
+        }
+
+
+        // -----------------------------------------
+        // ポイントを支払う
+        // -----------------------------------------
+
+        const pointRef =
+            database.ref(
+                "members/" +
+                currentUser.uid +
+                "/point"
+            );
+
+
+        const pointResult =
+            await pointRef.transaction(
+                point => {
+
+                    const current =
+                        Number(
+                            point || 0
+                        );
+
+
+                    if(
+                        current <
+                        price
+                    ){
+
+                        return;
+
+                    }
+
+
+                    return current -
+                        price;
+
+                }
+            );
+
+
+        if(
+            !pointResult.committed
+        ){
+
+            // 地主在庫を戻す
+            await stockRef.transaction(
+                stock => {
+
+                    if(!stock){
+                        return;
+                    }
+
+
+                    stock.quantity =
+                        Number(
+                            stock.quantity ||
+                            0
+                        ) + 1;
+
+
+                    return stock;
+
+                }
+            );
+
+
+            showMessage(
+                "ポイントが足りません"
+            );
+
+            return;
+
+        }
+
+
+        // -----------------------------------------
+        // 自分の農地作成
+        // -----------------------------------------
+
+        const farmRef =
+            database
+                .ref(
+                    "farms"
+                )
+                .push();
+
+
+        await farmRef.set({
+
+            ownerId:
+                currentUser.uid,
+
+            ownerName:
+                currentMember?.name ||
+                currentUser.displayName ||
+                "農園主",
+
+            farmType:
+                offer.farmType,
+
+            cropId:
+                null,
+
+            plantedAt:
+                null,
+
+            harvestAt:
+                null,
+
+            workerCount:
+                0,
+
+            workerCapacity:
+                farmType.workerCapacity,
+
+            salary:
+                0,
+
+            createdAt:
+                firebase.database
+                    .ServerValue
+                    .TIMESTAMP
+
+        });
+
+
+        showMessage(
+            farmType.name +
+            "を購入しました"
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "地主農地購入エラー:",
+            error
+        );
+
+
+        showMessage(
+            "農地を購入できませんでした"
+        );
+
+    }
+
+}
 // =====================================================
 // 新規農地購入ボタン
 // =====================================================
@@ -1792,32 +2176,26 @@ async function buyNewFarm(
     }
 
 
-    const price =
+    const stockId =
+        "agropolis_estate_" +
+        farmTypeId;
+
+
+    const stock =
+        landlordStockData[
+            stockId
+        ];
+
+
+    if(
+        !stock ||
         Number(
-            farmType.price || 0
-        );
-
-
-    const totalSnapshot =
-        await database
-            .ref(
-                "farmMeta/totalFarms"
-            )
-            .once(
-                "value"
-            );
-
-
-    const total =
-        Number(
-            totalSnapshot.val() || 0
-        );
-
-
-    if(total >= 30){
+            stock.quantity || 0
+        ) <= 0
+    ){
 
         showMessage(
-            "新しい農地はすべて売り切れています。不動産市場をご利用ください。"
+            "この農地は売り切れています"
         );
 
         return;
@@ -1825,246 +2203,40 @@ async function buyNewFarm(
     }
 
 
-    if(currentPoint < price){
+    await buyLandlordFarm({
 
-        showMessage(
-            "ポイントが足りません"
-        );
+        type:
+            "landlord",
 
-        return;
+        id:
+            stockId,
 
-    }
+        landlordId:
+            "agropolis_estate",
 
+        farmType:
+            farmTypeId,
 
-    const confirmed =
-        confirm(
+        farmTypeName:
+            farmType.name,
 
-            farmType.name +
-            "を" +
-            price.toLocaleString() +
-            " Ptで購入しますか？"
+        farmTypeIcon:
+            farmType.icon,
 
-        );
+        sellerName:
+            landlords
+                .agropolis_estate
+                .name,
 
+        price:
+            farmType.price,
 
-    if(!confirmed){
-        return;
-    }
+        quantity:
+            stock.quantity
 
-
-    let slotReserved =
-        false;
-
-    let pointDeducted =
-        false;
-
-
-    try{
-
-        const totalRef =
-            database.ref(
-                "farmMeta/totalFarms"
-            );
-
-
-        const slotResult =
-            await totalRef.transaction(
-                value => {
-
-                    const current =
-                        Number(
-                            value || 0
-                        );
-
-
-                    if(
-                        current >= 30
-                    ){
-
-                        return;
-
-                    }
-
-
-                    return current + 1;
-
-                }
-            );
-
-
-        if(
-            !slotResult.committed
-        ){
-
-            showMessage(
-                "農地はすべて売り切れています"
-            );
-
-            return;
-
-        }
-
-
-        slotReserved =
-            true;
-
-
-        const pointRef =
-            database.ref(
-                "members/" +
-                currentUser.uid +
-                "/point"
-            );
-
-
-        const pointResult =
-            await pointRef.transaction(
-                point => {
-
-                    const current =
-                        Number(
-                            point || 0
-                        );
-
-
-                    if(
-                        current <
-                        price
-                    ){
-
-                        return;
-
-                    }
-
-
-                    return current -
-                        price;
-
-                }
-            );
-
-
-        if(
-            !pointResult.committed
-        ){
-
-            showMessage(
-                "ポイントが足りません"
-            );
-
-            return;
-
-        }
-
-
-        pointDeducted =
-            true;
-
-
-        const farmRef =
-            database
-                .ref("farms")
-                .push();
-
-
-        await farmRef.set({
-
-            ownerId:
-                currentUser.uid,
-
-            ownerName:
-                currentMember?.name ||
-                currentUser.displayName ||
-                "農園主",
-
-            farmType:
-                farmTypeId,
-
-            cropId:
-                null,
-
-            plantedAt:
-                null,
-
-            harvestAt:
-                null,
-
-            workerCount:
-                0,
-
-            workerCapacity:
-                farmType.workerCapacity,
-
-            salary:
-                0,
-
-            createdAt:
-                firebase.database
-                    .ServerValue
-                    .TIMESTAMP
-
-        });
-
-
-        showMessage(
-            farmType.name +
-            "を購入しました"
-        );
-
-
-    }catch(error){
-
-        console.error(
-            "新規農地購入エラー:",
-            error
-        );
-
-
-        if(pointDeducted){
-
-            await database
-                .ref(
-                    "members/" +
-                    currentUser.uid +
-                    "/point"
-                )
-                .transaction(
-                    point =>
-                        Number(
-                            point || 0
-                        ) + price
-                );
-
-        }
-
-
-        if(slotReserved){
-
-            await database
-                .ref(
-                    "farmMeta/totalFarms"
-                )
-                .transaction(
-                    value =>
-                        Math.max(
-                            0,
-                            Number(
-                                value || 0
-                            ) - 1
-                        )
-                );
-
-        }
-
-
-        showMessage(
-            "農地を購入できませんでした"
-        );
-
-    }
+    });
 
 }
-
 
 // =====================================================
 // 自分の農地を出品
