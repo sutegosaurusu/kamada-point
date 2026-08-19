@@ -139,31 +139,7 @@ function startFarmListeners(){
         });
 
 
-    // -----------------------------------------
-    // 購入ボタン
-    // -----------------------------------------
-
-    document
-        .querySelectorAll(".buyButton")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const farmType =
-                        button.dataset.farmType;
-
-                    buyFarm(farmType);
-
-                }
-            );
-
-        });
-
-}
-
-
+   
 // =====================================================
 // 画面全体
 // =====================================================
