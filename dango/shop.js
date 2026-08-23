@@ -52,15 +52,35 @@ function watchMember(){
 
 
 
-function updatePointDisplay(){
+function updateSellAreaVisibility(){
 
-    const point =
-        Number(currentMember?.point || 0);
+    const isRealEstate =
+        currentCategory ===
+        "realestate";
 
+    const sellArea =
+        document.querySelector(".sellArea");
 
-    document.getElementById("pointDisplay")
-    .textContent =
-        point.toLocaleString() + " Pt";
+    const myListings =
+        document.querySelector(".myListings");
+
+    const myFarmSales =
+        document.getElementById("myFarmSalesSection");
+
+    if(sellArea){
+        sellArea.style.display =
+            isRealEstate ? "none" : "flex";
+    }
+
+    if(myListings){
+        myListings.style.display =
+            isRealEstate ? "none" : "block";
+    }
+
+    if(myFarmSales){
+        myFarmSales.style.display =
+            isRealEstate ? "block" : "none";
+    }
 
 }
 
