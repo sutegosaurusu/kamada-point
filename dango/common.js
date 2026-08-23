@@ -179,3 +179,18 @@ async function unequipItem(slot){
         )
         .remove();
 }
+// common.js に追加
+function updatePointDisplay(point){
+
+    const el =
+        document.getElementById("pointDisplay");
+
+    if(el){
+
+        el.textContent =
+            Number(point || 0).toLocaleString() +
+            " Pt";
+
+    }
+
+}
