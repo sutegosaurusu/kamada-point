@@ -194,3 +194,17 @@ function updatePointDisplay(point){
     }
 
 }
+let currentMember = null;
+
+function watchMember(){
+
+    database
+        .ref("members/" + currentUser.uid)
+        .on("value", snapshot => {
+
+            currentMember =
+                snapshot.val() || null;
+
+        });
+
+}
