@@ -495,7 +495,63 @@ header p{
 .myListing.sold{
     opacity:.55;
 }
+.myFarmSales{
+    width:100%;
+    max-width:850px;
+    margin:20px auto;
+    display:none; /* 不動産タブの時だけ表示 */
+}
 
+.myFarmSales h2{
+    margin:0;
+    padding-bottom:10px;
+    border-bottom:2px solid #8c7252;
+    text-align:center;
+    font-size:21px;
+}
+
+.farmSellCard{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:10px;
+    align-items:center;
+
+    margin:15px 0 8px;
+    padding:12px;
+
+    background:#d4c09b;
+    border:2px solid #60462e;
+}
+
+.farmSellName{
+    font-weight:bold;
+    font-size:16px;
+}
+
+.farmSellPrice{
+    margin-top:4px;
+    color:#4c351f;
+}
+
+.farmSellStatus{
+    margin-top:4px;
+    font-size:13px;
+    color:#66513a;
+}
+
+.farmSellButton{
+    padding:10px 12px;
+    border:2px solid #49311d;
+    background:#795536;
+    color:#fff0d1;
+    font-family:inherit;
+    cursor:pointer;
+}
+
+.farmSellButton:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
 </style>
 
 </head>
@@ -582,6 +638,12 @@ header p{
     <h2>自分の出品</h2>
     <div id="myListings">
         <div class="empty">出品はありません</div>
+    </div>
+</section>
+    <section class="myFarmSales" id="myFarmSalesSection">
+    <h2>自分の農地を出品</h2>
+    <div id="myFarmSales">
+        <div class="empty">所有している農地はありません</div>
     </div>
 </section>
 <div class="inventoryOverlay" id="inventoryOverlay">
