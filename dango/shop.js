@@ -1,4 +1,3 @@
-let currentMember = null;
 
 
 auth.onAuthStateChanged(async user => {
