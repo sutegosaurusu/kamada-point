@@ -13,7 +13,8 @@
 // ・不動産市場で農地購入
 // =====================================================
 
-
+// market.js の先頭あたりに追加
+let inventoryData = {};
 let currentCategory = "food";
 
 let listingData = {};
