@@ -89,62 +89,71 @@ function startShop(){
 
 function watchPoint(){
 
+    const user = firebase.auth().currentUser;
+
+    if(!user){
+        console.error("watchPoint: ログインユーザーが取得できません");
+        return;
+    }
+
+    const uid = user.uid;
+
+    console.log("watchPoint開始 UID =", uid);
+
     const pointRef = database.ref(
-        "members/" + currentUser.uid + "/point"
+        "members/" + uid + "/point"
     );
 
-    pointRef.on("value", snapshot => {
+    pointRef.on(
+        "value",
+        snapshot => {
 
-        if(!snapshot.exists()){
-
-            console.error(
-                "ポイントデータが見つかりません:",
-                "members/" + currentUser.uid + "/point"
-            );
-
-            document.getElementById("pointDisplay").textContent =
-                "取得失敗";
-
-            return;
-        }
-
-        const value = Number(snapshot.val());
-
-        if(!Number.isFinite(value)){
-
-            console.error(
-                "ポイントの値が不正です:",
+            console.log(
+                "watchPoint Firebase値 =",
                 snapshot.val()
             );
 
-            document.getElementById("pointDisplay").textContent =
-                "取得失敗";
+            if(!snapshot.exists()){
+                console.error(
+                    "ポイントデータが存在しません",
+                    "members/" + uid + "/point"
+                );
+                return;
+            }
 
-            return;
+            const value = Number(snapshot.val());
+
+            if(!Number.isFinite(value)){
+                console.error(
+                    "ポイントが数値ではありません:",
+                    snapshot.val()
+                );
+                return;
+            }
+
+            currentPoint = value;
+
+            const element =
+                document.getElementById("pointDisplay");
+
+            if(element){
+
+                element.textContent =
+                    value.toLocaleString() + " Pt";
+
+            }
+
+        },
+        error => {
+
+            console.error(
+                "ポイント監視エラー:",
+                error
+            );
+
         }
-
-        currentPoint = value;
-
-        const element =
-            document.getElementById("pointDisplay");
-
-        if(element){
-            element.textContent =
-                currentPoint.toLocaleString() + " Pt";
-        }
-
-    }, error => {
-
-        console.error(
-            "ポイント読み込みエラー:",
-            error
-        );
-
-        document.getElementById("pointDisplay").textContent =
-            "取得失敗";
-    });
+    );
 }
-
 function refreshPointDisplay(){
 
     if(!currentUser){
