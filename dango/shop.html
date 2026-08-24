@@ -673,5 +673,46 @@ header p{
 <script src="market.js"></script>
 <script src="shop.js"></script>
 <script src="inventoryPanel.js"></script>
+    <script>
+
+firebase.auth().onAuthStateChanged(function(user){
+
+    if(!user){
+        return;
+    }
+
+    const pointRef = firebase.database().ref(
+        "members/" + user.uid + "/point"
+    );
+
+    pointRef.on("value", function(snapshot){
+
+        const point = Number(snapshot.val() || 0);
+
+        const element =
+            document.getElementById("pointDisplay");
+
+        if(element){
+            element.textContent =
+                point.toLocaleString() + " Pt";
+        }
+
+        console.log(
+            "市場ポイント表示:",
+            point
+        );
+
+    }, function(error){
+
+        console.error(
+            "市場ポイント取得エラー:",
+            error
+        );
+
+    });
+
+});
+
+</script>
 </body>
 </html>
