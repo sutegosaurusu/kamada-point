@@ -78,6 +78,8 @@ function startShop(){
 
     setupShopEvents();
 
+    refreshPointDisplay();
+
 }
 
 
@@ -143,7 +145,48 @@ function watchPoint(){
     });
 }
 
+function refreshPointDisplay(){
 
+    if(!currentUser){
+        return;
+    }
+
+    database
+        .ref(
+            "members/" +
+            currentUser.uid +
+            "/point"
+        )
+        .once("value")
+        .then(snapshot => {
+
+            const point =
+                Number(snapshot.val() || 0);
+
+            currentPoint = point;
+
+            const element =
+                document.getElementById("pointDisplay");
+
+            if(element){
+
+                element.textContent =
+                    point.toLocaleString() +
+                    " Pt";
+
+            }
+
+        })
+        .catch(error => {
+
+            console.error(
+                "ポイント取得エラー:",
+                error
+            );
+
+        });
+
+}
 // =====================================================
 // 市場監視
 // =====================================================
