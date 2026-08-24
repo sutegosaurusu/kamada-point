@@ -87,39 +87,60 @@ function startShop(){
 
 function watchPoint(){
 
-    database
-        .ref(
-            "members/" +
-            currentUser.uid +
-            "/point"
-        )
-        .on(
-            "value",
-            snapshot => {
+    const pointRef = database.ref(
+        "members/" + currentUser.uid + "/point"
+    );
 
-                currentPoint =
-                    Number(
-                        snapshot.val() || 0
-                    );
+    pointRef.on("value", snapshot => {
 
+        if(!snapshot.exists()){
 
-                const element =
-                    document.getElementById(
-                        "pointDisplay"
-                    );
+            console.error(
+                "ポイントデータが見つかりません:",
+                "members/" + currentUser.uid + "/point"
+            );
 
+            document.getElementById("pointDisplay").textContent =
+                "取得失敗";
 
-                if(element){
+            return;
+        }
 
-                    element.textContent =
-                        currentPoint.toLocaleString() +
-                        " Pt";
+        const value = Number(snapshot.val());
 
-                }
+        if(!Number.isFinite(value)){
 
-            }
+            console.error(
+                "ポイントの値が不正です:",
+                snapshot.val()
+            );
+
+            document.getElementById("pointDisplay").textContent =
+                "取得失敗";
+
+            return;
+        }
+
+        currentPoint = value;
+
+        const element =
+            document.getElementById("pointDisplay");
+
+        if(element){
+            element.textContent =
+                currentPoint.toLocaleString() + " Pt";
+        }
+
+    }, error => {
+
+        console.error(
+            "ポイント読み込みエラー:",
+            error
         );
 
+        document.getElementById("pointDisplay").textContent =
+            "取得失敗";
+    });
 }
 
 
