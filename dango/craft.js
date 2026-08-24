@@ -175,29 +175,18 @@ function renderRecipeList(){
         Object.entries(recipes)
         .filter(([itemId]) => itemInformation[itemId]);
 
-    const craftableEntries =
-        recipeEntries
-        .filter(([, recipe]) => canCraft(recipe));
+  const craftableEntries =
+    recipeEntries
+    .filter(([, recipe]) => canCraft(recipe));
 
-    if(countBar){
-        countBar.textContent =
-            "⭐ 作れる装備 " + craftableEntries.length + "種類";
-    }
+if(countBar){
+    countBar.textContent =
+        "⭐ 作れる装備 " + craftableEntries.length + "種類";
+}
 
-    if(craftableEntries.length === 0){
+list.innerHTML = "";
 
-        list.innerHTML = `
-        <div class="empty">
-        今作れる装備はありません
-        </div>
-        `;
-
-        return;
-    }
-
-    list.innerHTML = "";
-
-   recipeEntries.forEach(([itemId, recipe]) => {
+recipeEntries.forEach(([itemId, recipe]) => {
 
         const info = itemInformation[itemId];
 
@@ -364,15 +353,9 @@ function renderRecipeIndex(){
         return;
     }
 
-    const recipeEntries =
-        Object.entries(recipes)
-        .filter(([itemId]) => itemInformation[itemId])
-        .filter(([itemId, recipe]) => {
-            return (
-                Boolean(craftedRecipes[itemId]) ||
-                canCraft(recipe)
-            );
-        });
+   const recipeEntries =
+    Object.entries(recipes)
+    .filter(([itemId]) => itemInformation[itemId]);
 
     if(recipeEntries.length === 0){
 
