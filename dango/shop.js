@@ -25,8 +25,7 @@ auth.onAuthStateChanged(async user => {
     }
 
 
-    updatePointDisplay();
-
+   updatePointDisplay(currentMember.point);
     watchMember();
     watchInventory();
     watchListings();
@@ -43,7 +42,7 @@ function watchMember(){
 
             currentMember = snapshot.val() || {};
 
-            updatePointDisplay();
+            updatePointDisplay(currentMember.point);
 
         });
 
