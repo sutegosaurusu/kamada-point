@@ -41,13 +41,7 @@ function loadPointForCraft(){
 
         currentPoint = Number(snapshot.val() || 0);
 
-        const pointDisplay =
-            document.getElementById("point");
-
-        if(pointDisplay){
-            pointDisplay.textContent =
-                currentPoint.toLocaleString() + " Pt";
-        }
+        updatePointDisplay(currentPoint);
 
         renderAll();
 

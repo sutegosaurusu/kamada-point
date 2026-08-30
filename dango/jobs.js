@@ -67,18 +67,7 @@ function watchPoint(){
                         snapshot.val() || 0
                     );
 
-                const point =
-                    document.getElementById(
-                        "point"
-                    );
-
-                if(point){
-
-                    point.textContent =
-                        currentPoint.toLocaleString() +
-                        " Pt";
-
-                }
+                updatePointDisplay(currentPoint);
 
             }
         );
@@ -486,6 +475,12 @@ function renderActiveJob(){
         "completed"
     ){
 
+        const salary =
+            Number(
+                activeJob.salary || 0
+            );
+
+
         container.innerHTML = `
 
             <div class="activeJobCard">
@@ -500,6 +495,65 @@ function renderActiveJob(){
                         "農園"
                     )}
                 </div>
+
+                <div class="jobInfo">
+
+                    <div class="infoBox">
+
+                        <div class="infoLabel">
+                            労働時間
+                        </div>
+
+                        <div class="infoValue">
+                            12時間
+                        </div>
+
+                    </div>
+
+
+                    <div class="infoBox">
+
+                        <div class="infoLabel">
+                            報酬
+                        </div>
+
+                        <div class="infoValue">
+                            ${salary.toLocaleString()} Pt
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="progressArea">
+
+                    <div class="progressLabel">
+
+                        <span>
+                            仕事の進行
+                        </span>
+
+                        <span>
+                            完了
+                        </span>
+
+                    </div>
+
+
+                    <div class="progressBar">
+
+                        <div
+                            id="jobProgress"
+                            class="progress"
+                            style="width: 100%;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <div id="jobResultInline"></div>
 
                 <button
                     class="jobButton"
@@ -1108,13 +1162,20 @@ function showJobResult(){
         );
 
 
+    const inlineTarget =
+        document.getElementById(
+            "jobResultInline"
+        );
+
+
     const result =
+        inlineTarget ||
         document.getElementById(
             "jobResult"
         );
 
 
-    if(!section || !result){
+    if(!result){
 
         return;
 
@@ -1161,18 +1222,24 @@ function showJobResult(){
     `;
 
 
-    section.style.display =
-        "block";
+    if(section){
+        section.style.display =
+            "none";
+    }
 
 
-    document
-        .getElementById(
+    const claimButton =
+        document.getElementById(
             "claimJobButton"
-        )
-        .addEventListener(
+        );
+
+
+    if(claimButton){
+        claimButton.addEventListener(
             "click",
             claimJobReward
         );
+    }
 
 }
 
@@ -1344,6 +1411,12 @@ function sectionReset(){
         );
 
 
+    const inlineResult =
+        document.getElementById(
+            "jobResultInline"
+        );
+
+
     if(section){
 
         section.style.display =
@@ -1355,6 +1428,14 @@ function sectionReset(){
     if(result){
 
         result.innerHTML =
+            "";
+
+    }
+
+
+    if(inlineResult){
+
+        inlineResult.innerHTML =
             "";
 
     }

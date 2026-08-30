@@ -182,16 +182,31 @@ async function unequipItem(slot){
 // common.js に追加
 function updatePointDisplay(point){
 
-    const el =
+    const value =
+        Number(point || 0).toLocaleString() +
+        " Pt";
+
+    const targets = new Set();
+
+    const pointDisplay =
         document.getElementById("pointDisplay");
 
-    if(el){
+    const pointElement =
+        document.getElementById("point");
 
-        el.textContent =
-            Number(point || 0).toLocaleString() +
-            " Pt";
+    const dotPointElements =
+        document.querySelectorAll(".point");
 
-    }
+    if(pointDisplay) targets.add(pointDisplay);
+    if(pointElement) targets.add(pointElement);
+
+    dotPointElements.forEach(el => {
+        targets.add(el);
+    });
+
+    targets.forEach(el => {
+        el.textContent = value;
+    });
 
 }
 let currentMember = null;

@@ -76,18 +76,7 @@ function startFarmListeners(){
                         snapshot.val() || 0
                     );
 
-                const pointElement =
-                    document.getElementById(
-                        "point"
-                    );
-
-                if(pointElement){
-
-                    pointElement.textContent =
-                        currentPoint.toLocaleString() +
-                        " Pt";
-
-                }
+                updatePointDisplay(currentPoint);
 
             }
         );
@@ -1167,6 +1156,7 @@ async function openFarmRecruitment(
         prompt(
 
             "12時間アルバイトの賃金を設定してください。\n\n" +
+            "半角数字のみ入力可能です。\n" +
             "現在の賃金：" +
             currentSalary +
             " Pt"
@@ -1179,8 +1169,31 @@ async function openFarmRecruitment(
     }
 
 
+    const normalizedInput =
+        String(input)
+            .trim()
+            .replace(
+                /[０-９]/g,
+                char =>
+                    String.fromCharCode(
+                        char.charCodeAt(0) - 0xFEE0
+                    )
+            );
+
+
+    if(!/^[0-9]+$/.test(normalizedInput)){
+
+        showFarmMessage(
+            "賃金は半角数字のみ入力してください。"
+        );
+
+        return;
+
+    }
+
+
     const salary =
-        Number(input);
+        Number(normalizedInput);
 
 
     if(
