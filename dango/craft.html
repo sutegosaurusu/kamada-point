@@ -66,27 +66,6 @@ header p{
     font-size:14px;
 }
 
-/* 上部情報 */
-
-.topInfo{
-    margin-top:12px;
-    padding:10px 12px;
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-
-    background:#d5c29e;
-    border:2px solid #60472e;
-}
-
-.pointDisplay{
-    font-size:19px;
-    font-weight:bold;
-    color:#715317;
-}
-
 .backButtons{
     display:flex;
     gap:7px;
@@ -315,7 +294,17 @@ header p{
         <p>素材から装備を作ろう</p>
     </header>
 
-    <div class="topInfo">
+    <div class="itemCard pointCard">
+
+        <div class="itemHeader">
+            所持ポイント
+        </div>
+
+        <div class="offerRow">
+
+            <span class="point" id="pointDisplay">
+                0 Pt
+            </span>
 
         <div class="backButtons">
 
@@ -332,6 +321,8 @@ header p{
             >
                 村へ戻る
             </button>
+
+        </div>
 
         </div>
 
