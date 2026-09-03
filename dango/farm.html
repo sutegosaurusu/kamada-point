@@ -404,26 +404,6 @@ footer{
    上部情報
 ========================================= */
 
-.topInfo{
-    width:100%;
-    max-width:1000px;
-    margin:0 auto 14px;
-    padding:10px 12px;
-
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-
-    background:#d5c29e;
-    border:2px solid #60472e;
-}
-
-.topInfo > div{
-    font-size:16px;
-    font-weight:bold;
-}
-
 .backButton{
     padding:8px 12px;
 
@@ -536,18 +516,14 @@ footer{
     <div class="offerRow">
         <span>現在の所持ポイント</span>
         <span class="point" id="pointDisplay">0 Pt</span>
+
+        <button
+            class="backButton"
+            onclick="location.href='dango.html'"
+        >
+            村へ戻る
+        </button>
     </div>
-
-</div>
-
-<div class="topInfo">
-
-    <button
-        class="backButton"
-        onclick="location.href='dango.html'"
-    >
-        村へ戻る
-    </button>
 
 </div>
 

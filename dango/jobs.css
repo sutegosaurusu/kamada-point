@@ -164,41 +164,6 @@ header p{
 }
 
 
-/* =========================================
-   ボタン
-========================================= */
-
-.jobButton{
-
-    width:100%;
-
-    padding:14px;
-
-    margin-top:15px;
-
-    background:#8a6842;
-
-    color:#f5ebd5;
-
-    border:3px solid #4d351f;
-
-    border-radius:6px;
-
-    font-size:17px;
-
-    font-family:inherit;
-
-    cursor:pointer;
-
-    box-shadow:
-        3px 3px 0 #3d2917;
-
-}
-
-
-.jobButton:active{
-
-    transform:
         translateY(3px);
 
     box-shadow:none;
