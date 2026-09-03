@@ -4,14 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ダンゴムシダンジョン</title>
-
 <style>
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
 }
-
 body{
     font-family:"Yu Mincho","Noto Serif JP",serif;
     background:#b79d74;
@@ -21,9 +19,7 @@ body{
     color:#2d2116;
     min-height:100vh;
 }
-
 /* タイトル */
-
 header{
     background:#cbb38a;
     border-bottom:6px solid #5b442b;
@@ -31,108 +27,107 @@ header{
     text-align:center;
     box-shadow:0 4px 8px rgba(0,0,0,.25);
 }
-
 header h1{
     font-size:36px;
     letter-spacing:2px;
     color:#3b2b1b;
 }
-
 header p{
     margin-top:8px;
     color:#6b5538;
     font-style:italic;
 }
 
-/* 共通カード */
-
-.card{
+/* ポイント表示：カードではなく石に刻まれた紋章のような演出 */
+.pointArea{
     width:90%;
     max-width:650px;
-    margin:24px auto;
-    background:#d9ccb2;
-    border:3px solid #5b442b;
-    border-radius:6px;
-    padding:18px;
-    box-shadow:4px 4px 0 #7d6443;
-}
-
-/* ポイント */
-
-.pointTitle{
+    margin:32px auto;
     text-align:center;
-    font-size:20px;
+    position:relative;
+    padding:10px 0 22px;
 }
-
-.point{
-    margin-top:12px;
-    text-align:center;
-    font-size:42px;
+.pointArea::before,
+.pointArea::after{
+    content:"";
+    display:block;
+    width:70%;
+    max-width:420px;
+    height:2px;
+    margin:0 auto 14px;
+    background:linear-gradient(to right,transparent,#5b442b 20%,#5b442b 80%,transparent);
+    opacity:.6;
+}
+.pointArea::after{
+    margin:16px auto 0;
+}
+.pointLabel{
+    font-size:16px;
+    letter-spacing:6px;
+    color:#6b5538;
+}
+.pointValue{
+    margin-top:6px;
+    font-size:72px;
     font-weight:bold;
-    color:#715317;
+    line-height:1;
+    color:#6b4d1f;
+    text-shadow:
+        1px 1px 0 #d9ccb2,
+        2px 2px 0 rgba(0,0,0,.25),
+        0 0 18px rgba(113,83,23,.35);
+    letter-spacing:1px;
+}
+.pointValue .unit{
+    font-size:26px;
+    margin-left:6px;
+    font-weight:normal;
+    color:#6b5538;
 }
 
 /* ボタン */
-
 .menu{
     width:90%;
     max-width:650px;
     margin:30px auto;
 }
-
 .menu button{
     width:100%;
     padding:18px;
     margin-bottom:16px;
-
     background:#8a6842;
     color:#f5ebd5;
-
     border:3px solid #4d351f;
     border-radius:6px;
-
     font-size:22px;
     font-family:inherit;
-
     cursor:pointer;
     transition:.15s;
-
     box-shadow:3px 3px 0 #3d2917;
 }
-
 .menu button:hover{
     background:#7a5937;
 }
-
 .menu button:active{
     transform:translateY(3px);
     box-shadow:none;
 }
-    .backArea{
+.backArea{
     text-align:center;
     margin:30px 0;
 }
-
 /* 現在地 */
-
 .location{
     width:90%;
     max-width:650px;
     margin:25px auto;
-
     background:#cab58d;
-
     border:3px solid #5b442b;
-
     padding:15px;
-
     text-align:center;
-
     font-size:18px;
 }
-
 /* フッター */
-
 footer{
     margin:40px 0 20px;
     text-align:center;
@@ -143,33 +138,22 @@ footer{
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
 <script src="firebase.js"></script>
 <script src="common.js"></script>
 <link rel="stylesheet" href="card.css">
 </head>
 <body>
-
 <header>
     <h1>🏛 ダンゴムシダンジョン</h1>
     <p>現在地: アグロポリス</p>
 </header>
 
+<div class="pointArea">
+    <div class="pointLabel">所持ポイント</div>
+    <div class="pointValue" id="pointDisplay">0<span class="unit">Pt</span></div>
+</div>
+
 <div class="menu">
-
-    <div class="itemCard pointCard">
-
-        <div class="itemHeader">
-            所持ポイント
-        </div>
-
-        <div class="offerRow">
-            <span>現在の所持ポイント</span>
-            <span class="point" id="pointDisplay">0 Pt</span>
-        </div>
-
-    </div>
-
    <button onclick="location.href='adventure.html'">
     ⚔ 探検へ
 </button>
@@ -182,7 +166,6 @@ footer{
 <button onclick="location.href='inventory.html'">
     🎒 持ち物
 </button>
-
 <button onclick="location.href='shop.html'">
     🏺 店
 </button>
@@ -196,12 +179,9 @@ footer{
         ← 戻る
     </button>
 </div>
-   
-</div>
 
 <footer>
     ダンゴムシ遠征隊
 </footer>
-
 </body>
 </html>
