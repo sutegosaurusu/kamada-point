@@ -13,6 +13,7 @@
 <title>アグロポリス求人所</title>
 
 <link rel="stylesheet" href="jobs.css">
+<link rel="stylesheet" href="card.css">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -40,15 +41,20 @@
 </header>
 
 
-<div class="topInfo">
+<div class="itemCard pointCard">
 
-    <div class="pointInfo">
-
-        💰 所持ポイント：
-        <span class="point" id="pointDisplay">0</span>
-        
-
+    <div class="itemHeader">
+        所持ポイント
     </div>
+
+    <div class="offerRow">
+        <span>現在の所持ポイント</span>
+        <span class="point" id="pointDisplay">0 Pt</span>
+    </div>
+
+</div>
+
+<div class="topInfo">
 
     <button
         class="backButton"

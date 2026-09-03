@@ -146,6 +146,7 @@ footer{
 
 <script src="firebase.js"></script>
 <script src="common.js"></script>
+<link rel="stylesheet" href="card.css">
 </head>
 <body>
 
@@ -156,7 +157,18 @@ footer{
 
 <div class="menu">
 
-    <div class="point" id="pointDisplay">0 Pt</div>
+    <div class="itemCard pointCard">
+
+        <div class="itemHeader">
+            所持ポイント
+        </div>
+
+        <div class="offerRow">
+            <span>現在の所持ポイント</span>
+            <span class="point" id="pointDisplay">0 Pt</span>
+        </div>
+
+    </div>
 
    <button onclick="location.href='adventure.html'">
     ⚔ 探検へ

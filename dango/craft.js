@@ -237,10 +237,10 @@ recipeEntries.forEach(([itemId, recipe]) => {
         const card =
             document.createElement("div");
 
-        card.className = "recipeCard";
+        card.className = "itemCard recipeCard";
 
         card.innerHTML = `
-        <div class="recipeHeader">
+        <div class="itemHeader recipeHeader">
             <div class="recipeIcon">
                 ${info.icon || getDefaultIcon(info.category)}
             </div>

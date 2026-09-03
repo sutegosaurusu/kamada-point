@@ -258,12 +258,12 @@ function renderJobs(){
 
 
             card.className =
-                "jobCard";
+                "itemCard jobCard";
 
 
             card.innerHTML = `
 
-                <div class="jobHeader">
+                <div class="itemHeader jobHeader">
 
                     <div>
 
@@ -483,7 +483,7 @@ function renderActiveJob(){
 
         container.innerHTML = `
 
-            <div class="activeJobCard">
+            <div class="itemCard activeJobCard">
 
                 <div class="activeJobTitle">
                     ✅ 仕事終了
@@ -604,7 +604,7 @@ function renderActiveJob(){
 
     container.innerHTML = `
 
-        <div class="activeJobCard">
+        <div class="itemCard activeJobCard">
 
             <div class="activeJobTitle">
 
@@ -1190,7 +1190,7 @@ function showJobResult(){
 
     result.innerHTML = `
 
-        <div class="resultCard">
+        <div class="itemCard resultCard">
 
             <div class="resultTitle">
 

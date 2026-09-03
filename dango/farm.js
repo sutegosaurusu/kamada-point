@@ -227,7 +227,7 @@ function createFarmCard(farm){
             );
 
         errorCard.className =
-            "farmCard";
+            "itemCard farmCard";
 
         errorCard.innerHTML = `
 
@@ -300,7 +300,7 @@ function createFarmCard(farm){
 
 
     card.className =
-        "farmCard";
+        "itemCard farmCard";
 
 
     // =================================================

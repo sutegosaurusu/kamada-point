@@ -59,18 +59,6 @@ header p{
    ポイント
 ============================== */
 
-.pointCard{
-    width:90%;
-    max-width:650px;
-    margin:20px auto;
-    background:#d9ccb2;
-    border:3px solid #5b442b;
-    border-radius:6px;
-    padding:15px;
-    text-align:center;
-    box-shadow:4px 4px 0 #7d6443;
-}
-
 .pointLabel{
     font-size:16px;
     color:#6b5538;
@@ -102,15 +90,6 @@ header p{
 /* ==============================
    農園カード
 ============================== */
-
-.farmCard{
-    background:#d9ccb2;
-    border:3px solid #5b442b;
-    border-radius:8px;
-    padding:18px;
-    margin-bottom:18px;
-    box-shadow:4px 4px 0 #7d6443;
-}
 
 .farmHeader{
     display:flex;
@@ -515,6 +494,7 @@ footer{
     margin:0 auto 16px;
 }
 </style>
+<link rel="stylesheet" href="card.css">
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -547,18 +527,20 @@ footer{
      上部情報
 ========================================= -->
 
-<div class="topInfo">
+<div class="itemCard pointCard">
 
-    <div>
-        所持ポイント：
-        <span
-            class="point"
-            id="pointDisplay"
-        >
-            0
-        </span>
-       
+    <div class="itemHeader">
+        所持ポイント
     </div>
+
+    <div class="offerRow">
+        <span>現在の所持ポイント</span>
+        <span class="point" id="pointDisplay">0 Pt</span>
+    </div>
+
+</div>
+
+<div class="topInfo">
 
     <button
         class="backButton"

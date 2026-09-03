@@ -1,0 +1,56 @@
+/* shop.html のカードを基準にした共通カード */
+.itemCard{
+    margin-bottom:10px;
+    background:#d7c4a1;
+    border:2px solid #5b422b;
+    box-shadow:3px 3px 0 #75593c;
+}
+
+.itemHeader{
+    padding:9px 12px;
+    border-bottom:1px solid #8c7252;
+    background:#c5ad83;
+    font-weight:bold;
+    font-size:17px;
+}
+
+.offerRow{
+    display:grid;
+    grid-template-columns:minmax(90px,1.3fr) minmax(65px,.8fr) 65px 74px;
+    align-items:center;
+    gap:7px;
+    padding:10px 12px;
+    border-top:1px dashed #9b8260;
+}
+
+.offerRow:first-child{
+    border-top:none;
+}
+
+.pointCard{
+    width:100%;
+    max-width:850px;
+    margin:0 auto 12px;
+    text-align:left;
+}
+
+.pointCard .point{
+    margin:0;
+    font-size:18px;
+    font-weight:bold;
+    color:#302318;
+}
+
+.pointCard .offerRow{
+    display:flex;
+    justify-content:space-between;
+}
+
+@media(max-width:600px){
+    .offerRow{
+        grid-template-columns:minmax(80px,1fr) 65px 58px 65px;
+        gap:4px;
+        padding:9px 7px;
+        font-size:13px;
+    }
+}
