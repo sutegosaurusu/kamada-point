@@ -959,6 +959,66 @@ async function harvestFarm(
                 workerCount
             );
 
+        const harvestCycleId =
+            latestFarm.plantedAt;
+
+        let totalWorkHours = 0;
+
+        if(harvestCycleId){
+
+            const workersSnapshot =
+                await farmRef
+                    .child(
+                        "harvestWorkers/" +
+                        harvestCycleId
+                    )
+                    .once("value");
+
+            const harvestWorkers =
+                workersSnapshot.val() || {};
+
+            const harvestAt =
+                Number(
+                    latestFarm.harvestAt
+                );
+
+            Object.values(
+                harvestWorkers
+            ).forEach(worker => {
+
+                const joinedAt =
+                    Number(worker?.joinedAt || 0);
+
+                const workEndAt =
+                    Number(worker?.workEndAt || harvestAt);
+
+                const workedMilliseconds =
+                    Math.max(
+                        0,
+                        Math.min(
+                            workEndAt,
+                            harvestAt
+                        ) - joinedAt
+                    );
+
+                totalWorkHours +=
+                    workedMilliseconds / 3600000;
+
+            });
+
+        }
+
+        const harvestBonusMultiplier =
+            calculateHarvestBonusMultiplier(
+                totalWorkHours
+            );
+
+        const finalHarvestAmount =
+            Math.floor(
+                harvestAmount *
+                harvestBonusMultiplier
+            );
+
 
         // ---------------------------------------------
         // インベントリ取得
@@ -1015,7 +1075,7 @@ async function harvestFarm(
 
             quantity:
                 currentQuantity +
-                harvestAmount,
+                finalHarvestAmount,
 
             updatedAt:
                 firebase.database
@@ -1057,7 +1117,7 @@ async function harvestFarm(
 
             crop.name +
             "を" +
-            harvestAmount +
+            finalHarvestAmount +
             "個収穫しました！"
 
         );

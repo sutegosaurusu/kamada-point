@@ -926,6 +926,29 @@ async function startJob(
 
         };
 
+        const harvestCycleId =
+            latestFarm.plantedAt ||
+            latestFarm.harvestAt - crop.growthTime;
+
+        if(harvestCycleId){
+
+            updates[
+                "farms/" +
+                farmId +
+                "/harvestWorkers/" +
+                harvestCycleId +
+                "/" +
+                currentJobsUser.uid
+            ] = {
+
+                joinedAt:startAt,
+
+                workEndAt:endAt
+
+            };
+
+        }
+
 
         updates[
             "farms/" +

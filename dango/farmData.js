@@ -152,6 +152,27 @@ function calculateFarmHarvest(
 }
 
 
+
+// =====================================================
+// 収穫ボーナス
+// =====================================================
+
+function calculateHarvestBonusMultiplier(
+    totalWorkHours
+){
+
+    const hours =
+        Math.max(
+            0,
+            Number(totalWorkHours || 0)
+        );
+
+    return Math.min(
+        1.5,
+        1 + 0.05 * Math.sqrt(hours)
+    );
+}
+
 // =====================================================
 // 成長時間
 // =====================================================
