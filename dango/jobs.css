@@ -164,6 +164,62 @@ header p{
 }
 
 
+.jobCard > .jobButton{
+
+    display:block;
+
+    width:min(240px, calc(100% - 24px));
+
+    margin:15px auto 12px;
+
+    padding:11px 16px;
+
+    background:#765536;
+
+    color:#fff0d1;
+
+    border:2px solid #49311d;
+
+    border-radius:0;
+
+    font-family:inherit;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:3px 3px 0 #4a321e;
+
+}
+
+
+.jobCard > .jobButton:hover{
+
+    background:#8a6542;
+
+}
+
+
+.jobCard > .jobButton:active{
+
+    transform:translate(2px,2px);
+
+    box-shadow:none;
+
+}
+
+
+.jobCard > .jobButton:disabled{
+
+    opacity:.5;
+
+    cursor:not-allowed;
+
+}
+
+
         translateY(3px);
 
     box-shadow:none;
